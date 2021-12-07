@@ -46,6 +46,12 @@ class Segment:
         orientation3 = orientation(segment.endpoint1, segment.endpoint2, self.endpoint1)
         orientation4 = orientation(segment.endpoint2, segment.endpoint2, self.endpoint2)
 
+        # Segments should intersect if they overlap
+        if ((orientation1 == 0 and orientation2 == 0 and orientation3 == 0 and orientation4 == 0) and
+             (on_segment(self.endpoint1, segment.endpoint1, self.endpoint2) or on_segment(self.endpoint1, segment.endpoint2, self.endpoint2) or
+                on_segment(segment.endpoint1, self.endpoint1, segment.endpoint2) or on_segment(segment.endpoint1, self.endpoint2, segment.endpoint2))):
+            return True
+
         # Endpoint of one line situated on other line should not intersect
         if ((orientation1 == 0 and on_segment(self.endpoint1, segment.endpoint1, self.endpoint2)) or
                 (orientation2 == 0 and on_segment(self.endpoint1, segment.endpoint2, self.endpoint2)) or
