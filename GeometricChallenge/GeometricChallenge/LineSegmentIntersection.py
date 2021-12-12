@@ -3,7 +3,11 @@ from cgshop2022utils.io import read_instance, write_instance
 import networkx as nx
 import random
 
+INPUT_FILE = "input_file_name"  # Name of the input file
+OUTPUT_FILE = "intersection_output.txt"  # Name of the output file
 
+
+# Class that represents a single Trapezoid in the Vertical Decomposition
 class Trapezoid:
     def __init__(self, top_segment, left_point, right_point, bottom_segment):
         self.top_segment = top_segment
@@ -15,16 +19,17 @@ class Trapezoid:
         bottom_segment.face_above = self
 
     def find_intersection(self, segment):
-        intersection_list = [self.bottom_segment, self.top_segment]
-        intersection_list = [line for line in intersection_list if line.intersects(segment)]
-
-        if len(intersection_list) > 0:
-            add_intersection_to_output(intersection_list)
+        # Only compare with bottom segment. If it also intersects top segment,
+        # then the intersection will be added when we evaluate the corresponding
+        # trapezoid as segment will also intersect that trapezoid.
+        if self.bottom_segment.intersects(segment) > 0:
+            add_intersection_to_output(self.bottom_segment, segment)
             return True
 
         return False
 
 
+# Class that represents a single line segment between two vertices
 class Segment:
     def __init__(self, endpoint1, endpoint2, face_above):
         self.endpoint1 = endpoint1 if endpoint1.x <= endpoint2.x else endpoint2
@@ -67,9 +72,11 @@ class Segment:
         return False
 
     def orientation_test(self, point):
+        # todo: is this orientation test correct?
         return orientation(self.endpoint1, self.endpoint2, point)
 
 
+# Class that represents a single vertex
 class Vertex:
     def __init__(self, x, y):
         self.x = x
@@ -85,6 +92,7 @@ class Vertex:
             return 1 if point.x > self.x else -1
 
 
+# Class that represents the DAG
 class DagNode:
     def __init__(self, content, left_child, right_child):
         self.content = content
@@ -101,9 +109,13 @@ class DagNode:
             return self.left_child if self.content.orientation_test(point) == 1 else self.right_child
 
     # Add segment
+    def add_segment_to_dag(self, segment):
+        # todo: implement adding segment to dag
+        assert(False, "DagNode: Adding segment not implemented yet")
+        return None
 
 
-# Class that represent the vertical decomposition of a planar graph
+# Class that represents the vertical decomposition of a planar graph
 class VerticalDecomposition:
     def __init__(self, bounding_box):
         self.dag = DagNode(bounding_box, None, None)
@@ -131,14 +143,15 @@ class VerticalDecomposition:
             if face.find_intersection(segment):
                 return False
 
-        # todo: insert segment into dag (recompute vertical decomposition)
+        # Add segment to DAG
+        self.dag.add_segment_to_dag(segment)
         return True
 
 
 # Incrementally build vertical decompositions of planar subgraphs
 def main():
     # Read instance and instantiate graph, bounding box and starting vertical decomposition
-    instance = read_instance('insert_file_name_here')  # read edges from input file
+    instance = read_instance(INPUT_FILE)  # read edges from input file
     g = instance["graph"]
 
     edges = g.edges
@@ -146,6 +159,10 @@ def main():
 
     bounding_box = find_bounding_box(g.nodes)
     vds = [VerticalDecomposition(bounding_box)]
+
+    # Init output file
+    file.open(OUTPUT_FILE, 'w')
+    file.write("%d %d \n" % (edges.len, g.nodes.len))
 
     # Process all edges
     for edge in edges:
@@ -179,9 +196,11 @@ def find_bounding_box(nodes):
     return Trapezoid(Segment(left_top, right_top, None), left_bottom, right_top, Segment(left_bottom, right_bottom, None))
 
 
-def add_intersection_to_output(intersection_list):
-    # todo: waardes wegschrijven naar output file implementeren
-    assert(False, "Main: adding intersection to output not implemented yet")
+# Adds the intersection with segment to the output file
+def add_intersection_to_output(bottom_segment, segment):
+    file = open(OUTPUT_FILE, "a")
+    file.write("%s %s \n" % (bottom_segment, segment))
+    file.close()
     return None
 
 
