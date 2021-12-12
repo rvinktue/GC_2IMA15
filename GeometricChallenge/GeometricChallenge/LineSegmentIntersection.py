@@ -1,5 +1,4 @@
-# Provided by the challenge
-from cgshop2022utils.io import read_instance, write_instance
+from cgshop2022utils.io import read_instance, write_instance  # Provided by the challenge
 import networkx as nx
 import random
 
@@ -9,6 +8,10 @@ OUTPUT_FILE = "intersection_output.txt"  # Name of the output file
 
 # Class that represents a single Trapezoid in the Vertical Decomposition
 class Trapezoid:
+    # todo: hoe gaan we om met meerdere vertices met dezelfde x-values?
+    # zie bv slide 66 van 04-pointlocation; dan zijn er meerdere left en right points
+    # we zouden daar een list van kunnen maken of we moeten een soort van prefix daarop gooien.
+    # Dit maakt wel heel uit voor de implementatie
     def __init__(self, top_segment, left_point, right_point, bottom_segment):
         self.top_segment = top_segment
         self.left_point = left_point
@@ -71,10 +74,6 @@ class Segment:
         # All other cases do not intersect
         return False
 
-    def orientation_test(self, point):
-        # todo: is this orientation test correct?
-        return orientation(self.endpoint1, self.endpoint2, point)
-
 
 # Class that represents a single vertex
 class Vertex:
@@ -91,6 +90,11 @@ class Vertex:
         else:
             return 1 if point.x > self.x else -1
 
+    # Returns True if vertex lies above the segment
+    #         False if vertex lies underneath the segment
+    def is_above(self, segment):
+        return orientation(segment.point1, segment.point2, self) == 2
+
 
 # Class that represents the DAG
 class DagNode:
@@ -105,14 +109,19 @@ class DagNode:
             return self
         elif isinstance(self.content, Vertex):
             return self.left_child if self.content.orientation(point) == -1 else self.right_child
+        elif isinstance(self.content, Segment):
+            return self.left_child if orientation(self.content.endpoint1, self.content.endpoint2, point) == 1 else self.right_child
         else:
-            return self.left_child if self.content.orientation_test(point) == 1 else self.right_child
+            assert(False, "DagNode: Encountered content of unexpected instance %s" % type(self.content).__name__)
+            return None
 
-    # Add segment
-    def add_segment_to_dag(self, segment):
-        # todo: implement adding segment to dag
-        assert(False, "DagNode: Adding segment not implemented yet")
-        return None
+    # Set left child
+    def set_left_child(self, content):
+        self.left_child = DagNode(content, None, None)
+
+    # Set right child
+    def set_right_child(self, content):
+        self.right_child = DagNode(content, None, None)
 
 
 # Class that represents the vertical decomposition of a planar graph
@@ -128,24 +137,84 @@ class VerticalDecomposition:
         return current_node
 
     # Finds all trapezoids that intersect the segment
-    def find_intersecting_faces(self, segment):
-        # todo: implement method to find all faces intersected by segment
-        assert(False, "VD: Find intersecting faces not implemented yet")
+    def find_intersecting_trapezoids(self, segment):
+        # todo: implement method to find all trapezoids intersected by segment (from left to right)
+        assert(False, "VD: Find intersecting trapezoids not implemented yet")
         return []
 
     # Adds a new segment to the vertical decomposition if it does not intersect
     # Returns True if segment could be inserted in this vertical decomposition
     #         False if segment could not be inserted in this vertical decomposition
     def add_segment(self, segment):
-        intersecting_faces = self.find_intersecting_faces(segment)
-        for face in intersecting_faces:
-            # Checks if the segment has an intersection with the boundary of the face
-            if face.find_intersection(segment):
+        intersecting_trapezoids = self.find_intersecting_trapezoids(segment)
+        for trapezoid in intersecting_trapezoids:
+            # Checks if the segment has an intersection with the bottom segment of the trapezoid
+            if trapezoid.find_intersection(segment):
                 return False
 
         # Add segment to DAG
-        self.dag.add_segment_to_dag(segment)
+        self.update(intersecting_trapezoids, segment)
         return True
+
+    # Updates the DAG with the new trapezoids induced by adding segment
+    def update(self, trapezoids, segment):
+        # todo: handle same x-coordinate degenerate cases in case trapezoid has multiple left or right points
+        new_trapezoids, carry = [], None
+        if len(trapezoids) == 1:
+            # Segment is completely contained in a single trapezoid
+            trapezoid = trapezoids[0]
+
+            # Replace trapezoid with four trapezoids
+            trapezoid1 = Trapezoid(trapezoid.top_segment, trapezoid.left_point, segment.endpoint1, trapezoid.bottom_segment)
+            trapezoid2 = Trapezoid(trapezoid.top_segment, segment.endpoint1, segment.endpoint2, segment)
+            trapezoid3 = Trapezoid(segment, segment.endpoint1, segment.endpoint2, trapezoid.bottom_segment)
+            trapezoid4 = Trapezoid(trapezoid.top_segment, segment.endpoint2, trapezoid.right_point, trapezoid.bottom_segment)
+
+            new_trapezoids.extend([trapezoid1, trapezoid2, trapezoid3, trapezoid4])
+        else:
+            for trapezoid in trapezoids:
+                if trapezoid.contains(segment.endpoint1):
+                    # Replace trapezoid with three trapezoids
+                    trapezoid1 = Trapezoid(trapezoid.top_segment, trapezoid.left_point, segment.endpoint1,trapezoid.bottom_segment)
+                    trapezoid2 = Trapezoid(trapezoid.top_segment, segment.endpoint1,
+                                           trapezoid.right_point if trapezoid.right_point.is_above(segment) else None,
+                                           segment)
+                    trapezoid3 = Trapezoid(segment, segment.endpoint1,
+                                           trapezoid.right_point if not trapezoid.right_point.is_above(segment) else None,
+                                           trapezoid.bottom_segment)
+
+                    carry = trapezoid2 if trapezoid2.right_point is None else trapezoid3
+                    new_trapezoids.extend(list(filter(lambda item: item != carry, [trapezoid1, trapezoid2, trapezoid3])))
+                elif trapezoid.contains(segment.endpoint2):
+                    assert(carry is not None, "VD: Expected a carry, but none found")
+
+                    # Replace trapezoid with three trapezoids
+                    trapezoid1 = Trapezoid(trapezoid.top_segment,
+                                           trapezoid.left_point if trapezoid.left_point.is_above(segment) else carry.left_point,
+                                           segment.endpoint2, segment)
+                    trapezoid2 = Trapezoid(segment,
+                                           trapezoid.left_point if not trapezoid.left_point.is_above(segment) else carry.left_point,
+                                           segment.endpoint2, trapezoid.bottom_segment)
+                    trapezoid3 = Trapezoid(trapezoid.top_segment, segment.endpoint2, trapezoid.right_point, trapezoid.bottom_segment)
+
+                    new_trapezoids.extend([trapezoid1, trapezoid2, trapezoid3])
+                else:  # Trapezoid is separated by segment
+                    assert (carry is not None, "VD: Expected a carry, but none found")
+
+                    # Replace trapezoid with two trapezoids
+                    trapezoid1 = Trapezoid(trapezoid.top_segment,
+                                           trapezoid.left_point if trapezoid.left_point.is_above(segment) else carry.left_point,
+                                           trapezoid.right_point if trapezoid.right_point.is_above(segment) else None,
+                                           segment)
+                    trapezoid2 = Trapezoid(segment,
+                                           trapezoid.left_point if not trapezoid.left_point.is_above(segment) else carry.left_point,
+                                           trapezoid.right_point if not trapezoid.right_point.is_above(segment) else None,
+                                           trapezoid.bottom_segment)
+
+                    carry = trapezoid1 if trapezoid1.right_point is None else trapezoid2
+                    new_trapezoids.extend(list(filter(lambda item: item != carry, [trapezoid1, trapezoid2])))
+
+        # todo: update DAG (replace trapezoids with new_trapezoids)
 
 
 # Incrementally build vertical decompositions of planar subgraphs
@@ -162,7 +231,7 @@ def main():
 
     # Init output file
     file.open(OUTPUT_FILE, 'w')
-    file.write("%d %d \n" % (edges.len, g.nodes.len))
+    file.write("%d %d \n" % (len(edges), len(g.nodes)))
 
     # Process all edges
     for edge in edges:
@@ -201,7 +270,6 @@ def add_intersection_to_output(bottom_segment, segment):
     file = open(OUTPUT_FILE, "a")
     file.write("%s %s \n" % (bottom_segment, segment))
     file.close()
-    return None
 
 
 # Returns 0 if the three points are collinear,
