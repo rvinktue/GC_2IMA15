@@ -21,7 +21,7 @@ class Trapezoid:
         # Only compare with bottom segment. If it also intersects top segment,
         # then the intersection will be added when we evaluate the corresponding
         # trapezoid as segment will also intersect that trapezoid.
-        if self.bottom_segment.intersects(segment) > 0:
+        if self.bottom_segment.intersects(segment):
             add_intersection_to_output(self.bottom_segment, segment)
             return True
 
@@ -30,8 +30,11 @@ class Trapezoid:
     # Returns True if the segment crosses this trapezoid
     #         False otherwise
     def intersects_segment(self, segment):
-        # Left lies above right
-        return orientation(segment.endpoint1, segment.endpoint2, self.bottom_segment.endpoint1) == 1 and orientation(segment.endpoint1, segment.endpoint2, self.top_segment.endpoint1) == 2
+        # If segment crosses trapezoid, then it must cross one of the four boundaries
+        return (self.bottom_segment.intersects(segment) or
+                self.top_segment.intersects(segment) or
+                Segment(self.top_segment.endpoint1, self.bottom_segment.endpoint1, None).intersects(segment) or
+                Segment(self.top_segment.endpoint2, self.bottom_segment.endpoint2, None).intersects(segment))
 
 
 
