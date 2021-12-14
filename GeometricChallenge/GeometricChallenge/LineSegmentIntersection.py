@@ -1,5 +1,4 @@
 from cgshop2022utils.io import read_instance, write_instance  # Provided by the challenge
-import networkx as nx
 import random
 
 INPUT_FILE = "input_file_name"  # Name of the input file
@@ -8,14 +7,10 @@ OUTPUT_FILE = "intersection_output.txt"  # Name of the output file
 
 # Class that represents a single Trapezoid in the Vertical Decomposition
 class Trapezoid:
-    # todo: hoe gaan we om met meerdere vertices met dezelfde x-values?
-    # zie bv slide 66 van 04-pointlocation; dan zijn er meerdere left en right points
-    # we zouden daar een list van kunnen maken of we moeten een soort van prefix daarop gooien.
-    # Dit maakt wel heel uit voor de implementatie
-    def __init__(self, top_segment, left_point, right_point, bottom_segment):
+    def __init__(self, top_segment, left_points, right_points, bottom_segment):
         self.top_segment = top_segment
-        self.left_point = left_point
-        self.right_point = right_point
+        self.left_points = left_points
+        self.right_points = right_points
         self.bottom_segment = bottom_segment
         self.neighbours = []
         # Update bottom segment reference
@@ -139,6 +134,7 @@ class VerticalDecomposition:
     # Finds all trapezoids that intersect the segment
     def find_intersecting_trapezoids(self, segment):
         # todo: implement method to find all trapezoids intersected by segment (from left to right)
+
         assert(False, "VD: Find intersecting trapezoids not implemented yet")
         return []
 
@@ -147,10 +143,15 @@ class VerticalDecomposition:
     #         False if segment could not be inserted in this vertical decomposition
     def add_segment(self, segment):
         intersecting_trapezoids = self.find_intersecting_trapezoids(segment)
+
+        intersection_found = False
         for trapezoid in intersecting_trapezoids:
             # Checks if the segment has an intersection with the bottom segment of the trapezoid
             if trapezoid.find_intersection(segment):
-                return False
+                intersection_found = True
+
+        if intersection_found:
+            return False
 
         # Add segment to DAG
         self.update(intersecting_trapezoids, segment)
@@ -165,17 +166,18 @@ class VerticalDecomposition:
             trapezoid = trapezoids[0]
 
             # Replace trapezoid with four trapezoids
-            trapezoid1 = Trapezoid(trapezoid.top_segment, trapezoid.left_point, segment.endpoint1, trapezoid.bottom_segment)
+            trapezoid1 = Trapezoid(trapezoid.top_segment, trapezoid.left_points, segment.endpoint1, trapezoid.bottom_segment)
             trapezoid2 = Trapezoid(trapezoid.top_segment, segment.endpoint1, segment.endpoint2, segment)
             trapezoid3 = Trapezoid(segment, segment.endpoint1, segment.endpoint2, trapezoid.bottom_segment)
             trapezoid4 = Trapezoid(trapezoid.top_segment, segment.endpoint2, trapezoid.right_point, trapezoid.bottom_segment)
 
+            trapezoid1.neighbours = [trapezoid2, trapezoid3, trapezoid4, trapezoid.neighbours]
             new_trapezoids.extend([trapezoid1, trapezoid2, trapezoid3, trapezoid4])
         else:
             for trapezoid in trapezoids:
                 if trapezoid.contains(segment.endpoint1):
                     # Replace trapezoid with three trapezoids
-                    trapezoid1 = Trapezoid(trapezoid.top_segment, trapezoid.left_point, segment.endpoint1,trapezoid.bottom_segment)
+                    trapezoid1 = Trapezoid(trapezoid.top_segment, trapezoid.left_point, segment.endpoint1, trapezoid.bottom_segment)
                     trapezoid2 = Trapezoid(trapezoid.top_segment, segment.endpoint1,
                                            trapezoid.right_point if trapezoid.right_point.is_above(segment) else None,
                                            segment)
@@ -230,8 +232,9 @@ def main():
     vds = [VerticalDecomposition(bounding_box)]
 
     # Init output file
-    file.open(OUTPUT_FILE, 'w')
+    file = open(OUTPUT_FILE, 'w')
     file.write("%d %d \n" % (len(edges), len(g.nodes)))
+    file.close()
 
     # Process all edges
     for edge in edges:
@@ -256,11 +259,10 @@ def find_bounding_box(nodes):
         min_x, min_y, max_x, max_y = min(node[0], min_x), min(node[1], min_y), max(node[0], max_x), max(node[1], max_y)
 
     # Build the trapezoid of the bounding box
-    # todo: even nadenken of het nodig is om ruimte te hebben tussen de bounding box en de nodes (if so, dan `max = max + 1` en `min = min - 1` pakken)
-    left_top = Vertex(min_x, max_y)
-    right_top = Vertex(max_x, max_y)
-    left_bottom = Vertex(min_x, min_y)
-    right_bottom = Vertex(max_x, min_y)
+    left_top = Vertex(min_x - 1, max_y + 1)
+    right_top = Vertex(max_x + 1, max_y + 1)
+    left_bottom = Vertex(min_x - 1, min_y - 1)
+    right_bottom = Vertex(max_x + 1, min_y + 1)
 
     return Trapezoid(Segment(left_top, right_top, None), left_bottom, right_top, Segment(left_bottom, right_bottom, None))
 
