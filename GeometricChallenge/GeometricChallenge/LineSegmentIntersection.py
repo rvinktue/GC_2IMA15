@@ -26,6 +26,12 @@ class Trapezoid:
 
         return False
 
+    # Returns true if the segment crosses this trapezoid
+    def intersects_segment(self, segment):
+        #left lies above right
+        return orientation(segment.endpoint1, segment.endpoint2, self.bottom_segment.endpoint1) == 1 and orientation(segment.endpoint1, segment.endpoint2, self.top_segment.endpoint1) == 2
+
+
 
 # Class that represents a single line segment between two vertices
 class Segment:
@@ -93,10 +99,11 @@ class Vertex:
 
 # Class that represents the DAG
 class DagNode:
-    def __init__(self, content, left_child, right_child):
+    def __init__(self, content, left_child, right_child, parent):
         self.content = content
         self.left_child = left_child
         self.right_child = right_child
+        self.parent = parent
 
     # Choose which child is the successor for the point location search
     def choose_next(self, point):
@@ -112,17 +119,17 @@ class DagNode:
 
     # Set left child
     def set_left_child(self, content):
-        self.left_child = DagNode(content, None, None)
+        self.left_child = DagNode(content, None, None, self)
 
     # Set right child
     def set_right_child(self, content):
-        self.right_child = DagNode(content, None, None)
+        self.right_child = DagNode(content, None, None, self)
 
 
 # Class that represents the vertical decomposition of a planar graph
 class VerticalDecomposition:
     def __init__(self, bounding_box):
-        self.dag = DagNode(bounding_box, None, None)
+        self.dag = DagNode(bounding_box, None, None, None)
 
     # Finds and returns the trapezoid in which the requested point lies
     def find_point_location(self, point):
@@ -133,10 +140,20 @@ class VerticalDecomposition:
 
     # Finds all trapezoids that intersect the segment
     def find_intersecting_trapezoids(self, segment):
-        # todo: implement method to find all trapezoids intersected by segment (from left to right)
+        start_trapezoid = self.find_point_location(segment.endpoint1)
+        end_trapezoid = self.find_point_location(segment.endpoint2)
 
-        assert(False, "VD: Find intersecting trapezoids not implemented yet")
-        return []
+        intersected_trapezoids = [start_trapezoid]
+        current_trapezoid = start_trapezoid
+        while not current_trapezoid == end_trapezoid:
+            # go to the next trapezoid on the path
+            for trap in current_trapezoid.neighbours:
+                if trap.intersects_segment(segment):
+                    #found successor
+                    intersected_trapezoids.append(trap)
+                    current_trapezoid = trap
+                    break
+        return intersected_trapezoids
 
     # Adds a new segment to the vertical decomposition if it does not intersect
     # Returns True if segment could be inserted in this vertical decomposition
@@ -171,7 +188,23 @@ class VerticalDecomposition:
             trapezoid3 = Trapezoid(segment, segment.endpoint1, segment.endpoint2, trapezoid.bottom_segment)
             trapezoid4 = Trapezoid(trapezoid.top_segment, segment.endpoint2, trapezoid.right_point, trapezoid.bottom_segment)
 
-            trapezoid1.neighbours = [trapezoid2, trapezoid3, trapezoid4, trapezoid.neighbours]
+            # update the dag
+            parent_node = trapezoid.parent
+            if parent_node.left_child.content == trapezoid:
+                parent_node.set_left_child(segment.endpoint1)
+                lp_node = parent_node.left_child
+            else:
+                parent_node.set_right(segment.endpoint1)
+                lp_node = parent_node.right_child
+
+            lp_node.set_left_child(trapezoid1)
+            lp_node.set_right_child(segment.endpoint2)
+            lp_node.set_right_child(trapezoid4)
+            lp_node.right_child.set_left_child(segment)
+            segment_node = lp_node.right_child.left_child
+            segment_node.set_left_child(trapezoid3)
+            segment_node.set_right_child(trapezoid2)
+
             new_trapezoids.extend([trapezoid1, trapezoid2, trapezoid3, trapezoid4])
         else:
             for trapezoid in trapezoids:
@@ -187,6 +220,22 @@ class VerticalDecomposition:
 
                     carry = trapezoid2 if trapezoid2.right_point is None else trapezoid3
                     new_trapezoids.extend(list(filter(lambda item: item != carry, [trapezoid1, trapezoid2, trapezoid3])))
+
+                    # update the dag
+                    parent_node = trapezoid.parent
+                    if parent_node.left_child.content == trapezoid:
+                        parent_node.set_left_child(segment.endpoint1)
+                        lp_node = parent_node.left_child
+                    else:
+                        parent_node.set_right(segment.endpoint1)
+                        lp_node = parent_node.right_child
+
+                    lp_node.set_left_child(trapezoid1)
+                    lp_node.set_right_child(segment)
+                    segment_node = lp_node.right_child
+                    segment_node.set_left_child(trapezoid3)
+                    segment_node.set_right_child(trapezoid2)
+
                 elif trapezoid.contains(segment.endpoint2):
                     assert(carry is not None, "VD: Expected a carry, but none found")
 
@@ -200,6 +249,21 @@ class VerticalDecomposition:
                     trapezoid3 = Trapezoid(trapezoid.top_segment, segment.endpoint2, trapezoid.right_point, trapezoid.bottom_segment)
 
                     new_trapezoids.extend([trapezoid1, trapezoid2, trapezoid3])
+
+                    # update the dag
+                    parent_node = trapezoid.parent
+                    if parent_node.left_child.content == trapezoid:
+                        parent_node.set_left_child(segment.endpoint2)
+                        lp_node = parent_node.left_child
+                    else:
+                        parent_node.set_right(segment.endpoint2)
+                        lp_node = parent_node.right_child
+
+                    lp_node.set_right_child(trapezoid3)
+                    lp_node.set_left_child(segment)
+                    segment_node = lp_node.left_child
+                    segment_node.set_left_child(trapezoid2)
+                    segment_node.set_right_child(trapezoid1)
                 else:  # Trapezoid is separated by segment
                     assert (carry is not None, "VD: Expected a carry, but none found")
 
@@ -215,6 +279,20 @@ class VerticalDecomposition:
 
                     carry = trapezoid1 if trapezoid1.right_point is None else trapezoid2
                     new_trapezoids.extend(list(filter(lambda item: item != carry, [trapezoid1, trapezoid2])))
+
+                    # update the dag
+                    parent_node = trapezoid.parent
+                    if parent_node.left_child.content == trapezoid:
+                        parent_node.set_left_child(segment)
+                        lp_node = parent_node.left_child
+                    else:
+                        parent_node.set_right(segment)
+                        lp_node = parent_node.right_child
+
+                    lp_node.set_right_child(trapezoid1)
+                    lp_node.set_left_child(trapezoid2)
+
+
 
         # todo: update DAG (replace trapezoids with new_trapezoids)
 
