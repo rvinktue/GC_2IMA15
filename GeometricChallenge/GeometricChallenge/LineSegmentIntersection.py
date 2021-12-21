@@ -151,12 +151,13 @@ class VerticalDecomposition:
     def find_intersecting_trapezoids(self, segment):
         start_node = self.find_point_location(segment.endpoint1)
         end_node = self.find_point_location(segment.endpoint2)
-
+        print(start_node)
+        print(end_node)
         intersected_trapezoids = [start_node]
         current_node = start_node
         while not current_node == end_node:
             # Go to the next trapezoid on the path
-            for node in current_node.right_neighbours:
+            for node in current_node.content.right_neighbours:
                 trap = node.content
                 assert isinstance(trap, Trapezoid), "expected type(trap) = Trapezoid, found %s" % type(trap).__name__
                 if trap.intersects_segment(segment):
@@ -198,52 +199,82 @@ class VerticalDecomposition:
             assert isinstance(trapezoid, Trapezoid), "Expected type(trapezoid) = Trapezoid, instead found %s" % type(trapezoid).__name__
 
             # Replace trapezoid with four trapezoids
+            # 1 -> 2 -> 3 -> 4
+            # order is top to bottom, then left to right
+            # 1: left of segment
+            # 2: above segment
+            # 3: below segment
+            # 4: right of segment
             trapezoid1 = Trapezoid(trapezoid.top_segment, trapezoid.left_points, segment.endpoint1, trapezoid.bottom_segment)
             trapezoid2 = Trapezoid(trapezoid.top_segment, segment.endpoint1, segment.endpoint2, segment)
             trapezoid3 = Trapezoid(segment, segment.endpoint1, segment.endpoint2, trapezoid.bottom_segment)
             trapezoid4 = Trapezoid(trapezoid.top_segment, segment.endpoint2, trapezoid.right_points, trapezoid.bottom_segment)
 
-            # Update neighbour lists
-            trapezoid1.left_neighbours = trapezoid.left_neighbours
-            trapezoid1.right_neighbours = [trapezoid2, trapezoid3]
-            for left_neighbour in trapezoid1.left_neighbours:
-                for (right_neighbour_index, right_neighbour) in left_neighbour.right_neighbours:
-                    if right_neighbour == trapezoid:
-                        left_neighbour.right_neighbours[right_neighbour_index] = trapezoid1
-
-            trapezoid2.left_neighbours = [trapezoid1]
-            trapezoid2.right_neighbours = [trapezoid4]
-
-            trapezoid3.left_neighbours = [trapezoid1]
-            trapezoid3.right_neighbours = [trapezoid4]
-
-            trapezoid4.left_neighbours = [trapezoid2, trapezoid3]
-            trapezoid4.right_neighbours = trapezoid.right_neighbours
-            for right_neighbour in trapezoid4.right_neighbours:
-                for left_neighbour_index in range(len(right_neighbour.left_neighbours)):
-                    if right_neighbour.left_neighbours[left_neighbour_index] == trapezoid:
-                        right_neighbour.left_neighbours[left_neighbour_index] = trapezoid4
-
             # Update DAG
             parent_node = node.parent
 
-            #   @TODO: Hier is nog geen functionality voor
-            assert parent_node is not None, "case parent node is None has not been implemented yet..."
+            if parent_node is None:
+                # Replace the initial bounding box
+                # new root becomes left endpoint of segment
+                self.dag = DagNode(segment.endpoint1, None, None, None)
+                self.dag.set_left_child(trapezoid1)
+                self.dag.set_right_child(segment.endpoint2)
+                self.dag.right_child.set_right_child(trapezoid4)
+                self.dag.right_child.set_left_child(segment)
+                self.dag.right_child.left_child.set_left_child(trapezoid3)
+                self.dag.right_child.left_child.set_right_child(trapezoid2)
 
-            if parent_node.left_child.content == trapezoid:
-                parent_node.set_left_child(segment.endpoint1)
-                lp_node = parent_node.left_child
+                trap1_node = self.dag.left_child
+                trap2_node = self.dag.right_child.left_child.right_child
+                trap3_node = self.dag.right_child.left_child.left_child
+                trap4_node = self.dag.right_child.right_child
             else:
-                parent_node.set_right(segment.endpoint1)
-                lp_node = parent_node.right_child
+                #   @TODO: Hier is nog geen functionality voor
+                assert parent_node is not None, "case parent node is None has not been implemented yet..."
 
-            lp_node.set_left_child(trapezoid1)
-            lp_node.set_right_child(segment.endpoint2)
-            lp_node.set_right_child(trapezoid4)
-            lp_node.right_child.set_left_child(segment)
-            segment_node = lp_node.right_child.left_child
-            segment_node.set_left_child(trapezoid3)
-            segment_node.set_right_child(trapezoid2)
+                if parent_node.left_child.content == trapezoid:  # If we are the left child
+                    parent_node.set_left_child(segment.endpoint1)  # Left endpoint becomes left child
+                    lp_node = parent_node.left_child  # Left Point node
+                else:
+                    # We are the right child
+                    parent_node.set_right(segment.endpoint1)  # Left endpoint becomes right child
+                    lp_node = parent_node.right_child
+
+                lp_node.set_left_child(trapezoid1)
+                lp_node.set_right_child(segment.endpoint2)
+                lp_node.right_child.set_right_child(trapezoid4)
+                lp_node.right_child.set_left_child(segment)
+                segment_node = lp_node.right_child.left_child
+                segment_node.set_left_child(trapezoid3)
+                segment_node.set_right_child(trapezoid2)
+
+                trap1_node = lp_node.left_child
+                trap2_node = lp_node.right_child.left_child.right_child
+                trap3_node = lp_node.right_child.left_child.left_child
+                trap4_node = lp_node.right_child.right_child
+
+
+            # Update neighbour lists
+            trapezoid1.left_neighbours = trapezoid.left_neighbours
+            trapezoid1.right_neighbours = [trap2_node, trap3_node]
+            for left_neighbour in trapezoid1.left_neighbours:
+                for (right_neighbour_index, right_neighbour) in left_neighbour.right_neighbours:
+                    if right_neighbour == node:
+                        left_neighbour.right_neighbours[right_neighbour_index] = trap1_node
+
+            trapezoid2.left_neighbours = [trap1_node]
+            trapezoid2.right_neighbours = [trap4_node]
+
+            trapezoid3.left_neighbours = [trap1_node]
+            trapezoid3.right_neighbours = [trap4_node]
+
+            trapezoid4.left_neighbours = [trap2_node, trap3_node]
+            trapezoid4.right_neighbours = trapezoid.right_neighbours
+            for right_neighbour in trapezoid4.right_neighbours:
+                for left_neighbour_index in range(len(right_neighbour.left_neighbours)):
+                    if right_neighbour.left_neighbours[left_neighbour_index] == node:
+                        right_neighbour.left_neighbours[left_neighbour_index] = trap4_node
+
         else:
             carry = None
             for node in nodes:
@@ -265,34 +296,6 @@ class VerticalDecomposition:
                     elif not trapezoid3.right_points:
                         carry = trapezoid3
 
-                    # Update neighbour lists
-                    trapezoid1.left_neighbours = trapezoid.left_neighbours
-                    trapezoid1.right_neighbours = [trapezoid2, trapezoid3]
-                    for left_neighbour in trapezoid1.left_neighbours:
-                        for (right_neighbour_index, right_neighbour) in left_neighbour.right_neighbours:
-                            if right_neighbour == trapezoid:
-                                left_neighbour.right_neighbours[right_neighbour_index] = trapezoid1
-
-                    trapezoid2.left_neighbours = [trapezoid1]
-                    if carry == trapezoid2:
-                        trapezoid2.right_neighbours = []
-                    else:
-                        trapezoid2.right_neighbours = [t for t in trapezoid.right_neighbours if len([point for point in t.left_points if point.is_above(segment)]) > 0]
-                    for right_neighbour in trapezoid2.right_neighbours:
-                        for (left_neighbour_index, left_neighbour) in right_neighbour.left_neighbours:
-                            if left_neighbour == trapezoid:
-                                right_neighbour.left_neighbours[left_neighbour_index] = trapezoid2
-
-                    trapezoid3.left_neighbours = [trapezoid1]
-                    if carry == trapezoid3:
-                        trapezoid3.right_neighbours = []
-                    else:
-                        trapezoid3.right_neighbours = [t for t in trapezoid.right_neighbours if len([point for point in t.left_points if not point.is_above(segment)]) > 0]
-                    for right_neighbour in trapezoid3.right_neighbours:
-                        for (left_neighbour_index, left_neighbour) in right_neighbour.left_neighbours:
-                            if left_neighbour == trapezoid:
-                                right_neighbour.left_neighbours[left_neighbour_index] = trapezoid3
-
                     # Update DAG
                     parent_node = trapezoid.parent
 
@@ -311,6 +314,41 @@ class VerticalDecomposition:
                     segment_node.set_left_child(trapezoid3)
                     segment_node.set_right_child(trapezoid2)
 
+                    trap1_node = lp_node.left_child
+                    trap2_node = segment_node.right_child
+                    trap3_node = segment_node.left_child
+
+                    # @TODO: Neighbours moeten naar nodes en niet trapezoids
+                    # Update neighbour lists
+                    trapezoid1.left_neighbours = trapezoid.left_neighbours
+                    trapezoid1.right_neighbours = [trap2_node, trap3_node]
+                    for left_neighbour in trapezoid1.left_neighbours:
+                        for (right_neighbour_index, right_neighbour) in left_neighbour.right_neighbours:
+                            if right_neighbour == node:
+                                left_neighbour.right_neighbours[right_neighbour_index] = trap1_node
+
+                    trapezoid2.left_neighbours = [trap1_node]
+                    if carry == trapezoid2:
+                        trapezoid2.right_neighbours = []
+                    else:
+                        trapezoid2.right_neighbours = [t for t in trapezoid.right_neighbours if len([point for point in t.left_points if point.is_above(segment)]) > 0]
+                    for right_neighbour in trapezoid2.right_neighbours:
+                        for (left_neighbour_index, left_neighbour) in right_neighbour.left_neighbours:
+                            if left_neighbour == node:
+                                right_neighbour.left_neighbours[left_neighbour_index] = trap2_node
+
+                    trapezoid3.left_neighbours = [trap1_node]
+                    if carry == trapezoid3:
+                        trapezoid3.right_neighbours = []
+                    else:
+                        trapezoid3.right_neighbours = [t for t in trapezoid.right_neighbours if len([point for point in t.left_points if not point.is_above(segment)]) > 0]
+                    for right_neighbour in trapezoid3.right_neighbours:
+                        for (left_neighbour_index, left_neighbour) in right_neighbour.left_neighbours:
+                            if left_neighbour == trapezoid:
+                                right_neighbour.left_neighbours[left_neighbour_index] = trap3_node
+
+
+
                 elif trapezoid.contains(segment.endpoint2):
                     left_points_above_segment = [point for point in trapezoid.left_points if point.is_above(segment)]
                     left_points_below_segment = [point for point in trapezoid.left_points if not point.is_above(segment)]
@@ -323,6 +361,7 @@ class VerticalDecomposition:
                     trapezoid2 = Trapezoid(segment, left_points_below_segment, segment.endpoint2, trapezoid.bottom_segment)
                     trapezoid3 = Trapezoid(trapezoid.top_segment, segment.endpoint2, trapezoid.right_points, trapezoid.bottom_segment)
 
+                    # @TODO: Neighbours moeten naar nodes en niet trapezoids
                     # Update neighbour lists
                     if carry is not None and not left_points_above_segment:
                         trapezoid1.left_neighbours = carry.left_neighbours
@@ -377,6 +416,7 @@ class VerticalDecomposition:
                     trapezoid1 = Trapezoid(trapezoid.top_segment, left_points_above_segment, right_points_above_segment, segment)
                     trapezoid2 = Trapezoid(segment, left_points_below_segment, right_points_below_segment, trapezoid.bottom_segment)
 
+                    # @TODO: Neighbours moeten naar nodes en niet trapezoids
                     # Update left neighbour lists
                     if carry is not None and not left_points_above_segment:
                         trapezoid1.left_neighbours = carry.left_neighbours
@@ -404,6 +444,7 @@ class VerticalDecomposition:
                     else:
                         carry = None
 
+                    # @TODO: Neighbours moeten naar nodes en niet trapezoids
                     # Update right neighbour lists
                     if carry == trapezoid1:
                         trapezoid1.right_neighbours = []
@@ -517,9 +558,6 @@ def on_segment(point1, point2, point3):
     return False
 
 
-
-
-
 ##### TESTING #####
 def test_draw_DAG(root):
     trapezoids = get_all_content_of_type(root, Trapezoid)
@@ -539,24 +577,51 @@ def test_draw_DAG(root):
 def test_draw_segment(seg):
     plt.plot([seg.endpoint1.x, seg.endpoint2.x], [seg.endpoint1.y, seg.endpoint2.y], color=(0, 0, 0))
 
+
 def get_all_content_of_type(root, content_type):
     contents = []
     stack = [root]
-    while (len(stack) > 0):
+    while len(stack) > 0:
         node = stack.pop()
+        if node is None:
+            continue
         stack.append(node.left_child)
         stack.append(node.right_child)
-        if (isinstance(node.content, content_type)):
+        if isinstance(node.content, content_type):
             contents.append(node.content)
     return contents
+
 
 def test_draw_trapezoid(trapezoid):
     a = trapezoid.top_segment.endpoint1
     b = trapezoid.top_segment.endpoint2
     c = trapezoid.bottom_segment.endpoint2
     d = trapezoid.bottom_segment.endpoint1
-    xs, ys = zip(*[[a.x,a.y], [b.x,b.y], [c.x,c.y], [d.x,d.y], [a.x,a.y]])
-    plt.plot(xs, ys, color=(1,0,0))
+    lijstje = [a,b,c,d]
+    lijstje.sort(key=lambda x: x.x)
+
+
+    p = lijstje[1]
+    q = lijstje[2]
+
+    p_top = Vertex(p.x, (a.y-b.y)/(a.x-b.x)*(p.x - a.x) + a.y)
+    p_bot = Vertex(p.x, (d.y-c.y)/(d.x-c.x)*(p.x - d.x) + d.y)
+
+    q_top = Vertex(q.x, (a.y - b.y) / (a.x - b.x)*(q.x - a.x) + a.y)
+    q_bot = Vertex(q.x, (d.y - c.y) / (d.x - c.x)*(q.x - d.x) + d.y)
+
+    # top: y = (a.y-b.y)/(a.x-b.x)(x - a.x) + a.y
+    # bot: y = (d.y-c.y)/(d.x-c.x)(x - d.x) + d.y
+
+    xs, ys = zip(*[[p.x, p.y], [p_top.x, p_top.y]])
+    plt.plot(xs, ys, color=(1, 0, 0))
+    xs, ys = zip(*[[p.x, p.y], [p_bot.x, p_bot.y]])
+    plt.plot(xs, ys, color=(1, 0, 0))
+    xs, ys = zip(*[[q.x, q.y], [q_top.x, q_top.y]])
+    plt.plot(xs, ys, color=(1, 0, 0))
+    xs, ys = zip(*[[q.x, q.y], [q_bot.x, q_bot.y]])
+    plt.plot(xs, ys, color=(1, 0, 0))
+
 
 def test_draw_graph(vertices, segments):
     for seg in segments:
@@ -569,10 +634,9 @@ def test_draw_graph(vertices, segments):
 
 
 
-vertices = [Vertex(1, 1), Vertex(2, 2), Vertex(1, 2), Vertex(2, 1)]
+vertices = [Vertex(1, 1), Vertex(5, 5), Vertex(2, 3), Vertex(3, 4)]
 vd = VerticalDecomposition(find_bounding_box(vertices))
 segments = [Segment(vertices[0], vertices[1]),
-            Segment(vertices[1], vertices[2]),
             Segment(vertices[2], vertices[3]),
            ]
 
@@ -581,7 +645,9 @@ segments = [Segment(vertices[0], vertices[1]),
 
 for seg in segments:
     is_added = vd.add_segment(seg)
-    if (is_added):
+    if is_added:
         print("Added: (%s, %s) -> (%s, %s)" % (seg.endpoint1.x, seg.endpoint1.y, seg.endpoint2.x, seg.endpoint2.y))
+        test_draw_DAG(vd.dag)
+        plt.show()
     else:
         print("Could not add: (%s, %s) -> (%s, %s)" % (seg.endpoint1.x, seg.endpoint1.y, seg.endpoint2.x, seg.endpoint2.y))
