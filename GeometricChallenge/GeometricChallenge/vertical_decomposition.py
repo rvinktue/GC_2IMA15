@@ -138,7 +138,7 @@ class VerticalDecomposition:
                     if right_neighbour == node:
                         left_neighbour.right_neighbours[right_neighbour_index] = trap_node1
 
-            trap_node1.left_neighbours = [trap_node1]
+            trap_node2.left_neighbours = [trap_node1]
             trap_node2.right_neighbours = [trap_node4]
 
             trap_node3.left_neighbours = [trap_node1]

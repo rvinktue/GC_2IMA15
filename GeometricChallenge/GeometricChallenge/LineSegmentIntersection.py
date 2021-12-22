@@ -81,7 +81,7 @@ def get_all_content_of_type(root, content_type):
     return contents
 
 
-def test_draw_trapezoid(trapezoid):
+def test_draw_trapezoid(trapezoid, color = (1, 0, 0)):
     a = trapezoid.top_segment.endpoint1
     b = trapezoid.top_segment.endpoint2
     c = trapezoid.bottom_segment.endpoint2
@@ -103,19 +103,19 @@ def test_draw_trapezoid(trapezoid):
     # bot: y = (d.y-c.y)/(d.x-c.x)(x - d.x) + d.y
 
     xs, ys = zip(*[[p.x, p.y], [p_top.x, p_top.y]])
-    plt.plot(xs, ys, color=(1, 0, 0))
+    plt.plot(xs, ys, color=color)
     xs, ys = zip(*[[p.x, p.y], [p_bot.x, p_bot.y]])
-    plt.plot(xs, ys, color=(1, 0, 0))
+    plt.plot(xs, ys, color=color)
     xs, ys = zip(*[[q.x, q.y], [q_top.x, q_top.y]])
-    plt.plot(xs, ys, color=(1, 0, 0))
+    plt.plot(xs, ys, color=color)
     xs, ys = zip(*[[q.x, q.y], [q_bot.x, q_bot.y]])
-    plt.plot(xs, ys, color=(1, 0, 0))
+    plt.plot(xs, ys, color=color)
 
 
     xs, ys = zip(*[[q_top.x, q_top.y], [p_top.x, p_top.y]])
-    plt.plot(xs, ys, color=(1, 0, 0))
+    plt.plot(xs, ys, color=color)
     xs, ys = zip(*[[q_bot.x, q_bot.y], [p_bot.x, p_bot.y]])
-    plt.plot(xs, ys, color=(1, 0, 0))
+    plt.plot(xs, ys, color=color)
 
 
 def test_draw_graph(vertices, segments):
@@ -134,12 +134,22 @@ vertices = [vertclass.Vertex(1, 1), vertclass.Vertex(10, 1),
 vd = vdclass.VerticalDecomposition(geometry.find_bounding_box(vertices))
 
 segments = [
-            segclass.Segment(vertices[2], vertices[3]),
             segclass.Segment(vertices[0], vertices[1]),
+            segclass.Segment(vertices[2], vertices[3]),
            ]
 
 #test_draw_graph(vertices,segments)
 #plt.show()
+
+vd.add_segment(segments[0])
+node = vd.find_point_location(vertclass.Vertex(5, 2))
+for n in node.right_neighbours:
+    test_draw_trapezoid(n.content)
+test_draw_trapezoid(node.content, (0, 0, 1))
+plt.show()
+test_draw_DAG(vd.dag)
+plt.show()
+
 
 for seg in segments:
     print("Before adding: ")
