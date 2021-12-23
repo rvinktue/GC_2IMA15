@@ -86,12 +86,10 @@ def test_draw_trapezoid(trapezoid, color = (1, 0, 0)):
     b = trapezoid.top_segment.endpoint2
     c = trapezoid.bottom_segment.endpoint2
     d = trapezoid.bottom_segment.endpoint1
-    lijstje = [a,b,c,d]
-    lijstje.sort(key=lambda x: x.x)
 
 
-    p = lijstje[1]
-    q = lijstje[2]
+    p = trapezoid.left_points[0]
+    q = trapezoid.right_points[0]
 
     p_top = vertclass.Vertex(p.x, (a.y-b.y)/(a.x-b.x)*(p.x - a.x) + a.y)
     p_bot = vertclass.Vertex(p.x, (d.y-c.y)/(d.x-c.x)*(p.x - d.x) + d.y)
@@ -129,9 +127,8 @@ def test_draw_graph(vertices, segments):
 
 
 vertices = [vertclass.Vertex(1, 1), vertclass.Vertex(10, 1),
-            vertclass.Vertex(11, 1), vertclass.Vertex(12, 1),
+            vertclass.Vertex(0, 2), vertclass.Vertex(2, 2),
             ]
-vd = vdclass.VerticalDecomposition(geometry.find_bounding_box(vertices))
 
 segments = [
             segclass.Segment(vertices[0], vertices[1]),
@@ -141,26 +138,23 @@ segments = [
 #test_draw_graph(vertices,segments)
 #plt.show()
 
-vd.add_segment(segments[0])
-node = vd.find_point_location(vertclass.Vertex(5, 2))
-for n in node.right_neighbours:
-    test_draw_trapezoid(n.content)
-test_draw_trapezoid(node.content, (0, 0, 1))
-plt.show()
-test_draw_DAG(vd.dag)
-plt.show()
+#vd = vdclass.VerticalDecomposition(geometry.find_bounding_box(vertices))
+#vd.add_segment(segments[0])
+#node = vd.find_point_location(vertclass.Vertex(0, 0))
+#for n in node.right_neighbours:
+#    test_draw_trapezoid(n.content)
+#test_draw_trapezoid(node.content, (0, 0, 1))
+#plt.show()
+#test_draw_DAG(vd.dag)
+#plt.show()
 
+vd = vdclass.VerticalDecomposition(geometry.find_bounding_box(vertices))
 
 for seg in segments:
-    print("Before adding: ")
-    trap1 = vd.find_point_location(seg.endpoint1).content
-    trap2 = vd.find_point_location(seg.endpoint2).content
-    print("First trapezoid: %s" % trap1)
-    print("Second trapezoid: %s" % trap2)
-    test_draw_trapezoid(trap1)
-    # plt.show()
-    test_draw_trapezoid(trap2)
-    # plt.show()
+    trap_node1 = vd.find_point_location(seg.endpoint1)
+    trap_node2 = vd.find_point_location(seg.endpoint2)
+    trap1 = trap_node1.content
+    trap2 = trap_node2.content
     is_added = vd.add_segment(seg)
     if is_added:
         print("Added: (%s, %s) -> (%s, %s)" % (seg.endpoint1.x, seg.endpoint1.y, seg.endpoint2.x, seg.endpoint2.y))

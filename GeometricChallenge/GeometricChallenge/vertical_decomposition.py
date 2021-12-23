@@ -20,8 +20,6 @@ class VerticalDecomposition:
     def find_intersecting_trapezoids(self, segment):
         start_node = self.find_point_location(segment.endpoint1)
         end_node = self.find_point_location(segment.endpoint2)
-        print(start_node)
-        print(end_node)
         intersected_trapezoids = [start_node]
         current_node = start_node
         while not current_node == end_node:
@@ -29,21 +27,20 @@ class VerticalDecomposition:
             for node in current_node.right_neighbours:
                 trap = node.content
                 assert isinstance(trap, trapclass.Trapezoid), "expected type(trap) = Trapezoid, found %s" % type(trap).__name__
-                if trap.intersects_segment(segment):
+                if trap.segment_enter(segment):
                     # Found the successor
                     intersected_trapezoids.append(node)
                     current_node = node
                     break
 
+        print("Segment forms path through %s trapezoids" % len(intersected_trapezoids))
         return intersected_trapezoids
 
     # Adds a new segment to the vertical decomposition if it does not intersect
     # Returns True if segment could be inserted in this vertical decomposition
     #         False if segment could not be inserted in this vertical decomposition
     def add_segment(self, segment):
-        print("Adding segments")
         intersecting_trapezoids = self.find_intersecting_trapezoids(segment)
-        print("Found intersecting trapezoids")
 
         intersection_found = False
         for node in intersecting_trapezoids:
@@ -103,6 +100,7 @@ class VerticalDecomposition:
             parent_node = node.parent
 
             if parent_node is None:
+                print("[VD] [Single trapezoid] replace initial bounding box")
                 # Replace the initial bounding box
                 # new root becomes left endpoint of segment
                 self.dag = dag.DagNode(segment.endpoint1)
@@ -131,7 +129,7 @@ class VerticalDecomposition:
 
 
             # Update neighbour lists
-            trap_node1.left_neighbours = node.left_neighbours
+            trap_node1.left_neighbours = node.left_neighbours[:]
             trap_node1.right_neighbours = [trap_node2, trap_node3]
             for left_neighbour in trap_node1.left_neighbours:
                 for (right_neighbour_index, right_neighbour) in enumerate(left_neighbour.right_neighbours):
@@ -145,7 +143,7 @@ class VerticalDecomposition:
             trap_node3.right_neighbours = [trap_node4]
 
             trap_node4.left_neighbours = [trap_node2, trap_node3]
-            trap_node4.right_neighbours = node.right_neighbours
+            trap_node4.right_neighbours = node.right_neighbours[:]
             for right_neighbour in trap_node4.right_neighbours:
                 for (left_neighbour_index, left_neighbour) in enumerate(right_neighbour.left_neighbours):
                     if left_neighbour == node:
@@ -160,7 +158,7 @@ class VerticalDecomposition:
                 assert isinstance(trapezoid, trapclass.Trapezoid),\
                     "Expected type(trapezoid) = Trapezoid, instead found %s" % type(trapezoid).__name__
 
-                print("Calling contains on trapezoid???")
+                #hier zitten we dus in meest linkse trapezoid
                 if trapezoid.contains(segment.endpoint1):
                     right_points_above_segment = [point for point in trapezoid.right_points if point.is_above(segment)]
                     right_points_below_segment = [point for point in trapezoid.right_points if not point.is_above(segment)]
@@ -226,8 +224,7 @@ class VerticalDecomposition:
                             if left_neighbour == trapezoid:
                                 right_neighbour.left_neighbours[left_neighbour_index] = trap_node3
 
-
-
+                #hier zitten we in meest rechtse trapezoid
                 elif trapezoid.contains(segment.endpoint2):
                     left_points_above_segment = [point for point in trapezoid.left_points if point.is_above(segment)]
                     left_points_below_segment = [point for point in trapezoid.left_points if not point.is_above(segment)]

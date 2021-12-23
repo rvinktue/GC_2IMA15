@@ -42,5 +42,5 @@ def find_bounding_box(nodes):
     left_bottom = vertex.Vertex(min_x - 1, min_y - 1)
     right_bottom = vertex.Vertex(max_x + 1, min_y - 1)
 
-    return trapezoid.Trapezoid(segment.Segment(left_top, right_top, None), left_bottom, right_top, segment.Segment(left_bottom, right_bottom, None))
+    return trapezoid.Trapezoid(segment.Segment(left_top, right_top, None), [left_bottom], [right_top], segment.Segment(left_bottom, right_bottom, None))
 
