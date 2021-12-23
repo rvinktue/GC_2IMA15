@@ -63,8 +63,8 @@ def test_draw_DAG(root):
         plt.scatter(v.x, v.y, color=(0,0,1))
 
 
-def test_draw_segment(seg):
-    plt.plot([seg.endpoint1.x, seg.endpoint2.x], [seg.endpoint1.y, seg.endpoint2.y], color=(0, 0, 0))
+def test_draw_segment(seg, color=(0, 0, 0)):
+    plt.plot([seg.endpoint1.x, seg.endpoint2.x], [seg.endpoint1.y, seg.endpoint2.y], color=color)
 
 
 def get_all_content_of_type(root, content_type):
@@ -82,38 +82,16 @@ def get_all_content_of_type(root, content_type):
 
 
 def test_draw_trapezoid(trapezoid, color = (1, 0, 0)):
-    a = trapezoid.top_segment.endpoint1
-    b = trapezoid.top_segment.endpoint2
-    c = trapezoid.bottom_segment.endpoint2
-    d = trapezoid.bottom_segment.endpoint1
+    p_top = trapezoid.left_segment.endpoint2
+    p_bot = trapezoid.left_segment.endpoint1
 
+    q_top = trapezoid.right_segment.endpoint2
+    q_bot = trapezoid.right_segment.endpoint1
 
-    p = trapezoid.left_points[0]
-    q = trapezoid.right_points[0]
-
-    p_top = vertclass.Vertex(p.x, (a.y-b.y)/(a.x-b.x)*(p.x - a.x) + a.y)
-    p_bot = vertclass.Vertex(p.x, (d.y-c.y)/(d.x-c.x)*(p.x - d.x) + d.y)
-
-    q_top = vertclass.Vertex(q.x, (a.y - b.y) / (a.x - b.x)*(q.x - a.x) + a.y)
-    q_bot = vertclass.Vertex(q.x, (d.y - c.y) / (d.x - c.x)*(q.x - d.x) + d.y)
-
-    # top: y = (a.y-b.y)/(a.x-b.x)(x - a.x) + a.y
-    # bot: y = (d.y-c.y)/(d.x-c.x)(x - d.x) + d.y
-
-    xs, ys = zip(*[[p.x, p.y], [p_top.x, p_top.y]])
-    plt.plot(xs, ys, color=color)
-    xs, ys = zip(*[[p.x, p.y], [p_bot.x, p_bot.y]])
-    plt.plot(xs, ys, color=color)
-    xs, ys = zip(*[[q.x, q.y], [q_top.x, q_top.y]])
-    plt.plot(xs, ys, color=color)
-    xs, ys = zip(*[[q.x, q.y], [q_bot.x, q_bot.y]])
-    plt.plot(xs, ys, color=color)
-
-
-    xs, ys = zip(*[[q_top.x, q_top.y], [p_top.x, p_top.y]])
-    plt.plot(xs, ys, color=color)
-    xs, ys = zip(*[[q_bot.x, q_bot.y], [p_bot.x, p_bot.y]])
-    plt.plot(xs, ys, color=color)
+    test_draw_segment(trapezoid.left_segment, color)
+    test_draw_segment(trapezoid.right_segment, color)
+    test_draw_segment(segclass.Segment(p_top, q_top), color)
+    test_draw_segment(segclass.Segment(p_bot, q_bot), color)
 
 
 def test_draw_graph(vertices, segments):
@@ -127,26 +105,14 @@ def test_draw_graph(vertices, segments):
 
 
 vertices = [vertclass.Vertex(1, 1), vertclass.Vertex(10, 1),
-            vertclass.Vertex(0, 2), vertclass.Vertex(2, 2),
+            vertclass.Vertex(1, 2), vertclass.Vertex(3, 2),
+            vertclass.Vertex(5, 2), vertclass.Vertex(7, 2),
+            vertclass.Vertex(9, 2), vertclass.Vertex(11, 2),
+            vertclass.Vertex(0, 3), vertclass.Vertex(2, 3),
             ]
 
-segments = [
-            segclass.Segment(vertices[0], vertices[1]),
-            segclass.Segment(vertices[2], vertices[3]),
-           ]
+segments = [ segclass.Segment(vertices[2*i], vertices[2*i+1]) for i in range(len(vertices)//2) ]
 
-#test_draw_graph(vertices,segments)
-#plt.show()
-
-#vd = vdclass.VerticalDecomposition(geometry.find_bounding_box(vertices))
-#vd.add_segment(segments[0])
-#node = vd.find_point_location(vertclass.Vertex(0, 0))
-#for n in node.right_neighbours:
-#    test_draw_trapezoid(n.content)
-#test_draw_trapezoid(node.content, (0, 0, 1))
-#plt.show()
-#test_draw_DAG(vd.dag)
-#plt.show()
 
 vd = vdclass.VerticalDecomposition(geometry.find_bounding_box(vertices))
 

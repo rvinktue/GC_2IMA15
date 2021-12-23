@@ -25,17 +25,24 @@ class Trapezoid:
         c = self.bottom_segment.endpoint2
         d = self.bottom_segment.endpoint1
 
-        p = self.left_points[0]
-        q = self.right_points[0]
+        if len(self.left_points) > 0:
+            px = self.left_points[0].x
+        else:
+            px = max(a.x, d.x)
+        if len(self.right_points) > 0:
+            qx = self.right_points[0].x
+        else:
+            qx = min(b.x, c.x)
 
-        p_top = vertclass.Vertex(p.x, (a.y - b.y) / (a.x - b.x) * (p.x - a.x) + a.y)
-        p_bot = vertclass.Vertex(p.x, (d.y - c.y) / (d.x - c.x) * (p.x - d.x) + d.y)
+        p_top = vertclass.Vertex(px, (a.y - b.y) / (a.x - b.x) * (px - a.x) + a.y)
+        p_bot = vertclass.Vertex(px, (d.y - c.y) / (d.x - c.x) * (px - d.x) + d.y)
 
-        q_top = vertclass.Vertex(q.x, (a.y - b.y) / (a.x - b.x) * (q.x - a.x) + a.y)
-        q_bot = vertclass.Vertex(q.x, (d.y - c.y) / (d.x - c.x) * (q.x - d.x) + d.y)
+        q_top = vertclass.Vertex(qx, (a.y - b.y) / (a.x - b.x) * (qx - a.x) + a.y)
+        q_bot = vertclass.Vertex(qx, (d.y - c.y) / (d.x - c.x) * (qx - d.x) + d.y)
 
         self.left_segment = seg_type.Segment(p_bot, p_top)
         self.right_segment = seg_type.Segment(q_bot, q_top)
+
 
     def find_intersection(self, segment):
         # Only compare with bottom segment. If it also intersects top segment,
