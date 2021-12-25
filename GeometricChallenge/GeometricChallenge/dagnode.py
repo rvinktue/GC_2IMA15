@@ -6,7 +6,7 @@ import geometry
 
 # Class that represents the DAG
 class DagNode:
-    def __init__(self, content, left_child = None, right_child = None, parent = None):
+    def __init__(self, content, left_child=None, right_child=None, parent=None):
         self.content = content
         self.left_child = left_child
         self.right_child = right_child
@@ -26,6 +26,17 @@ class DagNode:
                 else self.right_child
         else:
             assert False, "DagNode: Encountered content of unexpected instance %s" % type(self.content).__name__
+
+    # Find all objects of class
+    def find_all(self, object_class):
+        output = []
+        if isinstance(self.content, object_class):
+            output.append(self)
+        if self.left_child is not None:
+            output += self.left_child.find_all(object_class)
+        if self.right_child is not None:
+            output += self.right_child.find_all(object_class)
+        return output
 
     # Set left child
     def set_left_child(self, other):

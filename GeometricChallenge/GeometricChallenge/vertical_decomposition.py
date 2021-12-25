@@ -17,13 +17,17 @@ class VerticalDecomposition:
             % type(current_node.content).__name__
         return current_node  # Return DAG node containing trapezoid
 
-    # Finds all trapezoids that intersect the segment
+    # Finds all trapezoids intersected by segment (assuming segment does not intersect any existing edges in the VD)
     def find_intersecting_trapezoids(self, segment):
         start_node = self.find_point_location(segment.endpoint1)
         end_node = self.find_point_location(segment.endpoint2)
         intersected_trapezoids = [start_node]
         current_node = start_node
-        while not current_node == end_node:
+
+        while current_node is not end_node:
+            print(current_node, vars(current_node))
+            assert current_node.right_neighbours != [], "Current node has no neighbours, but is not end node"
+
             # Go to the next trapezoid on the path
             for node in current_node.right_neighbours:
                 trap = node.content
@@ -42,34 +46,27 @@ class VerticalDecomposition:
     # Returns True if segment could be inserted in this vertical decomposition
     #         False if segment could not be inserted in this vertical decomposition
     def add_segment(self, segment):
-        intersecting_trapezoids = self.find_intersecting_trapezoids(segment)
+        # Naively check all trapezoids for intersections @TODO: we can probably improve this
+        all_trapezoids = self.dag.find_all(trapclass.Trapezoid)
 
         intersection_found = False
-        for node in intersecting_trapezoids:
+        for node in all_trapezoids:
             trapezoid = node.content
             assert isinstance(trapezoid, trapclass.Trapezoid), \
                 "Expected type(trapezoid) = Trapezoid, instead found %s" % type(trapezoid).__name__
             # Checks if the segment has an intersection with the bottom segment of the trapezoid
-            if trapezoid.find_intersection(segment):
-                print("Intersection found between (%s, %s) -> (%s, %s) and (%s, %s) -> (%s, %s)"
-                      % (trapezoid.bottom_segment.endpoint1.x,
-                         trapezoid.bottom_segment.endpoint1.y,
-                         trapezoid.bottom_segment.endpoint2.x,
-                         trapezoid.bottom_segment.endpoint2.y,
-                         segment.endpoint1.x,
-                         segment.endpoint1.y,
-                         segment.endpoint2.x,
-                         segment.endpoint2.y))
+            if trapezoid.is_violated_by_segment(segment):
                 intersection_found = True
 
         if intersection_found:
             return False
 
         # Add segment to DAG
-        self.update(intersecting_trapezoids, segment)
+        self.update(self.find_intersecting_trapezoids(segment), segment)
         return True
 
     # Updates the DAG with the new trapezoids induced by adding segment
+    # @TODO: updating neighbours gaat nog fout
     def update(self, nodes, segment):
         if len(nodes) == 1:
             print("Segment entirely contained in a single trapezoid")

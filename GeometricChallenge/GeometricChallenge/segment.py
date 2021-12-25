@@ -3,7 +3,7 @@ import geometry
 
 # Class that represents a single line segment between two vertices
 class Segment:
-    def __init__(self, endpoint1, endpoint2, face_above = None):
+    def __init__(self, endpoint1, endpoint2, face_above=None):
         self.endpoint1 = endpoint1 if endpoint1.x <= endpoint2.x else endpoint2
         self.endpoint2 = endpoint2 if endpoint1.x <= endpoint2.x else endpoint1
         self.face_above = face_above
@@ -14,7 +14,7 @@ class Segment:
         orientation1 = geometry.orientation(self.endpoint1, self.endpoint2, segment.endpoint1)
         orientation2 = geometry.orientation(self.endpoint1, self.endpoint2, segment.endpoint2)
         orientation3 = geometry.orientation(segment.endpoint1, segment.endpoint2, self.endpoint1)
-        orientation4 = geometry.orientation(segment.endpoint2, segment.endpoint2, self.endpoint2)
+        orientation4 = geometry.orientation(segment.endpoint1, segment.endpoint2, self.endpoint2)
 
         # Segments should intersect if they overlap
         if ((orientation1 == geometry.CL and orientation2 == geometry.CL

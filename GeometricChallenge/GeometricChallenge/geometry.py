@@ -2,14 +2,14 @@ import vertex
 import segment
 import trapezoid
 
-# Returns 0 if the three points are collinear,
-#         1 if traversing the points in order of arguments given makes a right turn (clockwise)
-#        -1 if traversing the points in order of arguments given makes a left turn (counterclockwise)
 COLLINEAR = CL = 0
 CLOCKWISE = CW = 1
 COUNTERCLOCKWISE = CCW = -1
 
 
+# Returns 0 if the three points are collinear,
+#         1 if traversing the points in order of arguments given makes a right turn (clockwise)
+#        -1 if traversing the points in order of arguments given makes a left turn (counterclockwise)
 def orientation(point1, point2, point3):
     val = (float(point2.y - point1.y) * (point3.x - point2.x)) - (float(point2.x - point1.x) * (point3.y - point2.y))
     if val > 0:

@@ -106,7 +106,7 @@ vertices = [vertclass.Vertex(2, 1), vertclass.Vertex(10, 1),
             vertclass.Vertex(1, 2), vertclass.Vertex(3, 2),
             vertclass.Vertex(5, 2), vertclass.Vertex(7, 2),
             vertclass.Vertex(9, 2), vertclass.Vertex(11, 2),
-            vertclass.Vertex(0, 3), vertclass.Vertex(2, 3),
+            vertclass.Vertex(0, 3), vertclass.Vertex(10, 3),
             ]
 segments = [segclass.Segment(vertices[2 * i], vertices[2 * i + 1]) for i in range(len(vertices) // 2)]
 vd = vdclass.VerticalDecomposition(geometry.find_bounding_box(vertices))

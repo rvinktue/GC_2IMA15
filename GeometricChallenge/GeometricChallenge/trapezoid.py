@@ -42,26 +42,19 @@ class Trapezoid:
         self.left_segment = seg_type.Segment(p_bot, p_top)
         self.right_segment = seg_type.Segment(q_bot, q_top)
 
-    def find_intersection(self, segment):
-        # Only compare with bottom segment. If it also intersects top segment,
-        # then the intersection will be added when we evaluate the corresponding
-        # trapezoid as segment will also intersect that trapezoid.
-        if self.bottom_segment.intersects(segment):
-            return self.bottom_segment
-
-        return None
-
     def segment_enter(self, segment):
         return self.left_segment.intersects(segment)
 
-    # Returns True if the segment crosses this trapezoid
+    # Returns True if the segment crosses top or bottom boundary of this trapezoid
     #         False otherwise
-    def intersects_segment(self, segment):
-        # If segment crosses trapezoid, then it must cross one of the four boundaries
-        return (self.bottom_segment.intersects(segment) or
-                self.top_segment.intersects(segment) or
-                self.left_segment.intersects(segment) or
-                self.right_segment.intersects(segment))
+    def is_violated_by_segment(self, segment):
+        for boundary in [self.bottom_segment, self.top_segment]:
+            if boundary.intersects(segment):
+                print("Intersection found between (%s, %s) -> (%s, %s) and (%s, %s) -> (%s, %s)"
+                      % (boundary.endpoint1.x, boundary.endpoint1.y, boundary.endpoint2.x, boundary.endpoint2.y,
+                         segment.endpoint1.x, segment.endpoint1.y, segment.endpoint2.x, segment.endpoint2.y))
+                return True
+        return False
 
     def contains(self, point):
         return point.is_above(self.bottom_segment) and \
