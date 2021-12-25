@@ -2,17 +2,15 @@ from cgshop2022utils.io import read_instance, write_instance  # Provided by the 
 import random
 import matplotlib.pyplot as plt
 
-
 import trapezoid as trapclass
 import segment as segclass
 import vertex as vertclass
 import vertical_decomposition as vdclass
 import geometry
 
-
-
 INPUT_FILE = "input_file_name"  # Name of the input file
 OUTPUT_FILE = "intersection_output.txt"  # Name of the output file
+
 
 # Incrementally build vertical decompositions of planar subgraphs
 def main():
@@ -60,7 +58,7 @@ def test_draw_DAG(root):
         test_draw_segment(s)
     for v in vertices:
         assert isinstance(v, vertclass.Vertex), "v not a Vertex but a %s" % type(v).__name__
-        plt.scatter(v.x, v.y, color=(0,0,1))
+        plt.scatter(v.x, v.y, color=(0, 0, 1))
 
 
 def test_draw_segment(seg, color=(0, 0, 0)):
@@ -81,7 +79,7 @@ def get_all_content_of_type(root, content_type):
     return contents
 
 
-def test_draw_trapezoid(trapezoid, color = (1, 0, 0)):
+def test_draw_trapezoid(trapezoid, color=(1, 0, 0)):
     p_top = trapezoid.left_segment.endpoint2
     p_bot = trapezoid.left_segment.endpoint1
 
@@ -97,23 +95,20 @@ def test_draw_trapezoid(trapezoid, color = (1, 0, 0)):
 def test_draw_graph(vertices, segments):
     for seg in segments:
         print("(%s, %s) -> (%s, %s)" % (seg.endpoint1.x, seg.endpoint1.y, seg.endpoint2.x, seg.endpoint2.y))
-        plt.plot([seg.endpoint1.x, seg.endpoint2.x], [seg.endpoint1.y, seg.endpoint2.y], color=(0,0,0))
+        plt.plot([seg.endpoint1.x, seg.endpoint2.x], [seg.endpoint1.y, seg.endpoint2.y], color=(0, 0, 0))
     x = [p.x for p in vertices]
     y = [p.y for p in vertices]
     plt.scatter(x, y)
     test_draw_trapezoid(geometry.find_bounding_box(vertices))
 
 
-vertices = [vertclass.Vertex(1, 1), vertclass.Vertex(10, 1),
+vertices = [vertclass.Vertex(2, 1), vertclass.Vertex(10, 1),
             vertclass.Vertex(1, 2), vertclass.Vertex(3, 2),
             vertclass.Vertex(5, 2), vertclass.Vertex(7, 2),
             vertclass.Vertex(9, 2), vertclass.Vertex(11, 2),
             vertclass.Vertex(0, 3), vertclass.Vertex(2, 3),
             ]
-
-segments = [ segclass.Segment(vertices[2*i], vertices[2*i+1]) for i in range(len(vertices)//2) ]
-
-
+segments = [segclass.Segment(vertices[2 * i], vertices[2 * i + 1]) for i in range(len(vertices) // 2)]
 vd = vdclass.VerticalDecomposition(geometry.find_bounding_box(vertices))
 
 for seg in segments:
@@ -127,4 +122,5 @@ for seg in segments:
         test_draw_DAG(vd.dag)
         plt.show()
     else:
-        print("Could not add: (%s, %s) -> (%s, %s)" % (seg.endpoint1.x, seg.endpoint1.y, seg.endpoint2.x, seg.endpoint2.y))
+        print("Could not add: (%s, %s) -> (%s, %s)"
+              % (seg.endpoint1.x, seg.endpoint1.y, seg.endpoint2.x, seg.endpoint2.y))

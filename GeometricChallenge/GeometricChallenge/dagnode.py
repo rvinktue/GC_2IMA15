@@ -3,6 +3,7 @@ import vertex as vert
 import segment as seg
 import geometry
 
+
 # Class that represents the DAG
 class DagNode:
     def __init__(self, content, left_child = None, right_child = None, parent = None):
@@ -37,4 +38,3 @@ class DagNode:
         assert isinstance(other, DagNode), "Expected other to be of type DagNode, found: %s" % type(other).__name__
         self.right_child = other
         other.parent = self
-

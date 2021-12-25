@@ -2,19 +2,20 @@ import dagnode as dag
 import trapezoid as trapclass
 
 
-
 # Class that represents the vertical decomposition of a planar graph
 class VerticalDecomposition:
     def __init__(self, bounding_box):
-        self.dag = dag.DagNode(bounding_box, None, None, None)
+        self.dag = dag.DagNode(bounding_box)
 
     # Finds and returns the trapezoid in which the requested point lies in associated DAG node
     def find_point_location(self, point):
         current_node = self.dag.choose_next(point)
         while not isinstance(current_node.content, trapclass.Trapezoid):
             current_node = current_node.choose_next(point)
-        assert isinstance(current_node.content, trapclass.Trapezoid), "Expected to find type(current_node.content) = Trapezoid, instead found %s" % type(current_node.content).__name__
-        return current_node #return DAG node containing trapezoid
+        assert isinstance(current_node.content, trapclass.Trapezoid), \
+            "Expected to find type(current_node.content) = Trapezoid, instead found %s" \
+            % type(current_node.content).__name__
+        return current_node  # Return DAG node containing trapezoid
 
     # Finds all trapezoids that intersect the segment
     def find_intersecting_trapezoids(self, segment):
@@ -26,7 +27,8 @@ class VerticalDecomposition:
             # Go to the next trapezoid on the path
             for node in current_node.right_neighbours:
                 trap = node.content
-                assert isinstance(trap, trapclass.Trapezoid), "expected type(trap) = Trapezoid, found %s" % type(trap).__name__
+                assert isinstance(trap, trapclass.Trapezoid), \
+                    "expected type(trap) = Trapezoid, found %s" % type(trap).__name__
                 if trap.segment_enter(segment):
                     # Found the successor
                     intersected_trapezoids.append(node)
@@ -45,7 +47,8 @@ class VerticalDecomposition:
         intersection_found = False
         for node in intersecting_trapezoids:
             trapezoid = node.content
-            assert isinstance(trapezoid, trapclass.Trapezoid), "Expected type(trapezoid) = Trapezoid, instead found %s" % type(trapezoid).__name__
+            assert isinstance(trapezoid, trapclass.Trapezoid), \
+                "Expected type(trapezoid) = Trapezoid, instead found %s" % type(trapezoid).__name__
             # Checks if the segment has an intersection with the bottom segment of the trapezoid
             if trapezoid.find_intersection(segment):
                 print("Intersection found between (%s, %s) -> (%s, %s) and (%s, %s) -> (%s, %s)"
@@ -74,7 +77,8 @@ class VerticalDecomposition:
             node = nodes[0]
             trapezoid = node.content
 
-            assert isinstance(trapezoid, trapclass.Trapezoid), "Expected type(trapezoid) = Trapezoid, instead found %s" % type(trapezoid).__name__
+            assert isinstance(trapezoid, trapclass.Trapezoid), \
+                "Expected type(trapezoid) = Trapezoid, instead found %s" % type(trapezoid).__name__
 
             # Replace trapezoid with four trapezoids
             # 1 -> 2 -> 3 -> 4
@@ -163,20 +167,24 @@ class VerticalDecomposition:
             for node in nodes:
                 trapezoid = node.content
 
-                assert isinstance(trapezoid, trapclass.Trapezoid),\
+                assert isinstance(trapezoid, trapclass.Trapezoid), \
                     "Expected type(trapezoid) = Trapezoid, instead found %s" % type(trapezoid).__name__
 
-                #hier zitten we dus in meest linkse trapezoid
+                # Left most intersection trapezoid
                 if trapezoid.contains(segment.endpoint1):
-
-                    right_points_above_segment = [point for point in trapezoid.right_points if point.is_above(segment)]
-
-                    right_points_below_segment = [point for point in trapezoid.right_points if not point.is_above(segment)]
+                    print("Handling left most trapezoid intersection...")
+                    right_points_above_segment = [point for point in trapezoid.right_points
+                                                  if point.is_above(segment)]
+                    right_points_below_segment = [point for point in trapezoid.right_points
+                                                  if not point.is_above(segment)]
 
                     # Replace trapezoid with three trapezoids
-                    trapezoid1 = trapclass.Trapezoid(trapezoid.top_segment, trapezoid.left_points, segment.endpoint1, trapezoid.bottom_segment)
-                    trapezoid2 = trapclass.Trapezoid(trapezoid.top_segment, segment.endpoint1, right_points_above_segment, segment)
-                    trapezoid3 = trapclass.Trapezoid(segment, segment.endpoint1, right_points_below_segment, trapezoid.bottom_segment)
+                    trapezoid1 = trapclass.Trapezoid(trapezoid.top_segment, trapezoid.left_points, segment.endpoint1,
+                                                     trapezoid.bottom_segment)
+                    trapezoid2 = trapclass.Trapezoid(trapezoid.top_segment, segment.endpoint1,
+                                                     right_points_above_segment, segment)
+                    trapezoid3 = trapclass.Trapezoid(segment, segment.endpoint1, right_points_below_segment,
+                                                     trapezoid.bottom_segment)
 
                     trap_node1 = dag.DagNode(trapezoid1)
                     trap_node2 = dag.DagNode(trapezoid2)
@@ -221,7 +229,9 @@ class VerticalDecomposition:
                     if carry == trap_node2:
                         trap_node2.right_neighbours = []
                     else:
-                        trap_node2.right_neighbours = [t for t in node.right_neighbours if len([point for point in t.content.left_points if point.is_above(segment)]) > 0]
+                        trap_node2.right_neighbours = [t for t in node.right_neighbours if
+                                                       len([point for point in t.content.left_points if
+                                                            point.is_above(segment)]) > 0]
                     for right_neighbour in trap_node2.right_neighbours:
                         for (left_neighbour_index, left_neighbour) in enumerate(right_neighbour.left_neighbours):
                             if left_neighbour == node:
@@ -231,23 +241,31 @@ class VerticalDecomposition:
                     if carry == trap_node3:
                         trap_node3.right_neighbours = []
                     else:
-                        trap_node3.right_neighbours = [t for t in node.right_neighbours if len([point for point in t.content.left_points if not point.is_above(segment)]) > 0]
+                        trap_node3.right_neighbours = [t for t in node.right_neighbours if
+                                                       len([point for point in t.content.left_points if
+                                                            not point.is_above(segment)]) > 0]
                     for right_neighbour in trap_node3.right_neighbours:
                         for (left_neighbour_index, left_neighbour) in enumerate(right_neighbour.left_neighbours):
                             if left_neighbour == node:
                                 right_neighbour.left_neighbours[left_neighbour_index] = trap_node3
 
-                #hier zitten we in meest rechtse trapezoid
+                # Right most intersection trapezoid
                 elif trapezoid.contains(segment.endpoint2):
+                    print("Handling right most trapezoid intersection...")
                     left_points_above_segment = [point for point in trapezoid.left_points if point.is_above(segment)]
-                    left_points_below_segment = [point for point in trapezoid.left_points if not point.is_above(segment)]
+                    left_points_below_segment = [point for point in trapezoid.left_points if
+                                                 not point.is_above(segment)]
 
-                    assert carry is not None if not left_points_below_segment or not left_points_above_segment else carry is None, "VD: Expected a carry, but none found"
+                    assert carry is not None if not left_points_below_segment or not left_points_above_segment \
+                        else carry is None, "VD: Expected a carry, but none found"
 
                     # Replace trapezoid with three trapezoids
-                    trapezoid1 = trapclass.Trapezoid(trapezoid.top_segment, left_points_above_segment, segment.endpoint2, segment)
-                    trapezoid2 = trapclass.Trapezoid(segment, left_points_below_segment, segment.endpoint2, trapezoid.bottom_segment)
-                    trapezoid3 = trapclass.Trapezoid(trapezoid.top_segment, segment.endpoint2, trapezoid.right_points, trapezoid.bottom_segment)
+                    trapezoid1 = trapclass.Trapezoid(trapezoid.top_segment, left_points_above_segment,
+                                                     segment.endpoint2, segment)
+                    trapezoid2 = trapclass.Trapezoid(segment, left_points_below_segment, segment.endpoint2,
+                                                     trapezoid.bottom_segment)
+                    trapezoid3 = trapclass.Trapezoid(trapezoid.top_segment, segment.endpoint2, trapezoid.right_points,
+                                                     trapezoid.bottom_segment)
 
                     trap_node1 = dag.DagNode(trapezoid1)
                     trap_node2 = dag.DagNode(trapezoid2)
@@ -257,7 +275,9 @@ class VerticalDecomposition:
                     if carry is not None and not left_points_above_segment:
                         trap_node1.left_neighbours = carry.left_neighbours
                     else:
-                        trap_node1.left_neighbours = [t for t in node.left_neighbours if len([point for point in t.content.right_points if point.is_above(segment)]) > 0]
+                        trap_node1.left_neighbours = [t for t in node.left_neighbours if
+                                                      len([point for point in t.content.right_points if
+                                                           point.is_above(segment)]) > 0]
                     trap_node1.right_neighbours = [trap_node3]
                     for left_neighbour in trap_node1.left_neighbours:
                         for (right_neighbour_index, right_neighbour) in enumerate(left_neighbour.right_neighbours):
@@ -267,7 +287,9 @@ class VerticalDecomposition:
                     if carry is not None and not left_points_below_segment:
                         trap_node2.left_neighbours = carry.left_neighbours
                     else:
-                        trap_node2.left_neighbours = [t for t in node.left_neighbours if len([point for point in t.content.right_points if not point.is_above(segment)]) > 0]
+                        trap_node2.left_neighbours = [t for t in node.left_neighbours if
+                                                      len([point for point in t.content.right_points if
+                                                           not point.is_above(segment)]) > 0]
                     trap_node2.right_neighbours = [trap_node3]
                     for left_neighbour in trap_node2.left_neighbours:
                         for (right_neighbour_index, right_neighbour) in enumerate(left_neighbour.right_neighbours):
@@ -296,16 +318,22 @@ class VerticalDecomposition:
                     segment_node.set_left_child(trap_node2)
                     segment_node.set_right_child(trap_node1)
                 else:  # Trapezoid is separated by segment
+                    print("Handling intermediate trapezoid intersection...")
                     left_points_above_segment = [point for point in trapezoid.left_points if point.is_above(segment)]
-                    left_points_below_segment = [point for point in trapezoid.left_points if not point.is_above(segment)]
+                    left_points_below_segment = [point for point in trapezoid.left_points if
+                                                 not point.is_above(segment)]
                     right_points_above_segment = [point for point in trapezoid.right_points if point.is_above(segment)]
-                    right_points_below_segment = [point for point in trapezoid.right_points if not point.is_above(segment)]
+                    right_points_below_segment = [point for point in trapezoid.right_points if
+                                                  not point.is_above(segment)]
 
-                    assert carry is not None if not left_points_below_segment or not left_points_above_segment else carry is None, "VD: Expected a carry, but none found"
+                    assert carry is not None if not left_points_below_segment or not left_points_above_segment \
+                        else carry is None, "VD: Expected a carry, but none found"
 
                     # Replace trapezoid with two trapezoids
-                    trapezoid1 = trapclass.Trapezoid(trapezoid.top_segment, left_points_above_segment, right_points_above_segment, segment)
-                    trapezoid2 = trapclass.Trapezoid(segment, left_points_below_segment, right_points_below_segment, trapezoid.bottom_segment)
+                    trapezoid1 = trapclass.Trapezoid(trapezoid.top_segment, left_points_above_segment,
+                                                     right_points_above_segment, segment)
+                    trapezoid2 = trapclass.Trapezoid(segment, left_points_below_segment, right_points_below_segment,
+                                                     trapezoid.bottom_segment)
 
                     trap_node1 = dag.DagNode(trapezoid1)
                     trap_node2 = dag.DagNode(trapezoid2)
@@ -314,7 +342,9 @@ class VerticalDecomposition:
                     if carry is not None and not left_points_above_segment:
                         trap_node1.left_neighbours = carry.left_neighbours
                     else:
-                        trap_node1.left_neighbours = [t for t in node.left_neighbours if len([point for point in t.content.right_points if point.is_above(segment)]) > 0]
+                        trap_node1.left_neighbours = [t for t in node.left_neighbours if
+                                                      len([point for point in t.content.right_points if
+                                                           point.is_above(segment)]) > 0]
                     for left_neighbour in trap_node1.left_neighbours:
                         for (right_neighbour_index, right_neighbour) in enumerate(left_neighbour.right_neighbours):
                             if right_neighbour == node:
@@ -323,7 +353,9 @@ class VerticalDecomposition:
                     if carry is not None and not left_points_below_segment:
                         trap_node2.left_neighbours = carry.left_neighbours
                     else:
-                        trap_node2.left_neighbours = [t for t in node.left_neighbours if len([point for point in t.content.right_points if not point.is_above(segment)]) > 0]
+                        trap_node2.left_neighbours = [t for t in node.left_neighbours if
+                                                      len([point for point in t.content.right_points if
+                                                           not point.is_above(segment)]) > 0]
                     for left_neighbour in trap_node2.left_neighbours:
                         for (right_neighbour_index, right_neighbour) in enumerate(left_neighbour.right_neighbours):
                             if right_neighbour == node:
@@ -341,7 +373,9 @@ class VerticalDecomposition:
                     if carry == trap_node1:
                         trap_node1.right_neighbours = []
                     else:
-                        trap_node1.right_neighbours = [t for t in node.right_neighbours if len([point for point in t.content.left_points if point.is_above(segment)]) > 0]
+                        trap_node1.right_neighbours = [t for t in node.right_neighbours if
+                                                       len([point for point in t.content.left_points if
+                                                            point.is_above(segment)]) > 0]
                     for right_neighbour in trap_node1.right_neighbours:
                         for (left_neighbour_index, left_neighbour) in enumerate(right_neighbour.left_neighbours):
                             if left_neighbour == node:
@@ -350,7 +384,9 @@ class VerticalDecomposition:
                     if carry == trap_node2:
                         trap_node2.right_neighbours = []
                     else:
-                        trap_node2.right_neighbours = [t for t in node.right_neighbours if len([point for point in t.content.left_points if point.is_above(segment)]) > 0]
+                        trap_node2.right_neighbours = [t for t in node.right_neighbours if
+                                                       len([point for point in t.content.left_points if
+                                                            point.is_above(segment)]) > 0]
                     for right_neighbour in trap_node2.right_neighbours:
                         for (left_neighbour_index, left_neighbour) in right_neighbour.left_neighbours:
                             if left_neighbour == node:
@@ -367,4 +403,3 @@ class VerticalDecomposition:
 
                     lp_node.set_right_child(trap_node1)
                     lp_node.set_left_child(trap_node2)
-

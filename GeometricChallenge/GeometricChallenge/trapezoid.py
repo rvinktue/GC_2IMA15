@@ -18,8 +18,7 @@ class Trapezoid:
         # Update bottom segment reference
         bottom_segment.face_above = self
 
-
-        #precompute quad and left/right segments
+        # Precompute quad and left/right segments
         a = self.top_segment.endpoint1
         b = self.top_segment.endpoint2
         c = self.bottom_segment.endpoint2
@@ -42,7 +41,6 @@ class Trapezoid:
 
         self.left_segment = seg_type.Segment(p_bot, p_top)
         self.right_segment = seg_type.Segment(q_bot, q_top)
-
 
     def find_intersection(self, segment):
         # Only compare with bottom segment. If it also intersects top segment,

@@ -17,7 +17,8 @@ class Segment:
         orientation4 = geometry.orientation(segment.endpoint2, segment.endpoint2, self.endpoint2)
 
         # Segments should intersect if they overlap
-        if ((orientation1 == geometry.CL and orientation2 == geometry.CL and orientation3 == geometry.CL and orientation4 == geometry.CL) and
+        if ((orientation1 == geometry.CL and orientation2 == geometry.CL
+             and orientation3 == geometry.CL and orientation4 == geometry.CL) and
                 (geometry.on_segment(self.endpoint1, segment.endpoint1, self.endpoint2) or
                  geometry.on_segment(self.endpoint1, segment.endpoint2, self.endpoint2) or
                  geometry.on_segment(segment.endpoint1, self.endpoint1, segment.endpoint2) or
@@ -33,9 +34,12 @@ class Segment:
 
         # Endpoint of one line situated on other line should not intersect
         if ((orientation1 == geometry.CL and geometry.on_segment(self.endpoint1, segment.endpoint1, self.endpoint2)) or
-                (orientation2 == geometry.CL and geometry.on_segment(self.endpoint1, segment.endpoint2, self.endpoint2)) or
-                (orientation3 == geometry.CL and geometry.on_segment(segment.endpoint1, self.endpoint1, segment.endpoint2)) or
-                (orientation4 == geometry.CL and geometry.on_segment(segment.endpoint1, self.endpoint2, segment.endpoint2))):
+                (orientation2 == geometry.CL and
+                 geometry.on_segment(self.endpoint1, segment.endpoint2, self.endpoint2)) or
+                (orientation3 == geometry.CL and
+                 geometry.on_segment(segment.endpoint1, self.endpoint1, segment.endpoint2)) or
+                (orientation4 == geometry.CL and
+                 geometry.on_segment(segment.endpoint1, self.endpoint2, segment.endpoint2))):
             return False
 
         # Different orientations means lines intersect
@@ -44,5 +48,3 @@ class Segment:
 
         # All other cases do not intersect
         return False
-
-
