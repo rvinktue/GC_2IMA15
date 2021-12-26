@@ -48,3 +48,31 @@ class Segment:
 
         # All other cases do not intersect
         return False
+
+    # Calculate intersection between segment and vertical boundary (self) of trapezoid
+    def is_entered_by(self, segment):
+        # Find orientations
+        orientation1 = geometry.orientation(self.endpoint1, self.endpoint2, segment.endpoint1)
+        orientation2 = geometry.orientation(self.endpoint1, self.endpoint2, segment.endpoint2)
+        orientation3 = geometry.orientation(segment.endpoint1, segment.endpoint2, self.endpoint1)
+        orientation4 = geometry.orientation(segment.endpoint1, segment.endpoint2, self.endpoint2)
+
+        # Shared endpoint should intersect
+        if ((self.endpoint1.x == segment.endpoint1.x and self.endpoint1.y == segment.endpoint1.y) or
+                (self.endpoint2.x == segment.endpoint1.x and self.endpoint2.y == segment.endpoint1.y) or
+                (self.endpoint1.x == segment.endpoint2.x and self.endpoint1.y == segment.endpoint2.y) or
+                (self.endpoint2.x == segment.endpoint2.x and self.endpoint2.y == segment.endpoint2.y)):
+            return True
+
+        # Endpoint of segment on boundary should intersect
+        if ((orientation1 == geometry.CL and geometry.on_segment(self.endpoint1, segment.endpoint1, self.endpoint2)) or
+                (orientation2 == geometry.CL and
+                 geometry.on_segment(self.endpoint1, segment.endpoint2, self.endpoint2))):
+            return True
+
+        # Different orientations means lines intersect
+        if (orientation1 != orientation2) and (orientation3 != orientation4):
+            return True
+
+        # All other cases do not intersect
+        return False

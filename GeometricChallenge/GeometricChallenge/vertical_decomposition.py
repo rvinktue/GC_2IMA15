@@ -55,6 +55,7 @@ class VerticalDecomposition:
                 "Expected type(trapezoid) = Trapezoid, instead found %s" % type(trapezoid).__name__
             # Checks if the segment has an intersection with the bottom segment of the trapezoid
             if trapezoid.is_violated_by_segment(segment):
+                # @TODO: write intersection to file for C++
                 intersection_found = True
 
         if intersection_found:

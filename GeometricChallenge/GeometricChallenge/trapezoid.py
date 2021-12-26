@@ -33,17 +33,17 @@ class Trapezoid:
         else:
             qx = min(b.x, c.x)
 
-        p_top = vertclass.Vertex(px, (a.y - b.y) / (a.x - b.x) * (px - a.x) + a.y)
-        p_bot = vertclass.Vertex(px, (d.y - c.y) / (d.x - c.x) * (px - d.x) + d.y)
+        p_top = vertclass.Vertex(px, max(a.y, b.y) if a.x == b.x else (a.y - b.y) / (a.x - b.x) * (px - a.x) + a.y)
+        p_bot = vertclass.Vertex(px, min(c.y, d.y) if c.x == d.x else (d.y - c.y) / (d.x - c.x) * (px - d.x) + d.y)
 
-        q_top = vertclass.Vertex(qx, (a.y - b.y) / (a.x - b.x) * (qx - a.x) + a.y)
-        q_bot = vertclass.Vertex(qx, (d.y - c.y) / (d.x - c.x) * (qx - d.x) + d.y)
+        q_top = vertclass.Vertex(qx, max(a.y, b.y) if a.x == b.x else (a.y - b.y) / (a.x - b.x) * (qx - a.x) + a.y)
+        q_bot = vertclass.Vertex(qx, min(c.y, d.y) if c.x == d.x else (d.y - c.y) / (d.x - c.x) * (qx - d.x) + d.y)
 
         self.left_segment = seg_type.Segment(p_bot, p_top)
         self.right_segment = seg_type.Segment(q_bot, q_top)
 
     def segment_enter(self, segment):
-        return self.left_segment.intersects(segment)
+        return self.left_segment.is_entered_by(segment)
 
     # Returns True if the segment crosses top or bottom boundary of this trapezoid
     #         False otherwise

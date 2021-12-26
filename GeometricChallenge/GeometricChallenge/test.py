@@ -30,6 +30,7 @@ def handle_test(vertices, print_dag):
 for vertex_list in [
     test_cases.test_case_1(),
     test_cases.test_case_2(),
-    test_cases.test_case_3()
+    test_cases.test_case_3(),
+    test_cases.test_case_4()
 ]:
     handle_test(vertex_list, False)

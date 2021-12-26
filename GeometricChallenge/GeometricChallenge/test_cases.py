@@ -25,4 +25,10 @@ def test_case_3():
             vertclass.Vertex(5, 5), vertclass.Vertex(10, 1),
             ]
 
-# @TODO: add degenerate test cases
+
+# Tests degenerate case: vertical line
+def test_case_4():
+    return [vertclass.Vertex(1, 1), vertclass.Vertex(1, 5)
+            ]
+
+# @TODO: add some more (degenerate) test cases
