@@ -173,6 +173,11 @@ class VerticalDecomposition:
                                                   if not point.is_above(segment)]
 
                     # Replace trapezoid with three trapezoids
+                    # 1 -> 2 -> 3
+                    # order is top to bottom, then left to right
+                    # 1: left of segment
+                    # 2: above segment
+                    # 3: below segment
                     trapezoid1 = trapclass.Trapezoid(trapezoid.top_segment, trapezoid.left_points, segment.endpoint1,
                                                      trapezoid.bottom_segment)
                     trapezoid2 = trapclass.Trapezoid(trapezoid.top_segment, segment.endpoint1,
@@ -254,6 +259,11 @@ class VerticalDecomposition:
                         else carry is None, "VD: Expected a carry, but none found"
 
                     # Replace trapezoid with three trapezoids
+                    # 1 -> 2 -> 3
+                    # order is top to bottom, then left to right
+                    # 1: above segment
+                    # 2: below segment
+                    # 3: right of segment
                     trapezoid1 = trapclass.Trapezoid(trapezoid.top_segment, left_points_above_segment,
                                                      segment.endpoint2, segment)
                     trapezoid2 = trapclass.Trapezoid(segment, left_points_below_segment, segment.endpoint2,
@@ -352,6 +362,10 @@ class VerticalDecomposition:
                         else carry is None, "VD: Expected a carry, but none found"
 
                     # Replace trapezoid with two trapezoids
+                    # 1 -> 2
+                    # order is top to bottom, then left to right
+                    # 1: above segment
+                    # 2: below segment
                     trapezoid1 = trapclass.Trapezoid(trapezoid.top_segment, left_points_above_segment,
                                                      right_points_above_segment, segment)
                     trapezoid2 = trapclass.Trapezoid(segment, left_points_below_segment, right_points_below_segment,
