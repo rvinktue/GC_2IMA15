@@ -25,7 +25,6 @@ class VerticalDecomposition:
         current_node = start_node
 
         while current_node is not end_node:
-            print(current_node, vars(current_node))
             assert current_node.right_neighbours != [], "Current node has no neighbours, but is not end node"
 
             # Go to the next trapezoid on the path
@@ -66,10 +65,8 @@ class VerticalDecomposition:
         return True
 
     # Updates the DAG with the new trapezoids induced by adding segment
-    # @TODO: updating neighbours gaat nog fout
     def update(self, nodes, segment):
         if len(nodes) == 1:
-            print("Segment entirely contained in a single trapezoid")
             # Segment is completely contained in a single trapezoid
             node = nodes[0]
             trapezoid = node.content
@@ -159,8 +156,8 @@ class VerticalDecomposition:
                         right_neighbour.left_neighbours[left_neighbour_index] = trap_node4
 
         else:
-            print("Segment goes through multiple trapezoids...")
             carry = None
+            carry_complement = None
             for node in nodes:
                 trapezoid = node.content
 
@@ -215,7 +212,7 @@ class VerticalDecomposition:
                     trap_node3 = segment_node.left_child
 
                     # Update neighbour lists
-                    trap_node1.left_neighbours = node.left_neighbours
+                    trap_node1.left_neighbours = node.left_neighbours[:]
                     trap_node1.right_neighbours = [trap_node2, trap_node3]
                     for left_neighbour in trap_node1.left_neighbours:
                         for (right_neighbour_index, right_neighbour) in enumerate(left_neighbour.right_neighbours):
@@ -268,9 +265,29 @@ class VerticalDecomposition:
                     trap_node2 = dag.DagNode(trapezoid2)
                     trap_node3 = dag.DagNode(trapezoid3)
 
+                    # Update dag references to carry
+                    if carry is not None:
+                        if not left_points_above_segment:
+                            carry_complement = trap_node1
+                        if not left_points_below_segment:
+                            carry_complement = trap_node2
+
+                        for to_update in self.dag.find_all_node(carry):
+                            if to_update.parent.left_child == to_update:
+                                to_update.parent.set_left_child(carry_complement)
+                            else:
+                                to_update.parent.set_right_child(carry_complement)
+
                     # Update neighbour lists
                     if carry is not None and not left_points_above_segment:
-                        trap_node1.left_neighbours = carry.left_neighbours
+                        trap_node1.left_neighbours = carry.left_neighbours[:]
+
+                        # Update reference to carry to refer to trap_node1
+                        for carry_left_neighbour in carry.left_neighbours:
+                            for (right_neighbour_index, right_neighbour) in \
+                                    enumerate(carry_left_neighbour.right_neighbours):
+                                if right_neighbour == carry:
+                                    carry_left_neighbour.right_neighbours[right_neighbour_index] = trap_node1
                     else:
                         trap_node1.left_neighbours = [t for t in node.left_neighbours if
                                                       len([point for point in t.content.right_points if
@@ -282,7 +299,14 @@ class VerticalDecomposition:
                                 left_neighbour.right_neighbours[right_neighbour_index] = trap_node1
 
                     if carry is not None and not left_points_below_segment:
-                        trap_node2.left_neighbours = carry.left_neighbours
+                        trap_node2.left_neighbours = carry.left_neighbours[:]
+
+                        # Update reference to carry to refer to trap_node1
+                        for carry_left_neighbour in carry.left_neighbours:
+                            for (right_neighbour_index, right_neighbour) in \
+                                    enumerate(carry_left_neighbour.right_neighbours):
+                                if right_neighbour == carry:
+                                    carry_left_neighbour.right_neighbours[right_neighbour_index] = trap_node2
                     else:
                         trap_node2.left_neighbours = [t for t in node.left_neighbours if
                                                       len([point for point in t.content.right_points if
@@ -314,6 +338,7 @@ class VerticalDecomposition:
                     segment_node = lp_node.left_child
                     segment_node.set_left_child(trap_node2)
                     segment_node.set_right_child(trap_node1)
+
                 else:  # Trapezoid is separated by segment
                     print("Handling intermediate trapezoid intersection...")
                     left_points_above_segment = [point for point in trapezoid.left_points if point.is_above(segment)]
@@ -335,9 +360,29 @@ class VerticalDecomposition:
                     trap_node1 = dag.DagNode(trapezoid1)
                     trap_node2 = dag.DagNode(trapezoid2)
 
+                    # Update dag references to carry
+                    if carry is not None:
+                        if not left_points_above_segment:
+                            carry_complement = trap_node1
+                        if not left_points_below_segment:
+                            carry_complement = trap_node2
+
+                        for to_update in self.dag.find_all_node(carry):
+                            if to_update.parent.left_child == to_update:
+                                to_update.parent.set_left_child(carry_complement)
+                            else:
+                                to_update.parent.set_right_child(carry_complement)
+
                     # Update left neighbour lists
                     if carry is not None and not left_points_above_segment:
-                        trap_node1.left_neighbours = carry.left_neighbours
+                        trap_node1.left_neighbours = carry.left_neighbours[:]
+
+                        # Update reference to carry to refer to trap_node1
+                        for carry_left_neighbour in carry.left_neighbours:
+                            for (right_neighbour_index, right_neighbour) in \
+                                    enumerate(carry_left_neighbour.right_neighbours):
+                                if right_neighbour == carry:
+                                    carry_left_neighbour.right_neighbours[right_neighbour_index] = trap_node1
                     else:
                         trap_node1.left_neighbours = [t for t in node.left_neighbours if
                                                       len([point for point in t.content.right_points if
@@ -348,7 +393,14 @@ class VerticalDecomposition:
                                 left_neighbour.right_neighbours[right_neighbour_index] = trap_node1
 
                     if carry is not None and not left_points_below_segment:
-                        trap_node2.left_neighbours = carry.left_neighbours
+                        trap_node2.left_neighbours = carry.left_neighbours[:]
+
+                        # Update reference to carry to refer to trap_node1
+                        for carry_left_neighbour in carry.left_neighbours:
+                            for (right_neighbour_index, right_neighbour) in \
+                                    enumerate(carry_left_neighbour.right_neighbours):
+                                if right_neighbour == carry:
+                                    carry_left_neighbour.right_neighbours[right_neighbour_index] = trap_node2
                     else:
                         trap_node2.left_neighbours = [t for t in node.left_neighbours if
                                                       len([point for point in t.content.right_points if
@@ -400,3 +452,7 @@ class VerticalDecomposition:
 
                     lp_node.set_right_child(trap_node1)
                     lp_node.set_left_child(trap_node2)
+
+                    # @TODO: reference to old trapezoid is not yet (fully) deleted for some reason
+
+                assert not self.dag.find_all_node(node), "Reference to old trapezoid detected"

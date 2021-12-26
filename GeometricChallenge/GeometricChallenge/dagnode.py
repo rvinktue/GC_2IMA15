@@ -38,6 +38,17 @@ class DagNode:
             output += self.right_child.find_all(object_class)
         return output
 
+    # Find all references to node
+    def find_all_node(self, node):
+        output = []
+        if self.content == node.content:
+            output.append(self)
+        if self.left_child is not None:
+            output += self.left_child.find_all_node(node)
+        if self.right_child is not None:
+            output += self.right_child.find_all_node(node)
+        return output
+
     # Set left child
     def set_left_child(self, other):
         assert isinstance(other, DagNode), "Expected other to be of type DagNode, found: %s" % type(other).__name__

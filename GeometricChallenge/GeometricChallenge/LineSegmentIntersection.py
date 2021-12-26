@@ -102,11 +102,9 @@ def test_draw_graph(vertices, segments):
     test_draw_trapezoid(geometry.find_bounding_box(vertices))
 
 
-vertices = [vertclass.Vertex(2, 1), vertclass.Vertex(10, 1),
-            vertclass.Vertex(1, 2), vertclass.Vertex(3, 2),
-            vertclass.Vertex(5, 2), vertclass.Vertex(7, 2),
-            vertclass.Vertex(9, 2), vertclass.Vertex(11, 2),
-            vertclass.Vertex(0, 3), vertclass.Vertex(10, 3),
+vertices = [vertclass.Vertex(5, 1), vertclass.Vertex(10, 1),
+            vertclass.Vertex(1, 3), vertclass.Vertex(6, 3),
+            vertclass.Vertex(3, 2), vertclass.Vertex(8, 2),
             ]
 segments = [segclass.Segment(vertices[2 * i], vertices[2 * i + 1]) for i in range(len(vertices) // 2)]
 vd = vdclass.VerticalDecomposition(geometry.find_bounding_box(vertices))
@@ -124,3 +122,5 @@ for seg in segments:
     else:
         print("Could not add: (%s, %s) -> (%s, %s)"
               % (seg.endpoint1.x, seg.endpoint1.y, seg.endpoint2.x, seg.endpoint2.y))
+
+print(["%s, %s\n" % (node, vars(node)) for node in vd.dag.find_all(trapclass.Trapezoid)])
