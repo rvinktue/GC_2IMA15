@@ -265,19 +265,6 @@ class VerticalDecomposition:
                     trap_node2 = dag.DagNode(trapezoid2)
                     trap_node3 = dag.DagNode(trapezoid3)
 
-                    # Update dag references to carry
-                    if carry is not None:
-                        if not left_points_above_segment:
-                            carry_complement = trap_node1
-                        if not left_points_below_segment:
-                            carry_complement = trap_node2
-
-                        for to_update in self.dag.find_all_node(carry):
-                            if to_update.parent.left_child == to_update:
-                                to_update.parent.set_left_child(carry_complement)
-                            else:
-                                to_update.parent.set_right_child(carry_complement)
-
                     # Update neighbour lists
                     if carry is not None and not left_points_above_segment:
                         trap_node1.left_neighbours = carry.left_neighbours[:]
@@ -339,6 +326,19 @@ class VerticalDecomposition:
                     segment_node.set_left_child(trap_node2)
                     segment_node.set_right_child(trap_node1)
 
+                    # Update dag references to carry
+                    if carry is not None:
+                        if not left_points_above_segment:
+                            carry_complement = trap_node1
+                        if not left_points_below_segment:
+                            carry_complement = trap_node2
+
+                        for to_update in self.dag.find_all_node(carry):
+                            if to_update.parent.left_child == to_update:
+                                to_update.parent.set_left_child(carry_complement)
+                            else:
+                                to_update.parent.set_right_child(carry_complement)
+
                 else:  # Trapezoid is separated by segment
                     print("Handling intermediate trapezoid intersection...")
                     left_points_above_segment = [point for point in trapezoid.left_points if point.is_above(segment)]
@@ -359,19 +359,6 @@ class VerticalDecomposition:
 
                     trap_node1 = dag.DagNode(trapezoid1)
                     trap_node2 = dag.DagNode(trapezoid2)
-
-                    # Update dag references to carry
-                    if carry is not None:
-                        if not left_points_above_segment:
-                            carry_complement = trap_node1
-                        if not left_points_below_segment:
-                            carry_complement = trap_node2
-
-                        for to_update in self.dag.find_all_node(carry):
-                            if to_update.parent.left_child == to_update:
-                                to_update.parent.set_left_child(carry_complement)
-                            else:
-                                to_update.parent.set_right_child(carry_complement)
 
                     # Update left neighbour lists
                     if carry is not None and not left_points_above_segment:
@@ -410,6 +397,19 @@ class VerticalDecomposition:
                             if right_neighbour == node:
                                 left_neighbour.right_neighbours[right_neighbour_index] = trap_node2
 
+                    # Update dag references to carry
+                    if carry is not None:
+                        if not left_points_above_segment:
+                            carry_complement = trap_node1
+                        if not left_points_below_segment:
+                            carry_complement = trap_node2
+
+                        for to_update in self.dag.find_all_node(carry):
+                            if to_update.parent.left_child == to_update:
+                                to_update.parent.set_left_child(carry_complement)
+                            else:
+                                to_update.parent.set_right_child(carry_complement)
+
                     # Update carry
                     if not trapezoid1.right_points:
                         carry = trap_node1
@@ -443,7 +443,7 @@ class VerticalDecomposition:
 
                     # Update DAG
                     parent_node = node.parent
-                    if parent_node.left_child.content == node:
+                    if parent_node.left_child == node:
                         parent_node.set_left_child(dag.DagNode(segment))
                         lp_node = parent_node.left_child
                     else:
@@ -452,7 +452,5 @@ class VerticalDecomposition:
 
                     lp_node.set_right_child(trap_node1)
                     lp_node.set_left_child(trap_node2)
-
-                    # @TODO: reference to old trapezoid is not yet (fully) deleted for some reason
 
                 assert not self.dag.find_all_node(node), "Reference to old trapezoid detected"
