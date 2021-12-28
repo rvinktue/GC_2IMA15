@@ -1,6 +1,7 @@
 import dagnode as dag
 import trapezoid as trapclass
-
+import test_draw
+import matplotlib.pyplot as plt
 
 # Class that represents the vertical decomposition of a planar graph
 class VerticalDecomposition:
@@ -17,17 +18,43 @@ class VerticalDecomposition:
             % type(current_node.content).__name__
         return current_node  # Return DAG node containing trapezoid
 
+    def point_location_segment(self, segment):
+        current_node_1 = self.dag
+        while not isinstance(current_node_1.content, trapclass.Trapezoid):
+            current_node_1 = current_node_1.choose_next_segmented(segment, segment.endpoint1)
+        trap_point_1 = current_node_1
+
+        current_node_2 = self.dag
+        while not isinstance(current_node_2.content, trapclass.Trapezoid):
+            current_node_2 = current_node_2.choose_next_segmented(segment, segment.endpoint2)
+        trap_point_2 = current_node_2
+        # returns point location of left endpoint, point location of right endpoint
+        return trap_point_1, trap_point_2
+
+
     # Finds all trapezoids intersected by segment (assuming segment does not intersect any existing edges in the VD)
     def find_intersecting_trapezoids(self, segment):
-        start_node = self.find_point_location(segment.endpoint1)
-        end_node = self.find_point_location(segment.endpoint2)
+        # start_node = self.find_point_location(segment.endpoint1)
+        # end_node = self.find_point_location(segment.endpoint2)
+        start_node, end_node = self.point_location_segment(segment)
         intersected_trapezoids = [start_node]
         current_node = start_node
 
         while current_node is not end_node:
+            if current_node.right_neighbours == []:
+                test_draw.test_draw_dag(self.dag)
+               # test_draw.test_draw_segment(segment)
+                plt.show()
+                print("oh")
             assert current_node.right_neighbours != [], "Current node has no neighbours, but is not end node"
-
             # Go to the next trapezoid on the path
+            # assert len([n for n in current_node.right_neighbours if n.content.segment_enter(segment)]) > 0, "will get stuck"
+            temp = [n for n in current_node.right_neighbours if n.content.segment_enter(segment)]
+            if (len(temp) == 0):
+                test_draw.test_draw_dag(self.dag)
+                test_draw.test_draw_segment(segment)
+                plt.show()
+                assert False, "oh"
             for node in current_node.right_neighbours:
                 trap = node.content
                 assert isinstance(trap, trapclass.Trapezoid), \
@@ -250,7 +277,7 @@ class VerticalDecomposition:
                                 right_neighbour.left_neighbours[left_neighbour_index] = trap_node3
 
                 # Right most intersection trapezoid
-                elif trapezoid.contains(segment.endpoint2):
+                elif trapezoid.contains(segment.endpoint2) and segment.endpoint2.x != trapezoid.right_segment.endpoint1.x:
                     print("Handling right most trapezoid intersection...")
                     left_points_above_segment = [point for point in trapezoid.left_points if point.is_above(segment)]
                     left_points_below_segment = [point for point in trapezoid.left_points if
@@ -469,3 +496,19 @@ class VerticalDecomposition:
                     lp_node.set_left_child(trap_node2)
 
                 assert not self.dag.find_all_node(node), "Reference to old trapezoid detected"
+
+import geometry
+import segment, vertex
+#testing
+nodes = [(1,1), (10,10)]
+vertices = [vertex.Vertex(2,5), vertex.Vertex(8,6), vertex.Vertex(1,2), vertex.Vertex(3,4)]
+
+seg = segment.Segment(vertices[0], vertices[1])
+seg2 = segment.Segment(vertices[2], vertices[1])
+seg3 = segment.Segment(vertices[2], vertex.Vertex(7, 2))
+vd = VerticalDecomposition(geometry.find_bounding_box(nodes))
+vd.add_segment(seg)
+vd.add_segment(seg2)
+vd.add_segment(seg3)
+test_draw.test_draw_dag(vd.dag)
+plt.show()

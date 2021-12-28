@@ -27,6 +27,36 @@ class DagNode:
         else:
             assert False, "DagNode: Encountered content of unexpected instance %s" % type(self.content).__name__
 
+    # Choose which child is the successor for the point location search
+    def choose_next_segmented(self, segment, endpoint):
+        if isinstance(self.content, trap.Trapezoid):
+            return self
+        elif isinstance(self.content, vert.Vertex):
+            if endpoint.x < self.content.x:
+                return self.left_child
+            elif endpoint.x > self.content.x:
+                return self.right_child
+            else:
+                #endpoint.x == self.content.x
+                return self.left_child if segment.endpoint2 is endpoint else self.right_child
+        elif isinstance(self.content, seg.Segment):
+            ori = geometry.orientation(self.content.endpoint1, self.content.endpoint2, endpoint)
+            if ori is geometry.CW:
+                return self.left_child
+            elif ori is geometry.CCW:
+                return self.right_child
+            else:
+                #point lies on the segment
+                other_endpoint = segment.endpoint1 if endpoint is segment.endpoint2 else segment.endpoint2
+                if geometry.orientation(self.content.endpoint1, self.content.endpoint2, other_endpoint) is geometry.CW:
+                    return self.left_child
+                else:
+                    return self.right_child
+
+        else:
+            assert False, "DagNode: Encountered content of unexpected instance %s" % type(self.content).__name__
+
+
     # Find all objects of class
     def find_all(self, object_class):
         output = []
