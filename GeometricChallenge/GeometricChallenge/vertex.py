@@ -20,3 +20,7 @@ class Vertex:
     #         False if vertex lies underneath the segment
     def is_above(self, segment):
         return geometry.orientation(segment.endpoint1, segment.endpoint2, self) != geometry.CLOCKWISE
+
+    def is_below(self, segment):
+        return geometry.orientation(segment.endpoint1, segment.endpoint2, self) != geometry.CCW
+

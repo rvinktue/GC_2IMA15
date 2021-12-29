@@ -43,7 +43,7 @@ class VerticalDecomposition:
         while current_node is not end_node:
             if current_node.right_neighbours == []:
                 test_draw.test_draw_dag(self.dag)
-               # test_draw.test_draw_segment(segment)
+                test_draw.test_draw_segment(segment)
                 plt.show()
                 print("oh")
             assert current_node.right_neighbours != [], "Current node has no neighbours, but is not end node"
@@ -94,7 +94,7 @@ class VerticalDecomposition:
 
     # Updates the DAG with the new trapezoids induced by adding segment
     def update(self, nodes, segment):
-        if len(nodes) == 1:
+        if len(nodes) == 1 and nodes[0].content.left_points[0].x_order(segment.endpoint1) != 0 and nodes[0].content.right_points[0].x_order(segment.endpoint2) != 0:
             # Segment is completely contained in a single trapezoid
             node = nodes[0]
             trapezoid = node.content
@@ -193,12 +193,12 @@ class VerticalDecomposition:
                     "Expected type(trapezoid) = Trapezoid, instead found %s" % type(trapezoid).__name__
 
                 # Left most intersection trapezoid
-                if trapezoid.contains(segment.endpoint1):
+                if trapezoid.contains(segment.endpoint1) and segment.endpoint1.x_order(trapezoid.left_points[0]) != 0:
                     print("Handling left most trapezoid intersection...")
                     right_points_above_segment = [point for point in trapezoid.right_points
                                                   if point.is_above(segment)]
                     right_points_below_segment = [point for point in trapezoid.right_points
-                                                  if not point.is_above(segment)]
+                                                  if point.is_below(segment)]
 
                     # Replace trapezoid with three trapezoids
                     # 1 -> 2 -> 3
@@ -270,18 +270,23 @@ class VerticalDecomposition:
                     else:
                         trap_node3.right_neighbours = [t for t in node.right_neighbours if
                                                        len([point for point in t.content.left_points if
-                                                            not point.is_above(segment)]) > 0]
+                                                            point.is_below(segment)]) > 0]
                     for right_neighbour in trap_node3.right_neighbours:
                         for (left_neighbour_index, left_neighbour) in enumerate(right_neighbour.left_neighbours):
                             if left_neighbour == node:
                                 right_neighbour.left_neighbours[left_neighbour_index] = trap_node3
 
+                    assert trap_node1.content.left_points, "n1"
+                    assert trap_node2.content.left_points, "n2"
+                    assert trap_node3.content.left_points, "n3"
+
+
                 # Right most intersection trapezoid
-                elif trapezoid.contains(segment.endpoint2) and segment.endpoint2.x != trapezoid.right_segment.endpoint1.x:
+                elif trapezoid.contains(segment.endpoint2) and segment.endpoint2.x_order(trapezoid.right_points[0]) != 0:
                     print("Handling right most trapezoid intersection...")
                     left_points_above_segment = [point for point in trapezoid.left_points if point.is_above(segment)]
                     left_points_below_segment = [point for point in trapezoid.left_points if
-                                                 not point.is_above(segment)]
+                                                 point.is_below(segment)]
 
                     assert carry is not None if not left_points_below_segment or not left_points_above_segment \
                         else carry is None, "VD: Expected a carry, but none found"
@@ -306,6 +311,8 @@ class VerticalDecomposition:
                     # Update neighbour lists
                     if carry is not None and not left_points_above_segment:
                         trap_node1.left_neighbours = carry.left_neighbours[:]
+                        trap_node1.content.left_points = carry.content.left_points[:]
+
 
                         # Update reference to carry to refer to trap_node1
                         for carry_left_neighbour in carry.left_neighbours:
@@ -325,6 +332,8 @@ class VerticalDecomposition:
 
                     if carry is not None and not left_points_below_segment:
                         trap_node2.left_neighbours = carry.left_neighbours[:]
+                        trap_node2.content.left_points = carry.content.left_points[:]
+
 
                         # Update reference to carry to refer to trap_node1
                         for carry_left_neighbour in carry.left_neighbours:
@@ -335,7 +344,7 @@ class VerticalDecomposition:
                     else:
                         trap_node2.left_neighbours = [t for t in node.left_neighbours if
                                                       len([point for point in t.content.right_points if
-                                                           not point.is_above(segment)]) > 0]
+                                                           point.is_below(segment)]) > 0]
                     trap_node2.right_neighbours = [trap_node3]
                     for left_neighbour in trap_node2.left_neighbours:
                         for (right_neighbour_index, right_neighbour) in enumerate(left_neighbour.right_neighbours):
@@ -377,14 +386,18 @@ class VerticalDecomposition:
                             else:
                                 to_update.parent.set_right_child(carry_complement)
 
+                    assert trap_node1.content.left_points, "n1"
+                    assert trap_node2.content.left_points, "n2"
+                    assert trap_node3.content.left_points, "n3"
+
                 else:  # Trapezoid is separated by segment
                     print("Handling intermediate trapezoid intersection...")
                     left_points_above_segment = [point for point in trapezoid.left_points if point.is_above(segment)]
                     left_points_below_segment = [point for point in trapezoid.left_points if
-                                                 not point.is_above(segment)]
+                                                 point.is_below(segment)]
                     right_points_above_segment = [point for point in trapezoid.right_points if point.is_above(segment)]
                     right_points_below_segment = [point for point in trapezoid.right_points if
-                                                  not point.is_above(segment)]
+                                                  point.is_below(segment)]
 
                     assert carry is not None if not left_points_below_segment or not left_points_above_segment \
                         else carry is None, "VD: Expected a carry, but none found"
@@ -405,6 +418,7 @@ class VerticalDecomposition:
                     # Update left neighbour lists
                     if carry is not None and not left_points_above_segment:
                         trap_node1.left_neighbours = carry.left_neighbours[:]
+                        trap_node1.content.left_points = carry.content.left_points[:]
 
                         # Update reference to carry to refer to trap_node1
                         for carry_left_neighbour in carry.left_neighbours:
@@ -423,6 +437,7 @@ class VerticalDecomposition:
 
                     if carry is not None and not left_points_below_segment:
                         trap_node2.left_neighbours = carry.left_neighbours[:]
+                        trap_node2.content.left_points = carry.content.left_points[:]
 
                         # Update reference to carry to refer to trap_node1
                         for carry_left_neighbour in carry.left_neighbours:
@@ -433,7 +448,7 @@ class VerticalDecomposition:
                     else:
                         trap_node2.left_neighbours = [t for t in node.left_neighbours if
                                                       len([point for point in t.content.right_points if
-                                                           not point.is_above(segment)]) > 0]
+                                                           point.is_below(segment)]) > 0]
                     for left_neighbour in trap_node2.left_neighbours:
                         for (right_neighbour_index, right_neighbour) in enumerate(left_neighbour.right_neighbours):
                             if right_neighbour == node:
@@ -479,7 +494,7 @@ class VerticalDecomposition:
                                                        len([point for point in t.content.left_points if
                                                             point.is_above(segment)]) > 0]
                     for right_neighbour in trap_node2.right_neighbours:
-                        for (left_neighbour_index, left_neighbour) in right_neighbour.left_neighbours:
+                        for (left_neighbour_index, left_neighbour) in enumerate(right_neighbour.left_neighbours):
                             if left_neighbour == node:
                                 right_neighbour.left_neighbours[left_neighbour_index] = trap_node2
 
@@ -495,20 +510,26 @@ class VerticalDecomposition:
                     lp_node.set_right_child(trap_node1)
                     lp_node.set_left_child(trap_node2)
 
+                    assert trap_node1.content.left_points, "n1"
+                    if not trap_node2.content.left_points:
+                        assert False, "heaiojaefoea"
+
                 assert not self.dag.find_all_node(node), "Reference to old trapezoid detected"
 
 import geometry
 import segment, vertex
 #testing
 nodes = [(1,1), (10,10)]
-vertices = [vertex.Vertex(2,5), vertex.Vertex(8,6), vertex.Vertex(1,2), vertex.Vertex(3,4)]
+vertices = [vertex.Vertex(2,5), vertex.Vertex(8,6), vertex.Vertex(1,2), vertex.Vertex(3,4), vertex.Vertex(9, 3)]
 
 seg = segment.Segment(vertices[0], vertices[1])
 seg2 = segment.Segment(vertices[2], vertices[1])
-seg3 = segment.Segment(vertices[2], vertex.Vertex(7, 2))
+seg3 = segment.Segment(vertices[1], vertices[4])
+seg4 = segment.Segment(vertices[2], vertices[4])
 vd = VerticalDecomposition(geometry.find_bounding_box(nodes))
 vd.add_segment(seg)
 vd.add_segment(seg2)
 vd.add_segment(seg3)
+#vd.add_segment(seg4)
 test_draw.test_draw_dag(vd.dag)
 plt.show()
