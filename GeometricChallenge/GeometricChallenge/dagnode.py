@@ -6,11 +6,13 @@ import geometry
 
 # Class that represents the DAG
 class DagNode:
-    def __init__(self, content, left_child=None, right_child=None, parent=None):
+    def __init__(self, content, left_child=None, right_child=None, parents=None):
         self.content = content
         self.left_child = left_child
         self.right_child = right_child
-        self.parent = parent
+        self.parents = parents
+        if parents is None:
+            self.parents = []
         self.left_neighbours = []
         self.right_neighbours = []
 
@@ -79,14 +81,17 @@ class DagNode:
             output += self.right_child.find_all_node(node)
         return output
 
+    def set_reset_parent(self):
+        self.parents = []
+
     # Set left child
     def set_left_child(self, other):
         assert isinstance(other, DagNode), "Expected other to be of type DagNode, found: %s" % type(other).__name__
         self.left_child = other
-        other.parent = self
+        other.parents.append(self)
 
     # Set right child
     def set_right_child(self, other):
         assert isinstance(other, DagNode), "Expected other to be of type DagNode, found: %s" % type(other).__name__
         self.right_child = other
-        other.parent = self
+        other.parents.append(self)

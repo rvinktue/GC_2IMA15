@@ -132,9 +132,9 @@ class VerticalDecomposition:
             trap_node4 = dag.DagNode(trapezoid4)
 
             # Update DAG
-            parent_node = node.parent
+            parent_nodes = node.parents
 
-            if parent_node is None:
+            if len(parent_nodes) == 0:
                 print("[VD] [Single trapezoid] replace initial bounding box")
                 # Replace the initial bounding box
                 # new root becomes left endpoint of segment
@@ -146,13 +146,16 @@ class VerticalDecomposition:
                 self.dag.right_child.left_child.set_left_child(trap_node3)
                 self.dag.right_child.left_child.set_right_child(trap_node2)
             else:
-                if parent_node.left_child.content == trapezoid:  # If we are the left child
-                    parent_node.set_left_child(dag.DagNode(segment.endpoint1))  # Left endpoint becomes left child
-                    lp_node = parent_node.left_child  # Left Point node
-                else:
-                    # We are the right child
-                    parent_node.set_right_child(dag.DagNode(segment.endpoint1))  # Left endpoint becomes right child
-                    lp_node = parent_node.right_child
+                node_to_set = dag.DagNode(segment.endpoint1)
+                lp_node = None
+                for parent_node in parent_nodes:
+                    if parent_node.left_child.content == trapezoid:  # If we are the left child
+                        parent_node.set_left_child(node_to_set)  # Left endpoint becomes left child
+                        lp_node = parent_node.left_child  # Left Point node
+                    else:
+                        # We are the right child
+                        parent_node.set_right_child(node_to_set)  # Left endpoint becomes right child
+                        lp_node = parent_node.right_child
 
                 lp_node.set_left_child(trap_node1)
                 lp_node.set_right_child(dag.DagNode(segment.endpoint2))
@@ -223,16 +226,18 @@ class VerticalDecomposition:
                         carry = trap_node3
 
                     # Update DAG
-                    parent_node = node.parent
+                    parent_nodes = node.parents
 
-                    assert parent_node is not None, "Case parent_node = None not implemented"
+                    assert parent_nodes is not [], "Case parent_node = None not implemented"
 
-                    if parent_node.left_child.content == trapezoid:
-                        parent_node.set_left_child(dag.DagNode(segment.endpoint1))
-                        lp_node = parent_node.left_child
-                    else:
-                        parent_node.set_right_child(dag.DagNode(segment.endpoint1))
-                        lp_node = parent_node.right_child
+                    node_to_set = dag.DagNode(segment.endpoint1)
+                    for parent_node in parent_nodes:
+                        if parent_node.left_child.content == trapezoid:
+                            parent_node.set_left_child(node_to_set)
+                            lp_node = parent_node.left_child
+                        else:
+                            parent_node.set_right_child(node_to_set)
+                            lp_node = parent_node.right_child
 
                     lp_node.set_left_child(trap_node1)
                     lp_node.set_right_child(dag.DagNode(segment))
@@ -279,6 +284,13 @@ class VerticalDecomposition:
                     assert trap_node1.content.left_points, "n1"
                     assert trap_node2.content.left_points, "n2"
                     assert trap_node3.content.left_points, "n3"
+                    assert self.all_valid(), "n1"
+                    if not self.all_allowed_neighbours():
+                        test_draw.test_draw_dag(self.dag)
+                        test_draw.test_draw_segment(segment)
+                        plt.show()
+                        assert False, "ehao"
+
 
 
                 # Right most intersection trapezoid
@@ -350,6 +362,9 @@ class VerticalDecomposition:
                         for (right_neighbour_index, right_neighbour) in enumerate(left_neighbour.right_neighbours):
                             if right_neighbour == node:
                                 left_neighbour.right_neighbours[right_neighbour_index] = trap_node2
+                            #edge case where both trap1 and trap2 become neighbours of the trapezoid in question
+                            elif right_neighbour == trap_node1:
+                                left_neighbour.right_neighbours.append(trap_node2) #net toegevoegd
 
                     trap_node3.left_neighbours = [trap_node1, trap_node2]
                     trap_node3.right_neighbours = node.right_neighbours
@@ -359,13 +374,15 @@ class VerticalDecomposition:
                                 right_neighbour.left_neighbours[left_neighbour_index] = trap_node3
 
                     # Update DAG
-                    parent_node = node.parent
-                    if parent_node.left_child == node:
-                        parent_node.set_left_child(dag.DagNode(segment.endpoint2))
-                        lp_node = parent_node.left_child
-                    else:
-                        parent_node.set_right_child(dag.DagNode(segment.endpoint2))
-                        lp_node = parent_node.right_child
+                    parent_nodes = node.parents
+                    for parent_node in parent_nodes:
+                        node_to_set = dag.DagNode(segment.endpoint2)
+                        if parent_node.left_child == node:
+                            parent_node.set_left_child(node_to_set)
+                            lp_node = parent_node.left_child
+                        else:
+                            parent_node.set_right_child(node_to_set)
+                            lp_node = parent_node.right_child
 
                     lp_node.set_right_child(trap_node3)
                     lp_node.set_left_child(dag.DagNode(segment))
@@ -381,14 +398,26 @@ class VerticalDecomposition:
                             carry_complement = trap_node2
 
                         for to_update in self.dag.find_all_node(carry):
-                            if to_update.parent.left_child == to_update:
-                                to_update.parent.set_left_child(carry_complement)
-                            else:
-                                to_update.parent.set_right_child(carry_complement)
+                            for parent in to_update.parents:
+                                if parent.left_child == to_update:
+                                    parent.set_left_child(carry_complement)
+                                else:
+                                    parent.set_right_child(carry_complement)
 
                     assert trap_node1.content.left_points, "n1"
                     assert trap_node2.content.left_points, "n2"
                     assert trap_node3.content.left_points, "n3"
+                    if not self.all_allowed_neighbours():
+                        test_draw.test_draw_dag(self.dag)
+                        test_draw.test_draw_segment(segment)
+                        plt.show()
+                        assert False, "boab"
+                    if not self.all_valid():
+                        test_draw.test_draw_dag(self.dag)
+                        test_draw.test_draw_segment(segment)
+                        plt.show()
+                        assert False, "ehao"
+
 
                 else:  # Trapezoid is separated by segment
                     print("Handling intermediate trapezoid intersection...")
@@ -453,6 +482,9 @@ class VerticalDecomposition:
                         for (right_neighbour_index, right_neighbour) in enumerate(left_neighbour.right_neighbours):
                             if right_neighbour == node:
                                 left_neighbour.right_neighbours[right_neighbour_index] = trap_node2
+                            #edge case where both trap1 and trap2 become neighbours of the trapezoid in question
+                            elif right_neighbour == trap_node1:
+                                left_neighbour.right_neighbours.append(trap_node2)
 
                     # Update dag references to carry
                     if carry is not None:
@@ -462,10 +494,11 @@ class VerticalDecomposition:
                             carry_complement = trap_node2
 
                         for to_update in self.dag.find_all_node(carry):
-                            if to_update.parent.left_child == to_update:
-                                to_update.parent.set_left_child(carry_complement)
-                            else:
-                                to_update.parent.set_right_child(carry_complement)
+                            for parent in to_update.parents:
+                                if parent.left_child == to_update:
+                                    parent.set_left_child(carry_complement)
+                                else:
+                                    parent.set_right_child(carry_complement)
 
                     # Update carry
                     if not trapezoid1.right_points:
@@ -492,29 +525,110 @@ class VerticalDecomposition:
                     else:
                         trap_node2.right_neighbours = [t for t in node.right_neighbours if
                                                        len([point for point in t.content.left_points if
-                                                            point.is_above(segment)]) > 0]
+                                                            point.is_below(segment)]) > 0]
+
                     for right_neighbour in trap_node2.right_neighbours:
                         for (left_neighbour_index, left_neighbour) in enumerate(right_neighbour.left_neighbours):
                             if left_neighbour == node:
                                 right_neighbour.left_neighbours[left_neighbour_index] = trap_node2
+                            #edge case where both trap1 and trap2 become neighbours of the trapezoid in question
+                            elif left_neighbour == trap_node1:
+                                right_neighbour.left_neighbours.append(trap_node2)
 
                     # Update DAG
-                    parent_node = node.parent
-                    if parent_node.left_child == node:
-                        parent_node.set_left_child(dag.DagNode(segment))
-                        lp_node = parent_node.left_child
-                    else:
-                        parent_node.set_right_child(dag.DagNode(segment))
-                        lp_node = parent_node.right_child
+                    parent_nodes = node.parents
+                    node_to_set = dag.DagNode(segment)
+                    for parent_node in parent_nodes:
+                        if parent_node.left_child == node:
+                            parent_node.set_left_child(node_to_set)
+                            lp_node = parent_node.left_child
+                        else:
+                            parent_node.set_right_child(node_to_set)
+                            lp_node = parent_node.right_child
 
                     lp_node.set_right_child(trap_node1)
                     lp_node.set_left_child(trap_node2)
 
                     assert trap_node1.content.left_points, "n1"
-                    if not trap_node2.content.left_points:
-                        assert False, "heaiojaefoea"
+                    assert trap_node2.content.left_points, 'n2'
+                    assert self.all_valid(), "n1"
+                    if not self.all_allowed_neighbours():
+                        test_draw.test_draw_dag(self.dag)
+                        test_draw.test_draw_segment(segment)
+                        plt.show()
+                        assert False, "ehao"
+
 
                 assert not self.dag.find_all_node(node), "Reference to old trapezoid detected"
+
+    def trap_node_list(self, node):
+        if node is None:
+            return []
+        elif isinstance(node.content, trapclass.Trapezoid):
+            return [node]
+        else:
+            return self.trap_node_list(node.left_child) + self.trap_node_list(node.right_child)
+
+    def valid_node(self, node):
+        trapl = self.trap_node_list(self.dag)
+        if not isinstance(node.content, trapclass.Trapezoid):
+            return True
+        for nb in node.right_neighbours:
+            if not nb in trapl:
+                return False
+        for nb in node.left_neighbours:
+            if not nb in trapl:
+                return False
+        return node in trapl
+
+    def all_valid(self):
+        trapl = self.trap_node_list(self.dag)
+        for node in trapl:
+            if not self.valid_node(node):
+                return False
+        return True
+
+    def allowed_neighbours(self, node):
+        for nb in node.right_neighbours:
+            check = False
+            for point in node.content.right_points:
+                if point in nb.content.left_points:
+                    check = True
+                    break
+            if not check:
+                return False
+        for nb in node.left_neighbours:
+            check = False
+            for point in node.content.left_points:
+                if point in nb.content.right_points:
+                    check = True
+                    break
+            if not check:
+                return False
+        return True
+
+    def got_all_neighbours(self, node):
+        trapl = self.trap_node_list(self.dag)
+        for nb in trapl:
+            if not nb is node:
+                for point in node.content.right_points:
+                    if point in nb.content.left_points:
+                        if nb not in node.right_neighbours:
+                            return False
+                for point in node.content.left_points:
+                    if point in nb.content.right_points:
+                        if nb not in node.left_neighbours:
+                            return False
+
+        return True
+
+    def all_allowed_neighbours(self):
+        trapl = self.trap_node_list(self.dag)
+        for trap_node in trapl:
+            if not self.allowed_neighbours(trap_node) or not self.got_all_neighbours(trap_node):
+                return False
+        return True
+
 
 import geometry
 import segment, vertex
