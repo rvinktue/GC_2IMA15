@@ -5,6 +5,7 @@ import geometry
 import segment, vertex
 
 INPUT_FILE = "instances/sqrpecn3020.instance.json"  # Name of the input file
+#INPUT_FILE = "instances/small.instance.json"  # Name of the input file
 OUTPUT_FILE = "intersection_output.txt"  # Name of the output file
 
 
@@ -25,7 +26,12 @@ file.write("%d %d \n" % (len(edges), len(g.nodes)))
 file.close()
 
 # Process all edges
+counter = 0
 for edge in edges:
+    counter = counter + 1
+    if counter % 100 == 0:
+        print("-------Processed " + str(counter) + " edges ------------")
+        break
     seg = segment.Segment(vertex.Vertex(edge[0][0], edge[0][1]), vertex.Vertex(edge[1][0], edge[1][1]))
     for (key, vd) in enumerate(vds):
         if vd.add_segment(seg):
