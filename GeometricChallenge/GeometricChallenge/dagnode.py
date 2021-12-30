@@ -81,7 +81,7 @@ class DagNode:
             output += self.right_child.find_all_node(node)
         return output
 
-    def set_reset_parent(self):
+    def reset_parent(self):
         self.parents = []
 
     # Set left child

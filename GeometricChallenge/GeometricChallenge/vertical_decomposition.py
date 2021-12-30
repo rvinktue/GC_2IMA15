@@ -284,6 +284,7 @@ class VerticalDecomposition:
                     assert trap_node1.content.left_points, "n1"
                     assert trap_node2.content.left_points, "n2"
                     assert trap_node3.content.left_points, "n3"
+                    assert self.no_dupe(self.dag), 'oeir'
                     assert self.all_valid(), "n1"
                     if not self.all_allowed_neighbours():
                         test_draw.test_draw_dag(self.dag)
@@ -397,16 +398,17 @@ class VerticalDecomposition:
                         if not left_points_below_segment:
                             carry_complement = trap_node2
 
-                        for to_update in self.dag.find_all_node(carry):
-                            for parent in to_update.parents:
-                                if parent.left_child == to_update:
-                                    parent.set_left_child(carry_complement)
-                                else:
-                                    parent.set_right_child(carry_complement)
+
+                        for parent in carry.parents:
+                            if parent.left_child == carry:
+                                parent.set_left_child(carry_complement)
+                            else:
+                                parent.set_right_child(carry_complement)
 
                     assert trap_node1.content.left_points, "n1"
                     assert trap_node2.content.left_points, "n2"
                     assert trap_node3.content.left_points, "n3"
+                    assert self.no_dupe(self.dag), 'oeir'
                     if not self.all_allowed_neighbours():
                         test_draw.test_draw_dag(self.dag)
                         test_draw.test_draw_segment(segment)
@@ -443,6 +445,7 @@ class VerticalDecomposition:
 
                     trap_node1 = dag.DagNode(trapezoid1)
                     trap_node2 = dag.DagNode(trapezoid2)
+
 
                     # Update left neighbour lists
                     if carry is not None and not left_points_above_segment:
@@ -485,7 +488,11 @@ class VerticalDecomposition:
                             #edge case where both trap1 and trap2 become neighbours of the trapezoid in question
                             elif right_neighbour == trap_node1:
                                 left_neighbour.right_neighbours.append(trap_node2)
-
+                    if not self.no_dupe(self.dag):
+                        test_draw.test_draw_dag(self.dag)
+                        test_draw.test_draw_segment(segment)
+                        plt.show()
+                        assert False, "oeir"
                     # Update dag references to carry
                     if carry is not None:
                         if not left_points_above_segment:
@@ -493,13 +500,17 @@ class VerticalDecomposition:
                         if not left_points_below_segment:
                             carry_complement = trap_node2
 
-                        for to_update in self.dag.find_all_node(carry):
-                            for parent in to_update.parents:
-                                if parent.left_child == to_update:
-                                    parent.set_left_child(carry_complement)
-                                else:
-                                    parent.set_right_child(carry_complement)
+                        for parent in carry.parents:
+                             if parent.left_child == carry:
+                                parent.set_left_child(carry_complement)
+                             else:
+                                 parent.set_right_child(carry_complement)
 
+                    if not self.no_dupe(self.dag):
+                        test_draw.test_draw_dag(self.dag)
+                        test_draw.test_draw_segment(segment)
+                        plt.show()
+                        assert False, "oeir"
                     # Update carry
                     if not trapezoid1.right_points:
                         carry = trap_node1
@@ -551,7 +562,16 @@ class VerticalDecomposition:
 
                     assert trap_node1.content.left_points, "n1"
                     assert trap_node2.content.left_points, 'n2'
-                    assert self.all_valid(), "n1"
+                    if not self.no_dupe(self.dag):
+                        test_draw.test_draw_dag(self.dag)
+                        test_draw.test_draw_segment(segment)
+                        plt.show()
+                        assert False, "oeir"
+                    if not  self.all_valid():
+                        test_draw.test_draw_dag(self.dag)
+                        test_draw.test_draw_segment(segment)
+                        plt.show()
+                        assert False, "area"
                     if not self.all_allowed_neighbours():
                         test_draw.test_draw_dag(self.dag)
                         test_draw.test_draw_segment(segment)
@@ -587,6 +607,15 @@ class VerticalDecomposition:
             if not self.valid_node(node):
                 return False
         return True
+
+    def no_dupe(self, node):
+        if isinstance(node.content, trapclass.Trapezoid):
+            return True
+        else:
+            b1 = not node.left_child is node.right_child
+            return self.no_dupe(node.left_child) and self.no_dupe(node.right_child) and b1
+
+
 
     def allowed_neighbours(self, node):
         for nb in node.right_neighbours:
@@ -644,6 +673,6 @@ vd = VerticalDecomposition(geometry.find_bounding_box(nodes))
 vd.add_segment(seg)
 vd.add_segment(seg2)
 vd.add_segment(seg3)
-#vd.add_segment(seg4)
+vd.add_segment(seg4)
 test_draw.test_draw_dag(vd.dag)
 plt.show()
