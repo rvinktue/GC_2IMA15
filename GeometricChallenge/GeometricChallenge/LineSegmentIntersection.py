@@ -4,7 +4,7 @@ import vertical_decomposition as vdclass
 import geometry
 import segment, vertex
 
-INPUT_FILE = "instances/small.instance.json"  # Name of the input file
+INPUT_FILE = "instances/sqrpecn3020.instance.json"  # Name of the input file
 OUTPUT_FILE = "intersection_output.txt"  # Name of the output file
 
 
@@ -30,12 +30,19 @@ for edge in edges:
     for (key, vd) in enumerate(vds):
         if vd.add_segment(seg):
             # If segment can be added to the vertical decomposition of level key: add it and continue to next edge
-            continue
-        elif key == len(vds):
+            break
+        if key == len(vds) - 1:
             # If segment could not be added in any of the existing VDs, create a new VD
             new = vdclass.VerticalDecomposition(bounding_box)
             new.add_segment(seg)
             vds.append(new)
+            break
+
+import test_draw
+import matplotlib.pyplot as plt
+for vd in vds:
+    test_draw.test_draw_dag(vd.dag)
+    plt.show()
 
 # Return an upperbound on the edge-colouring
 print(len(vds))
