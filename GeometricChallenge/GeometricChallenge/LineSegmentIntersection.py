@@ -4,7 +4,7 @@ import vertical_decomposition as vdclass
 import geometry
 import segment, vertex
 
-INPUT_FILE = "instances/vispecn2518.instance.json"  # Name of the input file
+INPUT_FILE = "instances/vispecn10178.instance.json"  # Name of the input file
 #INPUT_FILE = "instances/small.instance.json"  # Name of the input file
 OUTPUT_FILE = "intersection_output.txt"  # Name of the output file
 
@@ -51,8 +51,7 @@ print("Checking validity")
 
 import test_draw
 import matplotlib.pyplot as plt
-# @TODO: Ruben mee bezig
-random.shuffle(vds)
+#random.shuffle(vds)
 biggestvd = 0
 biglen = 0
 colours = [-1 for _ in range(len(g.edges))]
