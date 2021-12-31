@@ -707,39 +707,3 @@ class VerticalDecomposition:
         return True
 
 
-import geometry
-import segment, vertex
-#testing
-nodes = [(1,1), (10,10)]
-vertices = [vertex.Vertex(2,5), vertex.Vertex(8,6), vertex.Vertex(1,2), vertex.Vertex(3,4), vertex.Vertex(9, 3)]
-
-# seg = segment.Segment(vertices[0], vertices[1])
-# seg2 = segment.Segment(vertices[2], vertices[1])
-# seg3 = segment.Segment(vertices[1], vertices[4])
-# seg4 = segment.Segment(vertices[2], vertices[4])
-# vd = VerticalDecomposition(geometry.find_bounding_box(nodes))
-# vd.add_segment(seg)
-# vd.add_segment(seg2)
-# vd.add_segment(seg3)
-# vd.add_segment(seg4)
-
-# seg = segment.Segment(vertex.Vertex(3,3), vertex.Vertex(8,5))
-# seg2 = segment.Segment(vertex.Vertex(1,1), vertex.Vertex(6, 3))
-# seg3 = segment.Segment(vertex.Vertex(2,5), vertex.Vertex(7,8))
-# #seg4 = segment.Segment(vertices[2], vertices[4])
-# vd = VerticalDecomposition(geometry.find_bounding_box(nodes))
-# vd.add_segment(seg)
-# vd.add_segment(seg2)
-# vd.add_segment(seg3)
-# #vd.add_segment(seg4)
-
-seg = segment.Segment(vertex.Vertex(3,3), vertex.Vertex(8,5))
-seg2 = segment.Segment(vertex.Vertex(1,6), vertex.Vertex(3, 3))
-#seg3 = segment.Segment(vertex.Vertex(2,5), vertex.Vertex(7,8))
-#seg4 = segment.Segment(vertices[2], vertices[4])
-vd = VerticalDecomposition(geometry.find_bounding_box(nodes))
-vd.add_segment(seg)
-vd.add_segment(seg2)
-#vd.add_segment(seg3)
-#test_draw.test_draw_dag(vd.dag)
-#plt.show()

@@ -3,10 +3,11 @@ import geometry
 
 # Class that represents a single line segment between two vertices
 class Segment:
-    def __init__(self, endpoint1, endpoint2, face_above=None):
+    def __init__(self, endpoint1, endpoint2, face_above=None, id = -1):
         self.endpoint1 = endpoint1 if endpoint1.x <= endpoint2.x else endpoint2
         self.endpoint2 = endpoint2 if endpoint1.x <= endpoint2.x else endpoint1
         self.face_above = face_above
+        self.id = id
 
     # Calculate intersection between the two segments
     def intersects(self, segment):

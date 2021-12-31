@@ -15,7 +15,7 @@ instance = read_instance(INPUT_FILE)  # read edges from input file
 g = instance["graph"]
 
 edges = list(g.edges)
-random.shuffle(edges)  # Find random reordering of edges to decrease expected running time complexity
+#random.shuffle(edges)  # Find random reordering of edges to decrease expected running time complexity
 
 bounding_box = geometry.find_bounding_box(g.nodes)
 vds = [vdclass.VerticalDecomposition(bounding_box)]
@@ -27,13 +27,13 @@ file.close()
 
 # Process all edges
 counter = 0
-for edge in edges:
+for (edgenum, edge) in enumerate(edges):
     counter = counter + 1
     if __debug__:
         if counter % 100 == 0:
             print("-------Processed " + str(counter) + " edges ------------")
             break
-    seg = segment.Segment(vertex.Vertex(edge[0][0], edge[0][1]), vertex.Vertex(edge[1][0], edge[1][1]))
+    seg = segment.Segment(vertex.Vertex(edge[0][0], edge[0][1]), vertex.Vertex(edge[1][0], edge[1][1]), id=edgenum)
     for (key, vd) in enumerate(vds):
         if vd.add_segment(seg):
             # If segment can be added to the vertical decomposition of level key: add it and continue to next edge
@@ -46,13 +46,46 @@ for edge in edges:
             print("Need new colour: %s" % len(vds))
             break
 
+print("Checking validity")
 #we gaan validity checken...
-
-for vd in vds:
-    # @TODO: Ruben mee bezig
 
 import test_draw
 import matplotlib.pyplot as plt
+# @TODO: Ruben mee bezig
+random.shuffle(vds)
+biggestvd = 0
+biglen = 0
+colours = [-1 for _ in range(len(g.edges))]
+for (vdnum, vd) in enumerate(vds):
+    segments = test_draw.get_all_content_of_type(vd.dag, segment.Segment)
+    if len(segments) > biglen:
+        biglen = len(segments)
+        biggestvd = vd
+
+    for seg in segments:
+        colours[seg.id] = vdnum
+
+    if __debug__:
+        for i in range(len(segments)):
+            for j in range(i+1, len(segments)):
+                if segments[i] == segments[j]:
+                    continue
+                if segments[i].intersects(segments[j]):
+                    print("Not valid since we intersect: (%s, %s) <-> (%s, %s) and (%s, %s) <-> (%s, %s)"
+                          % (segments[i].endpoint1.x, segments[i].endpoint1.y,
+                             segments[i].endpoint2.x, segments[i].endpoint2.y,
+                             segments[j].endpoint1.x, segments[j].endpoint1.y,
+                             segments[j].endpoint2.x, segments[j].endpoint2.y,))
+                    test_draw.test_draw_segment(segments[i])
+                    test_draw.test_draw_segment(segments[j])
+                    plt.show()
+
+print("Min(colours): %s" % min(colours))
+print("Max(colours): %s" % max(colours))
+
+test_draw.test_draw_dag(biggestvd.dag)
+plt.show()
+
 for vd in vds:
     test_draw.test_draw_dag(vd.dag)
     plt.show()
