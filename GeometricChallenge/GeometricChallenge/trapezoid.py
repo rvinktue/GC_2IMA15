@@ -45,6 +45,27 @@ class Trapezoid:
     def segment_enter(self, segment):
         return self.left_segment.is_entered_by(segment)
 
+    def update_left_points(self, new_points):
+        self.left_points = new_points[:]
+
+        # Precompute quad and left/right segments
+        a = self.top_segment.endpoint1
+        b = self.top_segment.endpoint2
+        c = self.bottom_segment.endpoint2
+        d = self.bottom_segment.endpoint1
+
+        if len(self.left_points) > 0:
+            px = self.left_points[0].x
+        else:
+            px = max(a.x, d.x)
+
+
+        p_top = vertclass.Vertex(px, max(a.y, b.y) if a.x == b.x else (a.y - b.y) / (a.x - b.x) * (px - a.x) + a.y)
+        p_bot = vertclass.Vertex(px, min(c.y, d.y) if c.x == d.x else (d.y - c.y) / (d.x - c.x) * (px - d.x) + d.y)
+
+        self.left_segment = seg_type.Segment(p_bot, p_top)
+
+
     # Returns True if the segment crosses top or bottom boundary of this trapezoid
     #         False otherwise
     def is_violated_by_segment(self, segment):

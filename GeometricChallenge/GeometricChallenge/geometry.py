@@ -34,7 +34,7 @@ def find_bounding_box(nodes):
     min_x = min_y = 1e10
     max_x = max_y = -1e10
     for node in nodes:
-        min_x, min_y, max_x, max_y = min(node.x, min_x), min(node.y, min_y), max(node.x, max_x), max(node.y, max_y)
+        min_x, min_y, max_x, max_y = min(node[0], min_x), min(node[1], min_y), max(node[0], max_x), max(node[1], max_y)
 
     # Build the trapezoid of the bounding box
     left_top = vertex.Vertex(min_x - 1, max_y + 1)
