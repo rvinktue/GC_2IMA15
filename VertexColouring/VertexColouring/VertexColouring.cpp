@@ -114,7 +114,7 @@ void populate_from_file_simple(const char* file_name, std::vector<std::vector<in
 	std::cout << "[SIMPLE] Read " << i << " value pairs." << std::endl;
 }
 
-const int BUFFER_SIZE = 8192*64;
+const int BUFFER_SIZE = 8192;
 // adapted from answer by Mats Petersson on stackoverflow:
 // https://stackoverflow.com/questions/15115943/what-is-the-best-efficient-way-to-read-millions-of-integers-separated-by-lines-f
 void populate_from_file_fast(const char* file_name, std::vector<std::vector<int>>& G) {
@@ -219,7 +219,7 @@ void f(int argc, char* argv[]) {
 
 	std::vector<int> color(n);
 	//Num of trials
-	int k = 10000;
+	int k = 100;
 	int teller = 0;
 	int best = INT_MAX;
 	while (teller++ < k) {
