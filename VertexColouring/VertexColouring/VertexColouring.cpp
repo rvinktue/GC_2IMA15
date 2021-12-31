@@ -130,11 +130,12 @@ void populate_from_file_fast(const char* file_name, std::vector<std::vector<int>
 	int hasnum = 0;
 	int eof = 0;
 	while (!eof){
+		memset(buffer, 13, sizeof(buffer));  // To detect end of files.
 		fread(buffer, 1, sizeof(buffer), f);
 		p = buffer;
-		bytes = BUFFER_SIZE;
+		bytes = sizeof(buffer);// BUFFER_SIZE;
 		while (bytes > 0){
-			if (*p == 26 || *p == NULL || *p == 13){ //eof marker
+			if (*p == 13){ //eof marker
 				eof = 1;
 				break;
 			}
@@ -144,8 +145,6 @@ void populate_from_file_fast(const char* file_name, std::vector<std::vector<int>
 						last = num;
 					}
 					else {
-						if (i >= 95013624) std::cout << "Line " << i << ": " << last << ", " << num << std::endl;
-						
 						G[last].push_back(num);
 						G[num].push_back(last);
 						i++;
@@ -166,8 +165,7 @@ void populate_from_file_fast(const char* file_name, std::vector<std::vector<int>
 				std::cout << "Error in reading file fast... *p = " << (int)*p << " i= " << i << std::endl;
 				exit(1);
 			}
-		}
-		memset(buffer, 26, sizeof(buffer));  // To detect end of files. 
+		} 
 	}
 	std::cout << "[FAST] Read " << i << " value pairs" << std::endl;
 	fclose(f);
@@ -197,7 +195,7 @@ void f(int argc, char* argv[]) {
 	//G[vertex] = {neigh_1, ..., neigh_n}
 	std::vector<std::vector<int>> G(n, std::vector<int>());
 	populate_from_file_fast(file_name_in, G);
-
+	//populate_from_file_simple(file_name_in, G);
 	auto stop = std::chrono::high_resolution_clock::now();
 	std::cout << "Done reading " << m << " lines in "
 		<< std::chrono::duration_cast<std::chrono::milliseconds>(stop - start).count()
