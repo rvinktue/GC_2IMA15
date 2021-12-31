@@ -71,9 +71,9 @@ class Trapezoid:
     def is_violated_by_segment(self, segment):
         for boundary in [self.bottom_segment, self.top_segment]:
             if boundary.intersects(segment):
-                print("Intersection found between (%s, %s) -> (%s, %s) and (%s, %s) -> (%s, %s)"
-                      % (boundary.endpoint1.x, boundary.endpoint1.y, boundary.endpoint2.x, boundary.endpoint2.y,
-                         segment.endpoint1.x, segment.endpoint1.y, segment.endpoint2.x, segment.endpoint2.y))
+                #print("Intersection found between (%s, %s) -> (%s, %s) and (%s, %s) -> (%s, %s)"
+                #      % (boundary.endpoint1.x, boundary.endpoint1.y, boundary.endpoint2.x, boundary.endpoint2.y,
+                #         segment.endpoint1.x, segment.endpoint1.y, segment.endpoint2.x, segment.endpoint2.y))
                 return True
         return False
 
