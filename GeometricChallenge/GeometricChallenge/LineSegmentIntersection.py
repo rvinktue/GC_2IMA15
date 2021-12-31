@@ -4,7 +4,7 @@ import vertical_decomposition as vdclass
 import geometry
 import segment, vertex
 
-INPUT_FILE = "instances/reecn3382.instance.json"  # Name of the input file
+INPUT_FILE = "instances/vispecn2518.instance.json"  # Name of the input file
 #INPUT_FILE = "instances/small.instance.json"  # Name of the input file
 OUTPUT_FILE = "intersection_output.txt"  # Name of the output file
 

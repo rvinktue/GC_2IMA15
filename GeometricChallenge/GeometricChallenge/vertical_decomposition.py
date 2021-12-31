@@ -268,12 +268,6 @@ class VerticalDecomposition:
                             if left_neighbour == node:
                                 right_neighbour.left_neighbours[left_neighbour_index] = trap_node2
 
-                    if not self.allowed_neighbours(trap_node2):
-                        test_draw.test_draw_dag(self.dag)
-                        test_draw.test_draw_segment(segment)
-                        plt.show()
-                        assert False, "ehao"
-
                     trap_node3.left_neighbours = [trap_node1]
                     if carry == trap_node3:
                         trap_node3.right_neighbours = []
@@ -286,25 +280,11 @@ class VerticalDecomposition:
                         for (left_neighbour_index, left_neighbour) in enumerate(right_neighbour.left_neighbours):
                             if left_neighbour == node:
                                 right_neighbour.left_neighbours[left_neighbour_index] = trap_node3
-                                if not self.allowed_neighbours(trap_node2):
-                                    test_draw.test_draw_dag(self.dag)
-                                    test_draw.test_draw_segment(segment)
-                                    plt.show()
-                                    assert False, "ehao"
                             elif left_neighbour == trap_node2:
                                 right_neighbour.left_neighbours.append(trap_node3)  # net toegevoegd
-                                if not self.allowed_neighbours(trap_node2):
-                                    test_draw.test_draw_dag(self.dag)
-                                    test_draw.test_draw_segment(segment)
-                                    plt.show()
-                                    assert False, "ehao"
 
 
-                    if not self.allowed_neighbours(trap_node2):
-                        test_draw.test_draw_dag(self.dag)
-                        test_draw.test_draw_segment(segment)
-                        plt.show()
-                        assert False, "ehao"
+
 
                     assert self.trap_segs_valid(), "traaaa"
                     assert trap_node1.content.left_points, "n1"
