@@ -41,20 +41,22 @@ class VerticalDecomposition:
         current_node = start_node
 
         while current_node is not end_node:
-            if current_node.right_neighbours == []:
-                test_draw.test_draw_dag(self.dag)
-                test_draw.test_draw_segment(segment)
-                plt.show()
-                print("oh")
+            if __debug__:
+                if current_node.right_neighbours == []:
+                    test_draw.test_draw_dag(self.dag)
+                    test_draw.test_draw_segment(segment)
+                    plt.show()
+                    print("oh")
             assert current_node.right_neighbours != [], "Current node has no neighbours, but is not end node"
             # Go to the next trapezoid on the path
             # assert len([n for n in current_node.right_neighbours if n.content.segment_enter(segment)]) > 0, "will get stuck"
             temp = [n for n in current_node.right_neighbours if n.content.segment_enter(segment)]
-            if (len(temp) == 0):
-                test_draw.test_draw_dag(self.dag)
-                test_draw.test_draw_segment(segment)
-                plt.show()
-                assert False, "oh"
+            if __debug__:
+                if (len(temp) == 0):
+                    test_draw.test_draw_dag(self.dag)
+                    test_draw.test_draw_segment(segment)
+                    plt.show()
+                    assert False, "oh"
             for node in current_node.right_neighbours:
                 trap = node.content
                 assert isinstance(trap, trapclass.Trapezoid), \
@@ -64,8 +66,8 @@ class VerticalDecomposition:
                     intersected_trapezoids.append(node)
                     current_node = node
                     break
-
-        print("Segment forms path through %s trapezoids" % len(intersected_trapezoids))
+        if __debug__:
+            print("Segment forms path through %s trapezoids" % len(intersected_trapezoids))
         return intersected_trapezoids
 
     # Adds a new segment to the vertical decomposition if it does not intersect
@@ -135,7 +137,8 @@ class VerticalDecomposition:
             parent_nodes = node.parents
 
             if len(parent_nodes) == 0:
-                print("[VD] [Single trapezoid] replace initial bounding box")
+                if __debug__:
+                    print("[VD] [Single trapezoid] replace initial bounding box")
                 # Replace the initial bounding box
                 # new root becomes left endpoint of segment
                 self.dag = dag.DagNode(segment.endpoint1)
@@ -196,7 +199,10 @@ class VerticalDecomposition:
 
                 # Left most intersection trapezoid
                 if trapezoid.contains(segment.endpoint1) and segment.endpoint1.x_order(trapezoid.left_points[0]) != 0:
-                    #print("Handling left most trapezoid intersection...")
+
+                    if __debug__:
+                        print("Handling left most trapezoid intersection...")
+
                     right_points_above_segment = [point for point in trapezoid.right_points
                                                   if point.is_above(segment)]
                     right_points_below_segment = [point for point in trapezoid.right_points
@@ -294,17 +300,21 @@ class VerticalDecomposition:
                     assert self.all_child(self.dag), "oeoeiea"
 
                     assert self.all_valid(), "n1"
-                    if not self.all_allowed_neighbours():
-                        test_draw.test_draw_dag(self.dag)
-                        test_draw.test_draw_segment(segment)
-                        plt.show()
-                        assert False, "ehao"
+                    if __debug__:
+                        if not self.all_allowed_neighbours():
+                            test_draw.test_draw_dag(self.dag)
+                            test_draw.test_draw_segment(segment)
+                            plt.show()
+                            assert False, "ehao"
 
 
 
                 # Right most intersection trapezoid
                 elif trapezoid.contains(segment.endpoint2) and segment.endpoint2.x_order(trapezoid.right_points[0]) != 0:
-                    #print("Handling right most trapezoid intersection...")
+
+                    if __debug__:
+                        print("Handling right most trapezoid intersection...")
+
                     left_points_above_segment = [point for point in trapezoid.left_points if point.is_above(segment)]
                     left_points_below_segment = [point for point in trapezoid.left_points if
                                                  point.is_below(segment)]
@@ -417,18 +427,18 @@ class VerticalDecomposition:
                     assert trap_node2.content.left_points, "n2"
                     assert trap_node3.content.left_points, "n3"
                     assert self.trap_segs_valid(), "traaaa"
-                    if not self.all_child(self.dag):
+                    if __debug__ and not self.all_child(self.dag):
                         test_draw.test_draw_dag(self.dag)
                  #       test_draw.test_draw_segment(segment)
                         plt.show()
                         assert False, "aiiia"
                     assert self.no_dupe(self.dag), 'oeir'
-                    if not self.all_allowed_neighbours():
+                    if __debug__ and not self.all_allowed_neighbours():
                         test_draw.test_draw_dag(self.dag)
                         test_draw.test_draw_segment(segment)
                         plt.show()
                         assert False, "boab"
-                    if not self.all_valid():
+                    if __debug__ and not self.all_valid():
                         test_draw.test_draw_dag(self.dag)
                         test_draw.test_draw_segment(segment)
                         plt.show()
@@ -436,7 +446,10 @@ class VerticalDecomposition:
 
 
                 else:  # Trapezoid is separated by segment
-                    #print("Handling intermediate trapezoid intersection...")
+
+                    if __debug__:
+                        print("Handling intermediate trapezoid intersection...")
+
                     left_points_above_segment = [point for point in trapezoid.left_points if point.is_above(segment)]
                     left_points_below_segment = [point for point in trapezoid.left_points if
                                                  point.is_below(segment)]
@@ -568,23 +581,23 @@ class VerticalDecomposition:
 
                     assert trap_node1.content.left_points, "n1"
                     assert trap_node2.content.left_points, 'n2'
-                    if not self.trap_segs_valid():
+                    if __debug__ and not self.trap_segs_valid():
                         test_draw.test_draw_dag(self.dag)
                      #   test_draw.test_draw_segment(segment)
                         plt.show()
                         assert False, "traaaa"
                     assert self.all_child(self.dag), "oeoeiea"
-                    if not self.no_dupe(self.dag):
+                    if __debug__ and not self.no_dupe(self.dag):
                         test_draw.test_draw_dag(self.dag)
                         test_draw.test_draw_segment(segment)
                         plt.show()
                         assert False, "oeir"
-                    if not  self.all_valid():
+                    if __debug__ and not  self.all_valid():
                         test_draw.test_draw_dag(self.dag)
                         test_draw.test_draw_segment(segment)
                         plt.show()
                         assert False, "area"
-                    if not self.all_allowed_neighbours():
+                    if __debug__ and not self.all_allowed_neighbours():
                         test_draw.test_draw_dag(self.dag)
                         test_draw.test_draw_segment(segment)
                         plt.show()

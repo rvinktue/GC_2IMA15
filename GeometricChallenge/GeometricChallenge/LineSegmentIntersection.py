@@ -14,8 +14,8 @@ OUTPUT_FILE = "intersection_output.txt"  # Name of the output file
 instance = read_instance(INPUT_FILE)  # read edges from input file
 g = instance["graph"]
 
-edges = g.edges
-#random.shuffle(edges)  # Find random reordering of edges to decrease expected running time complexity
+edges = list(g.edges)
+random.shuffle(edges)  # Find random reordering of edges to decrease expected running time complexity
 
 bounding_box = geometry.find_bounding_box(g.nodes)
 vds = [vdclass.VerticalDecomposition(bounding_box)]
@@ -29,9 +29,10 @@ file.close()
 counter = 0
 for edge in edges:
     counter = counter + 1
-    if counter % 100 == 0:
-        print("-------Processed " + str(counter) + " edges ------------")
-        break
+    if __debug__:
+        if counter % 100 == 0:
+            print("-------Processed " + str(counter) + " edges ------------")
+            break
     seg = segment.Segment(vertex.Vertex(edge[0][0], edge[0][1]), vertex.Vertex(edge[1][0], edge[1][1]))
     for (key, vd) in enumerate(vds):
         if vd.add_segment(seg):
@@ -42,7 +43,13 @@ for edge in edges:
             new = vdclass.VerticalDecomposition(bounding_box)
             new.add_segment(seg)
             vds.append(new)
+            print("Need new colour: %s" % len(vds))
             break
+
+#we gaan validity checken...
+
+for vd in vds:
+    # @TODO: Ruben mee bezig
 
 import test_draw
 import matplotlib.pyplot as plt
