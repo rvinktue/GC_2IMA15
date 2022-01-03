@@ -41,22 +41,12 @@ class VerticalDecomposition:
         current_node = start_node
 
         while current_node is not end_node:
-            if __debug__:
-                if current_node.right_neighbours == []:
-                    test_draw.test_draw_dag(self.dag)
-                    test_draw.test_draw_segment(segment)
-                    plt.show()
-                    print("oh")
+            if len(current_node.right_neighbours) == 0 or not segment.intersects(current_node.content.right_segment):
+                return []
+
             assert current_node.right_neighbours != [], "Current node has no neighbours, but is not end node"
-            # Go to the next trapezoid on the path
-            # assert len([n for n in current_node.right_neighbours if n.content.segment_enter(segment)]) > 0, "will get stuck"
-            temp = [n for n in current_node.right_neighbours if n.content.segment_enter(segment)]
-            if __debug__:
-                if (len(temp) == 0):
-                    test_draw.test_draw_dag(self.dag)
-                    test_draw.test_draw_segment(segment)
-                    plt.show()
-                    assert False, "oh"
+
+            found_successor = False
             for node in current_node.right_neighbours:
                 trap = node.content
                 assert isinstance(trap, trapclass.Trapezoid), \
@@ -65,9 +55,11 @@ class VerticalDecomposition:
                     # Found the successor
                     intersected_trapezoids.append(node)
                     current_node = node
+                    found_successor = True
                     break
-        if __debug__:
-            print("Segment forms path through %s trapezoids" % len(intersected_trapezoids))
+            if not found_successor:
+                return []
+
         return intersected_trapezoids
 
     # Adds a new segment to the vertical decomposition if it does not intersect
@@ -75,23 +67,15 @@ class VerticalDecomposition:
     #         False if segment could not be inserted in this vertical decomposition
     def add_segment(self, segment):
         # Naively check all trapezoids for intersections @TODO: we can probably improve this
-        all_trapezoids = self.dag.find_all(trapclass.Trapezoid)
+        #all_trapezoids = self.dag.find_all(trapclass.Trapezoid)
 
-        intersection_found = False
-        for node in all_trapezoids:
-            trapezoid = node.content
-            assert isinstance(trapezoid, trapclass.Trapezoid), \
-                "Expected type(trapezoid) = Trapezoid, instead found %s" % type(trapezoid).__name__
-            # Checks if the segment has an intersection with the bottom segment of the trapezoid
-            if trapezoid.is_violated_by_segment(segment):
-                # @TODO: write intersection to file for C++
-                intersection_found = True
+        traps = self.find_intersecting_trapezoids(segment)
 
-        if intersection_found:
+        if len(traps) == 0:
             return False
 
         # Add segment to DAG
-        self.update(self.find_intersecting_trapezoids(segment), segment)
+        self.update(traps, segment)
         return True
 
     # Updates the DAG with the new trapezoids induced by adding segment
@@ -592,7 +576,7 @@ class VerticalDecomposition:
                         test_draw.test_draw_segment(segment)
                         plt.show()
                         assert False, "oeir"
-                    if __debug__ and not  self.all_valid():
+                    if __debug__ and not self.all_valid():
                         test_draw.test_draw_dag(self.dag)
                         test_draw.test_draw_segment(segment)
                         plt.show()
