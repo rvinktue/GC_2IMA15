@@ -61,13 +61,13 @@ class DagNode:
 
     # Find all objects of class
     def find_all(self, object_class):
-        output = []
+        output = set()
         if isinstance(self.content, object_class):
-            output.append(self)
+            output.add(self)
         if self.left_child is not None:
-            output += self.left_child.find_all(object_class)
+            output.update(self.left_child.find_all(object_class))
         if self.right_child is not None:
-            output += self.right_child.find_all(object_class)
+            output.update(self.right_child.find_all(object_class))
         return output
 
     # Find all references to node

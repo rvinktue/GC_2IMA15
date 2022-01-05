@@ -9,11 +9,11 @@ class Trapezoid:
         if isinstance(left_points, vertclass.Vertex):
             self.left_points = [left_points]
         else:
-            self.left_points = left_points
+            self.left_points = left_points[:]
         if isinstance(right_points, vertclass.Vertex):
             self.right_points = [right_points]
         else:
-            self.right_points = right_points
+            self.right_points = right_points[:]
         self.bottom_segment = bottom_segment
         # Update bottom segment reference
         bottom_segment.face_above = self
@@ -41,6 +41,7 @@ class Trapezoid:
 
         self.left_segment = seg_type.Segment(p_bot, p_top)
         self.right_segment = seg_type.Segment(q_bot, q_top)
+
 
     def segment_enter(self, segment):
         return self.left_segment.is_entered_by(segment)

@@ -7,14 +7,16 @@ import segment, vertex
 
 def perform_decompositions(g, shuffle) -> [vdclass.VerticalDecomposition]:
     edges = list(g.edges)
+    indices = list(range(len(edges)))
     if shuffle:
-        random.shuffle(edges)  # Find random reordering of edges to decrease expected running time complexity
+        random.shuffle(indices)  # Find random reordering of edges to decrease expected running time complexity
 
     bounding_box = geometry.find_bounding_box(g.nodes)
     vds = [vdclass.VerticalDecomposition(bounding_box)]
 
     # Process all edges
-    for (edgenum, edge) in enumerate(edges):
+    for edgenum in indices:
+        edge = edges[edgenum]
         seg = segment.Segment(vertex.Vertex(edge[0][0], edge[0][1]), vertex.Vertex(edge[1][0], edge[1][1]), id=edgenum)
         for (key, vd) in enumerate(vds):
             if vd.add_segment(seg):
@@ -32,7 +34,7 @@ def perform_decompositions(g, shuffle) -> [vdclass.VerticalDecomposition]:
 
 # takes file name outputs json string with solution encoded, no debug info
 # Expected format of file_name "instances/<INSTANCE_NAME>.instance.json"
-def solve(file_name: str, save_to_file = True, shuffle = True) -> str:
+def solve(file_name: str, save_to_file = True, shuffle = True, verify = False) -> str:
     # Incrementally build vertical decompositions of planar subgraphs
     # Read instance and instantiate graph, bounding box and starting vertical decomposition
     instance = read_instance(file_name)  # read edges from input file
@@ -55,10 +57,26 @@ def solve(file_name: str, save_to_file = True, shuffle = True) -> str:
         for seg in segments:
             colours[seg.id] = vdnum
 
+        if verify:
+            print(f"Starting verification on {len(segments)} segments...")
+            for (ind, seg1) in enumerate(segments):
+                for seg2 in segments[ind+1:]:
+                    if seg1 == seg2:
+                        continue
+                    if seg1.intersects(seg2):
+                        print("Verification failed...")
+                        return None
+            print("Verification successful!")
     assert min(colours) >= 0, "Some edges are uncoloured..."
     num_colours = max(colours) - min(colours) + 1
     instance_name = file_name.split('.')[0][10:]
-
+    '''
+    import numpy as np
+    import matplotlib.pyplot as plt
+    hist, bins = np.histogram(lengths, range = (0, 100*((max(lengths)//100)+1)), bins=25)
+    plt.hist(lengths, bins)
+    plt.show()
+    '''
     output_string = "{\n" \
                     "  \"type\": \"Solution_CGSHOP2022\",\n" \
                     "  \"instance\": \"" + instance_name + "\", \n" \

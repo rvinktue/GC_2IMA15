@@ -80,7 +80,7 @@ class VerticalDecomposition:
 
     # Updates the DAG with the new trapezoids induced by adding segment
     def update(self, nodes, segment):
-        if len(nodes) == 1 and nodes[0].content.left_points[0].x_order(segment.endpoint1) != 0 and nodes[0].content.right_points[0].x_order(segment.endpoint2) != 0:
+        if len(nodes) == 1 and nodes[0].content.left_segment.endpoint1.x_order(segment.endpoint1) != 0 and nodes[0].content.right_segment.endpoint1.x_order(segment.endpoint2) != 0:
             # Segment is completely contained in a single trapezoid
             node = nodes[0]
             trapezoid = node.content
@@ -182,7 +182,7 @@ class VerticalDecomposition:
                     "Expected type(trapezoid) = Trapezoid, instead found %s" % type(trapezoid).__name__
 
                 # Left most intersection trapezoid
-                if trapezoid.contains(segment.endpoint1) and segment.endpoint1.x_order(trapezoid.left_points[0]) != 0:
+                if trapezoid.contains(segment.endpoint1) and segment.endpoint1.x_order(trapezoid.left_segment.endpoint1) != 0:
 
                     if __debug__:
                         print("Handling left most trapezoid intersection...")
@@ -294,7 +294,7 @@ class VerticalDecomposition:
 
 
                 # Right most intersection trapezoid
-                elif trapezoid.contains(segment.endpoint2) and segment.endpoint2.x_order(trapezoid.right_points[0]) != 0:
+                elif trapezoid.contains(segment.endpoint2) and segment.endpoint2.x_order(trapezoid.right_segment.endpoint1) != 0:
 
                     if __debug__:
                         print("Handling right most trapezoid intersection...")
