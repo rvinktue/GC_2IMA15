@@ -1,7 +1,12 @@
 from cgshop2022utils.io import read_instance  # Provided by the challenge
+
+import geometry
 import segment
+import test_draw
 import vertex
 import json
+
+import vertical_decomposition
 
 
 class SolutionCheck:
@@ -78,5 +83,22 @@ if False and __name__ == "__main__":
         if not solcheck.is_correct:
             solcheck.report_errors()
 
+
+import matplotlib.pyplot as plt
+g = read_instance("instances/reecn50133.instance.json")["graph"]
 solcheck = check_instance("reecn50133")
 solcheck.report_errors()
+print(f"Segment ids: {[(segnr, seg.id) for (segnr, seg) in enumerate(solcheck.subsets[9])]}")
+vd = vertical_decomposition.VerticalDecomposition(geometry.find_bounding_box(g.nodes))
+for seg in solcheck.subsets[9]:
+    vd.add_segment(seg)
+    if seg.id == 1420:
+        test_draw.test_draw_dag(vd.dag)
+        test_draw.test_draw_segment(solcheck.subsets[9][28], (0, 1, 1))
+        plt.show()
+
+    if seg.id == 1455:
+        test_draw.test_draw_dag(vd.dag)
+        test_draw.test_draw_segment(seg, (0, 1, 1))
+        test_draw.test_draw_segment(solcheck.subsets[9][8], (1, 0, 1))
+        plt.show()
