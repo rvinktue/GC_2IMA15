@@ -10,13 +10,17 @@ import test_cases
 # Handles test case (given list of vertex endpoints)
 def handle_test(vertices, print_dag):
     segments = [segclass.Segment(vertices[2 * i], vertices[2 * i + 1]) for i in range(len(vertices) // 2)]
-    vd = vdclass.VerticalDecomposition(geometry.find_bounding_box(vertices))
+    vd = vdclass.VerticalDecomposition(geometry.find_bounding_box([[v.x, v.y] for v in vertices]))
 
     for seg in segments:
         is_added = vd.add_segment(seg)
         if is_added:
             print("Added: (%s, %s) -> (%s, %s)" % (seg.endpoint1.x, seg.endpoint1.y, seg.endpoint2.x, seg.endpoint2.y))
             test_draw.test_draw_dag(vd.dag)
+            # for trap in vd.dag.find_all(trapclass.Trapezoid):
+            #     test_draw.test_draw_trapezoid(trap.content, (190/255, 190/255, 190/255))
+            #     plt.show()
+            #     test_draw.test_draw_dag(vd.dag)
             plt.show()
         else:
             print("Could not add: (%s, %s) -> (%s, %s)"
@@ -27,10 +31,11 @@ def handle_test(vertices, print_dag):
 
 
 # Run all test cases (switch the False to True to print the final DAG for each test case)
-for vertex_list in [
+for index, vertex_list in enumerate([
     test_cases.test_case_1(),
     test_cases.test_case_2(),
     test_cases.test_case_3(),
     test_cases.test_case_4()
-]:
+]):
+    print(f"Running test {index}")
     handle_test(vertex_list, False)

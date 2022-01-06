@@ -1,4 +1,4 @@
-import segment as seg_type
+import segment as segclass
 import vertex as vertclass
 
 
@@ -17,6 +17,18 @@ class Trapezoid:
         self.bottom_segment = bottom_segment
         # Update bottom segment reference
         bottom_segment.face_above = self
+
+        if self.top_segment.endpoint1.x == self.top_segment.endpoint2.x:
+            bottom_vertex = self.top_segment.endpoint1 \
+                if self.top_segment.endpoint1.y <= self.top_segment.endpoint2.y \
+                else self.top_segment.endpoint2
+            self.top_segment = segclass.Segment(bottom_vertex, bottom_vertex)
+
+        if self.bottom_segment.endpoint1.x == self.bottom_segment.endpoint2.x:
+            top_vertex = self.bottom_segment.endpoint1 \
+                if self.bottom_segment.endpoint1.y >= self.bottom_segment.endpoint2.y \
+                else self.bottom_segment.endpoint2
+            self.bottom_segment = segclass.Segment(top_vertex, top_vertex)
 
         # Precompute quad and left/right segments
         a = self.top_segment.endpoint1
@@ -39,8 +51,8 @@ class Trapezoid:
         q_top = vertclass.Vertex(qx, max(a.y, b.y) if a.x == b.x else (a.y - b.y) / (a.x - b.x) * (qx - a.x) + a.y)
         q_bot = vertclass.Vertex(qx, min(c.y, d.y) if c.x == d.x else (d.y - c.y) / (d.x - c.x) * (qx - d.x) + d.y)
 
-        self.left_segment = seg_type.Segment(p_bot, p_top)
-        self.right_segment = seg_type.Segment(q_bot, q_top)
+        self.left_segment = segclass.Segment(p_bot, p_top)
+        self.right_segment = segclass.Segment(q_bot, q_top)
 
     def segment_enter(self, segment):
         return self.left_segment.is_entered_by(segment)
@@ -62,7 +74,7 @@ class Trapezoid:
         p_top = vertclass.Vertex(px, max(a.y, b.y) if a.x == b.x else (a.y - b.y) / (a.x - b.x) * (px - a.x) + a.y)
         p_bot = vertclass.Vertex(px, min(c.y, d.y) if c.x == d.x else (d.y - c.y) / (d.x - c.x) * (px - d.x) + d.y)
 
-        self.left_segment = seg_type.Segment(p_bot, p_top)
+        self.left_segment = segclass.Segment(p_bot, p_top)
 
     # Returns True if the segment crosses top or bottom boundary of this trapezoid
     #         False otherwise

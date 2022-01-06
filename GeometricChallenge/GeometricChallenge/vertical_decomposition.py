@@ -90,9 +90,17 @@ class VerticalDecomposition:
                 and not trapezoid.right_segment.on_segment(segment.endpoint2):
             self.update_single_trapezoid_contained(node, trapezoid, segment)
 
+        if trapezoid.left_segment.on_segment(segment.endpoint1) \
+                and not trapezoid.right_segment.on_segment(segment.endpoint2):
+            self.update_single_trapezoid_left_boundary(node, trapezoid, segment)
+
         if not trapezoid.left_segment.on_segment(segment.endpoint1) \
                 and trapezoid.right_segment.on_segment(segment.endpoint2):
             self.update_single_trapezoid_right_boundary(node, trapezoid, segment)
+
+        if trapezoid.left_segment.on_segment(segment.endpoint1) \
+                and trapezoid.right_segment.on_segment(segment.endpoint2):
+            self.update_single_trapezoid_both_boundary(node, trapezoid, segment)
 
     def update_single_trapezoid_contained(
             self,
@@ -176,6 +184,87 @@ class VerticalDecomposition:
             for (left_neighbour_index, left_neighbour) in enumerate(right_neighbour.left_neighbours):
                 if left_neighbour == node:
                     right_neighbour.left_neighbours[left_neighbour_index] = trap_node4
+
+    def update_single_trapezoid_left_boundary(
+            self,
+            node: dag.DagNode,
+            trapezoid: trapclass.Trapezoid,
+            segment: segclass.Segment
+    ) -> None:
+        left_points_above_segment = [point for point in trapezoid.left_points
+                                     if point.is_above(segment)]
+        left_points_below_segment = [point for point in trapezoid.left_points
+                                     if point.is_below(segment)]
+
+        # 1: above segment
+        trapezoid1 = trapclass.Trapezoid(trapezoid.top_segment,
+                                         left_points_above_segment + [segment.endpoint1],
+                                         segment.endpoint2,
+                                         segment)
+        # 2: below segment
+        trapezoid2 = trapclass.Trapezoid(segment,
+                                         left_points_below_segment + [segment.endpoint1],
+                                         segment.endpoint2,
+                                         trapezoid.bottom_segment)
+
+        # 3: right of segment
+        trapezoid3 = trapclass.Trapezoid(trapezoid.top_segment,
+                                         segment.endpoint2,
+                                         trapezoid.right_points,
+                                         trapezoid.bottom_segment)
+
+        trap_node1 = dag.DagNode(trapezoid1)
+        trap_node2 = dag.DagNode(trapezoid2)
+        trap_node3 = dag.DagNode(trapezoid3)
+
+        # Update DAG
+        parent_nodes = node.parents
+        lp_node = dag.DagNode(segment.endpoint1)
+        for parent_node in parent_nodes:
+            if parent_node.left_child.content == trapezoid:  # If we are the left child
+                parent_node.set_left_child(lp_node)  # Left endpoint becomes left child
+            else:
+                # We are the right child
+                parent_node.set_right_child(lp_node)  # Left endpoint becomes right child
+
+        lp_node.set_right_child(dag.DagNode(segment.endpoint2))
+        lp_node.right_child.set_right_child(trap_node3)
+        lp_node.right_child.set_left_child(dag.DagNode(segment))
+        segment_node = lp_node.right_child.left_child
+        segment_node.set_left_child(trap_node2)
+        segment_node.set_right_child(trap_node1)
+
+        # Update neighbours
+        trap_node1.left_neighbours = [neighbour for neighbour in node.left_neighbours
+                                      if neighbour.content.right_segment.intersects(trapezoid1.left_segment)]
+        trap_node1.right_neighbours = [trap_node3]
+
+        trap_node2.left_neighbours = [neighbour for neighbour in node.left_neighbours
+                                      if neighbour.content.right_segment.intersects(trapezoid2.left_segment)]
+        trap_node2.right_neighbours = [trap_node3]
+
+        trap_node3.left_neighbours = [trap_node1, trap_node2]
+        trap_node3.right_neighbours = node.right_neighbours[:]
+
+        for left_neighbour in trap_node1.left_neighbours:
+            for (right_neighbour_index, right_neighbour) in enumerate(left_neighbour.right_neighbours):
+                if right_neighbour == node:
+                    left_neighbour.right_neighbours[right_neighbour_index] = trap_node1
+
+        for left_neighbour in trap_node2.left_neighbours:
+            for (right_neighbour_index, right_neighbour) in enumerate(left_neighbour.right_neighbours):
+                if right_neighbour == node:
+                    left_neighbour.right_neighbours[right_neighbour_index] = trap_node2
+
+        for right_neighbour in trap_node3.right_neighbours:
+            for (left_neighbour_index, left_neighbour) in enumerate(right_neighbour.left_neighbours):
+                if left_neighbour == node:
+                    right_neighbour.left_neighbours[left_neighbour_index] = trap_node3
+
+        # Add segment endpoint to neighbour trapezoids
+        for left_neighbour in node.left_neighbours:
+            if left_neighbour.content.right_segment.on_segment(segment.endpoint1):
+                left_neighbour.content.right_points.append(segment.endpoint1)
 
     def update_single_trapezoid_right_boundary(
             self,
@@ -344,7 +433,7 @@ class VerticalDecomposition:
         # Add segment endpoints to neighbour trapezoids
         for left_neighbour in node.left_neighbours:
             if left_neighbour.content.right_segment.on_segment(segment.endpoint1):
-                left_neighbour.content.right_segment.append(segment.endpoint1)
+                left_neighbour.content.right_points.append(segment.endpoint1)
 
         for right_neighbour in node.right_neighbours:
             if right_neighbour.content.left_segment.on_segment(segment.endpoint2):
@@ -384,7 +473,10 @@ class VerticalDecomposition:
 
             # Handle case as middle or right, return for now
             return None, None
-        if not trapezoid.right_segment.on_segment(segment.endpoint1):
+        elif trapezoid.left_segment.on_segment(segment.endpoint1):
+            # Handle case as middle with left endpoint on left boundary
+            return self.update_multiple_trapezoids_middle(node, trapezoid, segment, carry, carry_complement)
+        else:
             right_points_above_segment = [point for point in trapezoid.right_points
                                           if point.is_above(segment)]
             right_points_below_segment = [point for point in trapezoid.right_points

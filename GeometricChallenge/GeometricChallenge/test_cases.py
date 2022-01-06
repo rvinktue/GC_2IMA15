@@ -14,7 +14,7 @@ def test_case_1():
 # Tests degenerate case: lines with same x-coordinates
 def test_case_2():
     return [vertclass.Vertex(1, 1), vertclass.Vertex(5, 1),
-            vertclass.Vertex(1, 3), vertclass.Vertex(5, 3),
+            vertclass.Vertex(1, 3), vertclass.Vertex(3, 3),
             ]
 
 
@@ -28,7 +28,8 @@ def test_case_3():
 
 # Tests degenerate case: vertical line
 def test_case_4():
-    return [vertclass.Vertex(1, 1), vertclass.Vertex(1, 5)
+    return [vertclass.Vertex(2, 1), vertclass.Vertex(2, 5),
+            vertclass.Vertex(1, 3), vertclass.Vertex(3, 3)
             ]
 
 # @TODO: add some more (degenerate) test cases
