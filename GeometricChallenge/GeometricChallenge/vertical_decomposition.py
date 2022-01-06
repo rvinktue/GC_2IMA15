@@ -236,11 +236,11 @@ class VerticalDecomposition:
 
         # Update neighbours
         trap_node1.left_neighbours = [neighbour for neighbour in node.left_neighbours
-                                      if neighbour.content.right_segment.intersects(trapezoid1.left_segment)]
+                                      if neighbour.content.right_segment.intersects_vertical(trapezoid1.left_segment)]
         trap_node1.right_neighbours = [trap_node3]
 
         trap_node2.left_neighbours = [neighbour for neighbour in node.left_neighbours
-                                      if neighbour.content.right_segment.intersects(trapezoid2.left_segment)]
+                                      if neighbour.content.right_segment.intersects_vertical(trapezoid2.left_segment)]
         trap_node2.right_neighbours = [trap_node3]
 
         trap_node3.left_neighbours = [trap_node1, trap_node2]
@@ -250,7 +250,7 @@ class VerticalDecomposition:
             for (right_neighbour_index, right_neighbour) in enumerate(left_neighbour.right_neighbours):
                 if right_neighbour == node:
                     left_neighbour.right_neighbours[right_neighbour_index] = trap_node1
-                    if left_neighbour.content.right_segment.intersects(trapezoid2.left_segment):
+                    if left_neighbour.content.right_segment.intersects_vertical(trapezoid2.left_segment):
                         left_neighbour.right_neighbours.append(trap_node2)
 
         for left_neighbour in trap_node2.left_neighbours:
@@ -323,11 +323,11 @@ class VerticalDecomposition:
 
         trap_node2.left_neighbours = [trap_node1]
         trap_node2.right_neighbours = [neighbour for neighbour in node.right_neighbours
-                                       if neighbour.content.left_segment.intersects(trapezoid2.right_segment)]
+                                       if neighbour.content.left_segment.intersects_vertical(trapezoid2.right_segment)]
 
         trap_node3.left_neighbours = [trap_node1]
         trap_node3.right_neighbours = [neighbour for neighbour in node.right_neighbours
-                                       if neighbour.content.left_segment.intersects(trapezoid3.right_segment)]
+                                       if neighbour.content.left_segment.intersects_vertical(trapezoid3.right_segment)]
 
         for left_neighbour in trap_node1.left_neighbours:
             for (right_neighbour_index, right_neighbour) in enumerate(left_neighbour.right_neighbours):
@@ -338,7 +338,7 @@ class VerticalDecomposition:
             for (left_neighbour_index, left_neighbour) in enumerate(right_neighbour.left_neighbours):
                 if left_neighbour == node:
                     right_neighbour.left_neighbours[left_neighbour_index] = trap_node2
-                    if right_neighbour.content.left_segment.intersects(trapezoid3.right_segment):
+                    if right_neighbour.content.left_segment.intersects_vertical(trapezoid3.right_segment):
                         right_neighbour.left_neighbours.append(trap_node3)
 
         for right_neighbour in trap_node3.right_neighbours:
@@ -398,20 +398,20 @@ class VerticalDecomposition:
 
         # Update neighbours
         trap_node1.left_neighbours = [left_neighbour for left_neighbour in node.left_neighbours
-                                      if left_neighbour.content.right_segment.intersects(trapezoid1.left_segment)]
+                                      if left_neighbour.content.right_segment.intersects_vertical(trapezoid1.left_segment)]
         trap_node1.right_neighbours = [right_neighbour for right_neighbour in node.right_neighbours
-                                       if right_neighbour.content.left_segment.intersects(trapezoid1.right_segment)]
+                                       if right_neighbour.content.left_segment.intersects_vertical(trapezoid1.right_segment)]
 
         trap_node2.left_neighbours = [left_neighbour for left_neighbour in node.left_neighbours
-                                      if left_neighbour.content.right_segment.intersects(trapezoid2.left_segment)]
+                                      if left_neighbour.content.right_segment.intersects_vertical(trapezoid2.left_segment)]
         trap_node2.right_neighbours = [right_neighbour for right_neighbour in node.right_neighbours
-                                       if right_neighbour.content.left_segment.intersects(trapezoid2.right_segment)]
+                                       if right_neighbour.content.left_segment.intersects_vertical(trapezoid2.right_segment)]
 
         for left_neighbour in trap_node1.left_neighbours:
             for (right_neighbour_index, right_neighbour) in enumerate(left_neighbour.right_neighbours):
                 if right_neighbour == node:
                     left_neighbour.right_neighbours[right_neighbour_index] = trap_node1
-                    if left_neighbour.content.right_segment.intersects(trapezoid2.left_segment):
+                    if left_neighbour.content.right_segment.intersects_vertical(trapezoid2.left_segment):
                         left_neighbour.right_neighbours.append(trap_node2)
 
         for left_neighbour in trap_node2.left_neighbours:
@@ -423,7 +423,7 @@ class VerticalDecomposition:
             for (left_neighbour_index, left_neighbour) in enumerate(right_neighbour.left_neighbours):
                 if left_neighbour == node:
                     right_neighbour.left_neighbours[left_neighbour_index] = trap_node1
-                    if right_neighbour.content.left_segment.intersects(trapezoid2.right_segment):
+                    if right_neighbour.content.left_segment.intersects_vertical(trapezoid2.right_segment):
                         right_neighbour.left_neighbours.append(trap_node2)
 
         for right_neighbour in trap_node2.right_neighbours:
@@ -536,12 +536,12 @@ class VerticalDecomposition:
                 trap_node2.right_neighbours = []
             else:
                 trap_node2.right_neighbours = [right_neighbour for right_neighbour in node.right_neighbours
-                                               if right_neighbour.content.left_segment.intersects(trapezoid2.right_segment)]
+                                               if right_neighbour.content.left_segment.intersects_vertical(trapezoid2.right_segment)]
                 for right_neighbour in trap_node2.right_neighbours:
                     for (left_neighbour_index, left_neighbour) in enumerate(right_neighbour.left_neighbours):
                         if left_neighbour == node:
                             right_neighbour.left_neighbours[left_neighbour_index] = trap_node2
-                            if right_neighbour.content.left_segment.intersects(trapezoid3.right_segment):
+                            if right_neighbour.content.left_segment.intersects_vertical(trapezoid3.right_segment):
                                 right_neighbour.left_neighbours.append(trap_node3)
 
             trap_node3.left_neighbours = [trap_node1]
@@ -549,7 +549,7 @@ class VerticalDecomposition:
                 trap_node3.right_neighbours = []
             else:
                 trap_node3.right_neighbours = [right_neighbour for right_neighbour in node.right_neighbours
-                                               if right_neighbour.content.left_segment.intersects(trapezoid3.right_segment)]
+                                               if right_neighbour.content.left_segment.intersects_vertical(trapezoid3.right_segment)]
                 print(len(trap_node3.right_neighbours))
                 for right_neighbour in trap_node3.right_neighbours:
                     for (left_neighbour_index, left_neighbour) in enumerate(right_neighbour.left_neighbours):
@@ -613,26 +613,26 @@ class VerticalDecomposition:
                 for (right_neighbour_index, right_neighbour) in enumerate(carry_left_neighbour.right_neighbours):
                     if right_neighbour == carry:
                         carry_left_neighbour.right_neighbours[right_neighbour_index] = trap_node1
-                        if carry_left_neighbour.content.right_segment.intersects(trapezoid2.left_segment):
+                        if carry_left_neighbour.content.right_segment.intersects_vertical(trapezoid2.left_segment):
                             carry_left_neighbour.right_neighbours.append(trap_node2)
         else:
             trap_node1.left_neighbours = [left_neighbour for left_neighbour in node.left_neighbours
-                                          if left_neighbour.content.right_segment.intersects(trapezoid1.left_segment)]
+                                          if left_neighbour.content.right_segment.intersects_vertical(trapezoid1.left_segment)]
 
             for left_neighbour in trap_node1.left_neighbours:
                 for (right_neighbour_index, right_neighbour) in enumerate(left_neighbour.right_neighbours):
                     if right_neighbour == node:
                         left_neighbour.right_neighbours[right_neighbour_index] = trap_node1
-                        if left_neighbour.content.right_segment.intersects(trapezoid2.left_segment):
+                        if left_neighbour.content.right_segment.intersects_vertical(trapezoid2.left_segment):
                             left_neighbour.right_neighbours.append(trap_node2)
 
         trap_node1.right_neighbours = [right_neighbour for right_neighbour in node.right_neighbours
-                                       if right_neighbour.content.left_segment.intersects(trapezoid1.right_segment)]
+                                       if right_neighbour.content.left_segment.intersects_vertical(trapezoid1.right_segment)]
         for right_neighbour in trap_node1.right_neighbours:
             for (left_neighbour_index, left_neighbour) in enumerate(right_neighbour.left_neighbours):
                 if left_neighbour == node:
                     right_neighbour.left_neighbours[left_neighbour_index] = trap_node1
-                    if right_neighbour.content.left_segment.intersects(trapezoid2.right_segment):
+                    if right_neighbour.content.left_segment.intersects_vertical(trapezoid2.right_segment):
                         right_neighbour.left_neighbours.append(trap_node2)
 
         if carry is not None and not left_points_below_segment:
@@ -646,7 +646,7 @@ class VerticalDecomposition:
                         carry_left_neighbour.right_neighbours[right_neighbour_index] = trap_node2
         else:
             trap_node2.left_neighbours = [left_neighbour for left_neighbour in node.left_neighbours
-                                          if left_neighbour.content.right_segment.intersects(trapezoid2.left_segment)]
+                                          if left_neighbour.content.right_segment.intersects_vertical(trapezoid2.left_segment)]
 
             for left_neighbour in trap_node2.left_neighbours:
                 for (right_neighbour_index, right_neighbour) in enumerate(left_neighbour.right_neighbours):
@@ -654,7 +654,7 @@ class VerticalDecomposition:
                         left_neighbour.right_neighbours[right_neighbour_index] = trap_node2
 
         trap_node2.right_neighbours = [right_neighbour for right_neighbour in node.right_neighbours
-                                       if right_neighbour.content.left_segment.intersects(trapezoid2.right_segment)]
+                                       if right_neighbour.content.left_segment.intersects_vertical(trapezoid2.right_segment)]
         for right_neighbour in trap_node2.right_neighbours:
             for (left_neighbour_index, left_neighbour) in enumerate(right_neighbour.left_neighbours):
                 if left_neighbour == node:
@@ -737,17 +737,17 @@ class VerticalDecomposition:
                 for (right_neighbour_index, right_neighbour) in enumerate(carry_left_neighbour.right_neighbours):
                     if right_neighbour == carry:
                         carry_left_neighbour.right_neighbours[right_neighbour_index] = trap_node1
-                        if carry_left_neighbour.content.right_segment.intersects(trapezoid2.left_segment):
+                        if carry_left_neighbour.content.right_segment.intersects_vertical(trapezoid2.left_segment):
                             carry_left_neighbour.right_neighbours.append(trap_node2)
         else:
             trap_node1.left_neighbours = [left_neighbour for left_neighbour in node.left_neighbours
-                                          if left_neighbour.content.right_segment.intersects(trapezoid1.left_segment)]
+                                          if left_neighbour.content.right_segment.intersects_vertical(trapezoid1.left_segment)]
 
             for left_neighbour in trap_node1.left_neighbours:
                 for (right_neighbour_index, right_neighbour) in enumerate(left_neighbour.right_neighbours):
                     if right_neighbour == node:
                         left_neighbour.right_neighbours[right_neighbour_index] = trap_node1
-                        if left_neighbour.content.right_segment.intersects(trapezoid2.left_segment):
+                        if left_neighbour.content.right_segment.intersects_vertical(trapezoid2.left_segment):
                             left_neighbour.right_neighbours.append(trap_node2)
 
         trap_node1.right_neighbours = [trap_node3]
@@ -763,7 +763,7 @@ class VerticalDecomposition:
                         carry_left_neighbour.right_neighbours[right_neighbour_index] = trap_node2
         else:
             trap_node2.left_neighbours = [left_neighbour for left_neighbour in node.left_neighbours
-                                          if left_neighbour.content.right_segment.intersects(trapezoid2.left_segment)]
+                                          if left_neighbour.content.right_segment.intersects_vertical(trapezoid2.left_segment)]
 
             for left_neighbour in trap_node2.left_neighbours:
                 for (right_neighbour_index, right_neighbour) in enumerate(left_neighbour.right_neighbours):
@@ -848,16 +848,16 @@ class VerticalDecomposition:
                 for (right_neighbour_index, right_neighbour) in enumerate(carry_left_neighbour.right_neighbours):
                     if right_neighbour == carry:
                         carry_left_neighbour.right_neighbours[right_neighbour_index] = trap_node1
-                        if carry_left_neighbour.content.right_segment.intersects(trapezoid2.left_segment):
+                        if carry_left_neighbour.content.right_segment.intersects_vertical(trapezoid2.left_segment):
                             carry_left_neighbour.right_neighbours.append(trap_node2)
         else:
             trap_node1.left_neighbours = [left_neighbour for left_neighbour in node.left_neighbours
-                                          if left_neighbour.content.right_segment.intersects(trapezoid1.left_segment)]
+                                          if left_neighbour.content.right_segment.intersects_vertical(trapezoid1.left_segment)]
             for left_neighbour in trap_node1.left_neighbours:
                 for (right_neighbour_index, right_neighbour) in enumerate(left_neighbour.right_neighbours):
                     if right_neighbour == node:
                         left_neighbour.right_neighbours[right_neighbour_index] = trap_node1
-                        if left_neighbour.content.right_segment.intersects(trapezoid2.left_segment):
+                        if left_neighbour.content.right_segment.intersects_vertical(trapezoid2.left_segment):
                             left_neighbour.right_neighbours.append(trap_node2)
 
         # Update left neighbour lists
@@ -872,7 +872,7 @@ class VerticalDecomposition:
                         carry_left_neighbour.right_neighbours[right_neighbour_index] = trap_node2
         else:
             trap_node2.left_neighbours = [left_neighbour for left_neighbour in node.left_neighbours
-                                          if left_neighbour.content.right_segment.intersects(trapezoid2.left_segment)]
+                                          if left_neighbour.content.right_segment.intersects_vertical(trapezoid2.left_segment)]
             for left_neighbour in trap_node1.left_neighbours:
                 for (right_neighbour_index, right_neighbour) in enumerate(left_neighbour.right_neighbours):
                     if right_neighbour == node:
@@ -904,12 +904,12 @@ class VerticalDecomposition:
             trap_node1.right_neighbours = []
         else:
             trap_node1.right_neighbours = [right_neighbour for right_neighbour in node.right_neighbours
-                                           if right_neighbour.content.left_segment.intersects(trapezoid1.right_segment)]
+                                           if right_neighbour.content.left_segment.intersects_vertical(trapezoid1.right_segment)]
             for right_neighbour in trap_node1.right_neighbours:
                 for (left_neighbour_index, left_neighbour) in enumerate(right_neighbour.left_neighbours):
                     if left_neighbour == node:
                         right_neighbour.left_neighbours[left_neighbour_index] = trap_node1
-                        if right_neighbour.content.left_segment.intersects(trapezoid2.right_segment):
+                        if right_neighbour.content.left_segment.intersects_vertical(trapezoid2.right_segment):
                             right_neighbour.left_neighbours.append(trap_node2)
 
         # Update right neighbour lists
@@ -917,7 +917,7 @@ class VerticalDecomposition:
             trap_node2.right_neighbours = []
         else:
             trap_node2.right_neighbours = [right_neighbour for right_neighbour in node.right_neighbours
-                                           if right_neighbour.content.left_segment.intersects(trapezoid2.right_segment)]
+                                           if right_neighbour.content.left_segment.intersects_vertical(trapezoid2.right_segment)]
             for right_neighbour in trap_node2.right_neighbours:
                 for (left_neighbour_index, left_neighbour) in enumerate(right_neighbour.left_neighbours):
                     if left_neighbour == node:

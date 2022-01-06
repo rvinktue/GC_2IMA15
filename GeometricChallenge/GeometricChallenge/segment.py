@@ -51,6 +51,12 @@ class Segment:
         # All other cases do not intersect
         return False
 
+    # Calculate intersection between the two segments
+    # Used for neighbours calculation
+    def intersects_vertical(self, segment: 'Segment') -> bool:
+        return min(self.endpoint1.y, self.endpoint2.y) < segment.endpoint1.y < max(self.endpoint1.y, self.endpoint2.y) \
+               or min(self.endpoint1.y, self.endpoint2.y) < segment.endpoint2.y < max(self.endpoint1.y, self.endpoint2.y)
+
     # Calculate intersection between segment and vertical boundary (self) of trapezoid
     def is_entered_by(self, segment: 'Segment') -> bool:
         # Find orientations
