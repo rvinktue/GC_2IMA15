@@ -21,7 +21,10 @@ def solve_CG_challenge():
 if __name__ == '__main__':
     #counter = 0
     #solve_CG_challenge()
+    start = time.perf_counter()
+    print(f"Starting reecn50133...")
     gcsolver.solve("instances/reecn50133.instance.json", shuffle=False)
+    print(f"Solved reecn50133 in {time.perf_counter() - start} seconds...")
 
 '''
 INPUT_FILE = "instances/reecn11799.instance.json"  # Name of the input file

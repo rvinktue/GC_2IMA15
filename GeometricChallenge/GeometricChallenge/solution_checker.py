@@ -87,29 +87,38 @@ if False and __name__ == "__main__":
 import matplotlib.pyplot as plt
 g = read_instance("instances/reecn50133.instance.json")["graph"]
 solcheck = check_instance("reecn50133")
-solcheck.report_errors()
-print(f"Segment ids: {[(segnr, seg.index) for (segnr, seg) in enumerate(solcheck.subsets[9])]}")
+#solcheck.report_errors()
+
+
+min = 1241241241124
+best = 0
+for i in range(len(solcheck.subsets)):
+    if len(solcheck.errors[i]) > 0 and len(solcheck.subsets[i]) < min:
+        best = i
+        min = len(solcheck.subsets[i])
+
+subset = solcheck.errors[best]
+print(f"  {len(subset)} unexpected intersections in subset {best} with {len(solcheck.subsets[best])} segments:")
+for seg1, seg2 in subset:
+    print(f"    Segment {seg1.index} - {seg2.index} \n"
+          f"      ({seg1.endpoint1.x},{seg1.endpoint1.y}) -- ({seg1.endpoint2.x},{seg1.endpoint2.y}) and ({seg2.endpoint1.x},{seg2.endpoint1.y}) -- ({seg2.endpoint2.x},{seg2.endpoint2.y})")
+print(f"Segment ids: {[(segnr, seg.index) for (segnr, seg) in enumerate(solcheck.subsets[best])]}")
 vd = vertical_decomposition.VerticalDecomposition(geometry.find_bounding_box(g.nodes))
-for (segnr, seg) in enumerate(solcheck.subsets[9]):
+
+for (segnr, seg) in enumerate(solcheck.subsets[best]):
     test_draw.test_draw_dag(vd.dag)
     node1, node2 = vd.point_location_segment(seg)
+    for node in vd.find_intersecting_trapezoids(seg):
+        test_draw.test_draw_trapezoid(node.content, (0, 1, 0))
     test_draw.test_draw_trapezoid(node1.content, (1, 0, 1))
     test_draw.test_draw_trapezoid(node2.content, (1, 1, 0))
     test_draw.test_draw_segment(seg, (0, 1, 1))
-    plt.title(f"Segment {segnr}, {seg.id} to be added.")
+    plt.title(f"Segment {segnr}, {seg.index} to be added.")
     plt.show()
+
     vd.add_segment(seg)
     test_draw.test_draw_dag(vd.dag)
     test_draw.test_draw_segment(seg, (0, 1, 1))
-    plt.title(f"Segment {segnr}, {seg.id} added.")
+    plt.title(f"Segment {segnr}, {seg.index} added.")
     plt.show()
-    if seg.index == 1420:
-        test_draw.test_draw_dag(vd.dag)
-        test_draw.test_draw_segment(solcheck.subsets[9][28], (0, 1, 1))
-        plt.show()
 
-    if seg.index == 1455:
-        test_draw.test_draw_dag(vd.dag)
-        test_draw.test_draw_segment(seg, (0, 1, 1))
-        test_draw.test_draw_segment(solcheck.subsets[9][8], (1, 0, 1))
-        plt.show()
