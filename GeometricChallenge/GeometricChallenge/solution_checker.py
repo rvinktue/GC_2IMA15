@@ -84,10 +84,12 @@ if False and __name__ == "__main__":
             solcheck.report_errors()
 
 
+#print(segment.Segment(vertex.Vertex(0, 0), vertex.Vertex(0, 1)).intersects(segment.Segment(vertex.Vertex(0, 2), vertex.Vertex(0, 3))))
+
 import matplotlib.pyplot as plt
 g = read_instance("instances/reecn50133.instance.json")["graph"]
 solcheck = check_instance("reecn50133")
-#solcheck.report_errors()
+solcheck.report_errors()
 
 
 min = 1241241241124
