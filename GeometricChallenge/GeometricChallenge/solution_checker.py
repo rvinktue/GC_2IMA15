@@ -106,19 +106,21 @@ print(f"Segment ids: {[(segnr, seg.index) for (segnr, seg) in enumerate(solcheck
 vd = vertical_decomposition.VerticalDecomposition(geometry.find_bounding_box(g.nodes))
 
 for (segnr, seg) in enumerate(solcheck.subsets[best]):
-    test_draw.test_draw_dag(vd.dag)
+    fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2, sharex=True, sharey=True)
+    test_draw.test_draw_dag(vd.dag,ax=ax1)
+    test_draw.test_draw_dag(vd.dag,ax=ax3)
     node1, node2 = vd.point_location_segment(seg)
     for node in vd.find_intersecting_trapezoids(seg):
-        test_draw.test_draw_trapezoid(node.content, (0, 1, 0))
-    test_draw.test_draw_trapezoid(node1.content, (1, 0, 1))
-    test_draw.test_draw_trapezoid(node2.content, (1, 1, 0))
-    test_draw.test_draw_segment(seg, (0, 1, 1))
-    plt.title(f"Segment {segnr}, {seg.index} to be added.")
-    plt.show()
+        test_draw.test_draw_trapezoid(node.content, (0, 1, 0), ax=ax1, linestyle='-')
+    test_draw.test_draw_trapezoid(node1.content, (1, 0, 1), ax=ax1)
+    test_draw.test_draw_trapezoid(node2.content, (1, 1, 0), ax=ax1)
+    test_draw.test_draw_segment(seg, (0, 1, 1), ax=ax1)
+    ax1.set_title(f"Segment {segnr}, {seg.index} to be added.")
 
     vd.add_segment(seg)
-    test_draw.test_draw_dag(vd.dag)
-    test_draw.test_draw_segment(seg, (0, 1, 1))
-    plt.title(f"Segment {segnr}, {seg.index} added.")
+    test_draw.test_draw_dag(vd.dag, ax=ax2)
+    test_draw.test_draw_dag(vd.dag, ax=ax4)
+    test_draw.test_draw_segment(seg, (0, 1, 1), ax=ax2)
+    ax2.set_title(f"Segment {segnr}, {seg.index} added.")
     plt.show()
 
