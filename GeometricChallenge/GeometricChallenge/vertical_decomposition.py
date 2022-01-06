@@ -550,6 +550,7 @@ class VerticalDecomposition:
             else:
                 trap_node3.right_neighbours = [right_neighbour for right_neighbour in node.right_neighbours
                                                if right_neighbour.content.left_segment.intersects(trapezoid3.right_segment)]
+                print(len(trap_node3.right_neighbours))
                 for right_neighbour in trap_node3.right_neighbours:
                     for (left_neighbour_index, left_neighbour) in enumerate(right_neighbour.left_neighbours):
                         if left_neighbour == node:
