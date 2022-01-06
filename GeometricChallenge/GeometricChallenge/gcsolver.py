@@ -16,7 +16,7 @@ def perform_decompositions(g, shuffle) -> [vdclass.VerticalDecomposition]:
     # Process all edges
     for edgenum in indices:
         edge = edges[edgenum]
-        seg = segment.Segment(vertex.Vertex(edge[0][0], edge[0][1]), vertex.Vertex(edge[1][0], edge[1][1]), id=edgenum)
+        seg = segment.Segment(vertex.Vertex(edge[0][0], edge[0][1]), vertex.Vertex(edge[1][0], edge[1][1]), index=edgenum)
         for (key, vd) in enumerate(vds):
             if vd.add_segment(seg):
                 # If segment can be added to the vertical decomposition of level key: add it and continue to next edge
@@ -54,7 +54,7 @@ def solve(file_name: str, save_to_file = True, shuffle = True, verify = False) -
             biggestvd = vd
 
         for seg in segments:
-            colours[seg.id] = vdnum
+            colours[seg.index] = vdnum
 
         if verify:
             print(f"Starting verification on {len(segments)} segments...")

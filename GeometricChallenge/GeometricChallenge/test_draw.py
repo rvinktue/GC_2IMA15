@@ -10,13 +10,10 @@ def test_draw_dag(root):
     segments = get_all_content_of_type(root, segclass.Segment)
     vertices = get_all_content_of_type(root, vertclass.Vertex)
     for t in trapezoids:
-        assert isinstance(t, trapclass.Trapezoid), "t not a Trapezoid but a %s" % type(t).__name__
         test_draw_trapezoid(t)
     for s in segments:
-        assert isinstance(s, segclass.Segment), "s not a Segment but a %s" % type(s).__name__
         test_draw_segment(s)
     for v in vertices:
-        assert isinstance(v, vertclass.Vertex), "v not a Vertex but a %s" % type(v).__name__
         plt.scatter(v.x, v.y, color=(0, 0, 1))
 
 
@@ -53,7 +50,6 @@ def test_draw_trapezoid(trapezoid, color=(1, 0, 0)):
 
 def test_draw_graph(vertices, segments):
     for seg in segments:
-        print("(%s, %s) -> (%s, %s)" % (seg.endpoint1.x, seg.endpoint1.y, seg.endpoint2.x, seg.endpoint2.y))
         plt.plot([seg.endpoint1.x, seg.endpoint2.x], [seg.endpoint1.y, seg.endpoint2.y], color=(0, 0, 0))
     x = [p.x for p in vertices]
     y = [p.y for p in vertices]

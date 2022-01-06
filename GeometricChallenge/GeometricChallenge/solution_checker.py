@@ -28,7 +28,7 @@ class SolutionCheck:
             if len(subset) > 0:
                 print(f"  {len(subset)} unexpected intersections in subset {subsetnr} with {len(self.subsets[subsetnr])} segments:")
                 for seg1, seg2 in subset:
-                    print(f"    Segment {seg1.id} - {seg2.id} \n"
+                    print(f"    Segment {seg1.index} - {seg2.index} \n"
                           f"      ({seg1.endpoint1.x},{seg1.endpoint1.y}) -- ({seg1.endpoint2.x},{seg1.endpoint2.y}) and ({seg2.endpoint1.x},{seg2.endpoint1.y}) -- ({seg2.endpoint2.x},{seg2.endpoint2.y})")
 
 
@@ -39,7 +39,7 @@ class SolutionCheck:
                 if col == i:
                     a = self.edges[j][0]
                     b = self.edges[j][1]
-                    cur.append(segment.Segment(vertex.Vertex(a[0], a[1]), vertex.Vertex(b[0], b[1]), id=j))
+                    cur.append(segment.Segment(vertex.Vertex(a[0], a[1]), vertex.Vertex(b[0], b[1]), index=j))
 
             self.subsets.append(cur)
 
@@ -49,7 +49,7 @@ class SolutionCheck:
             for i in range(len(subset)):
                 for j in range(i + 1, len(subset)):
                     if subset[i].intersects(subset[j]):
-                        #print(f"We have a problem between edge {subset[i].id} and {subset[j].id} in subset {subsetnr}")
+                        #print(f"We have a problem between edge {subset[i].index} and {subset[j].index} in subset {subsetnr}")
                         error.append((subset[i], subset[j]))
             self.errors.append(error)
 
@@ -88,7 +88,7 @@ import matplotlib.pyplot as plt
 g = read_instance("instances/reecn50133.instance.json")["graph"]
 solcheck = check_instance("reecn50133")
 solcheck.report_errors()
-print(f"Segment ids: {[(segnr, seg.id) for (segnr, seg) in enumerate(solcheck.subsets[9])]}")
+print(f"Segment ids: {[(segnr, seg.index) for (segnr, seg) in enumerate(solcheck.subsets[9])]}")
 vd = vertical_decomposition.VerticalDecomposition(geometry.find_bounding_box(g.nodes))
 for (segnr, seg) in enumerate(solcheck.subsets[9]):
     test_draw.test_draw_dag(vd.dag)
@@ -103,12 +103,12 @@ for (segnr, seg) in enumerate(solcheck.subsets[9]):
     test_draw.test_draw_segment(seg, (0, 1, 1))
     plt.title(f"Segment {segnr}, {seg.id} added.")
     plt.show()
-    if seg.id == 1420:
+    if seg.index == 1420:
         test_draw.test_draw_dag(vd.dag)
         test_draw.test_draw_segment(solcheck.subsets[9][28], (0, 1, 1))
         plt.show()
 
-    if seg.id == 1455:
+    if seg.index == 1455:
         test_draw.test_draw_dag(vd.dag)
         test_draw.test_draw_segment(seg, (0, 1, 1))
         test_draw.test_draw_segment(solcheck.subsets[9][8], (1, 0, 1))

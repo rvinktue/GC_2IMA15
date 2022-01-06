@@ -1,16 +1,17 @@
 import geometry
+import vertex
 
 
 # Class that represents a single line segment between two vertices
 class Segment:
-    def __init__(self, endpoint1, endpoint2, face_above=None, id = -1):
+    def __init__(self, endpoint1, endpoint2, face_above=None, index = -1):
         self.endpoint1 = endpoint1 if endpoint1.x <= endpoint2.x else endpoint2
         self.endpoint2 = endpoint2 if endpoint1.x <= endpoint2.x else endpoint1
         self.face_above = face_above
-        self.id = id
+        self.index = index
 
     # Calculate intersection between the two segments
-    def intersects(self, segment):
+    def intersects(self, segment: 'Segment') -> bool:
         # Find orientations
         orientation1 = geometry.orientation(self.endpoint1, self.endpoint2, segment.endpoint1)
         orientation2 = geometry.orientation(self.endpoint1, self.endpoint2, segment.endpoint2)
@@ -51,7 +52,7 @@ class Segment:
         return False
 
     # Calculate intersection between segment and vertical boundary (self) of trapezoid
-    def is_entered_by(self, segment):
+    def is_entered_by(self, segment: 'Segment') -> bool:
         # Find orientations
         orientation1 = geometry.orientation(self.endpoint1, self.endpoint2, segment.endpoint1)
         orientation2 = geometry.orientation(self.endpoint1, self.endpoint2, segment.endpoint2)
@@ -77,3 +78,10 @@ class Segment:
 
         # All other cases do not intersect
         return False
+
+    def on_segment(self, point: vertex.Vertex) -> bool:
+        """
+        This method returns True if point lies on segment, False otherwise.
+        We assume the segment is a vertical line.
+        """
+        return self.endpoint1.x == point.x
