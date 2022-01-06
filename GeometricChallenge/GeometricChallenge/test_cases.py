@@ -32,4 +32,11 @@ def test_case_4():
             vertclass.Vertex(1, 3), vertclass.Vertex(3, 3)
             ]
 
-# @TODO: add some more (degenerate) test cases
+
+# Some general case
+def test_case_5():
+    return [vertclass.Vertex(1, 1), vertclass.Vertex(3, 1),
+            vertclass.Vertex(1, 4), vertclass.Vertex(2, 4),
+            vertclass.Vertex(-1, 3), vertclass.Vertex(5, 3),
+            vertclass.Vertex(0, 2), vertclass.Vertex(4, 2)
+            ]
