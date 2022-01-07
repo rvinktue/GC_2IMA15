@@ -71,6 +71,8 @@ if __name__ == "__main__":
         p.close()
         p.join()
 
-    for solcheck in solution_checks:
-        if not solcheck.is_correct:
-            solcheck.report_errors()
+    print(f"{len([x for x in solution_checks if x.is_correct])}/225 correct.")
+
+    # for solcheck in solution_checks:
+    #     if not solcheck.is_correct:
+    #         solcheck.report_errors()
