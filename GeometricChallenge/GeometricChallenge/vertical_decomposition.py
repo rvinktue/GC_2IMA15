@@ -575,23 +575,24 @@ def update_multiple_trapezoids_right_boundary(
     # No internal neighbours
 
     # Merge carry
-    if not left_points_above_segment:  # Carry should be merged with trapezoid1
-        trapezoid1.update_left_points(carry.content.left_points)
-        for left_neighbour in carry.left_neighbours:
-            left_neighbour.right_neighbours.remove(carry)
-            left_neighbour.right_neighbours.append(trap_node1)
-            trap_node1.left_neighbours.append(left_neighbour)
-    if not left_points_below_segment:  # Carry should be merged with trapezoid2
-        trapezoid2.update_left_points(carry.content.left_points)
-        for left_neighbour in carry.left_neighbours:
-            left_neighbour.right_neighbours.remove(carry)
-            left_neighbour.right_neighbours.append(trap_node2)
-            trap_node2.left_neighbours.append(left_neighbour)
+    if carry is not None:
+        if not left_points_above_segment:  # Carry should be merged with trapezoid1
+            trapezoid1.update_left_points(carry.content.left_points)
+            for left_neighbour in carry.left_neighbours:
+                left_neighbour.right_neighbours.remove(carry)
+                left_neighbour.right_neighbours.append(trap_node1)
+                trap_node1.left_neighbours.append(left_neighbour)
+        if not left_points_below_segment:  # Carry should be merged with trapezoid2
+            trapezoid2.update_left_points(carry.content.left_points)
+            for left_neighbour in carry.left_neighbours:
+                left_neighbour.right_neighbours.remove(carry)
+                left_neighbour.right_neighbours.append(trap_node2)
+                trap_node2.left_neighbours.append(left_neighbour)
 
-    # Add segment endpoint to neighbour trapezoids
-    for right_neighbour in node.right_neighbours:
-        if right_neighbour.content.left_segment.on_segment(segment.endpoint2):
-            right_neighbour.content.left_points.append(segment.endpoint2)
+        # Add segment endpoint to neighbour trapezoids
+        for right_neighbour in node.right_neighbours:
+            if right_neighbour.content.left_segment.on_segment(segment.endpoint2):
+                right_neighbour.content.left_points.append(segment.endpoint2)
 
     # Update DAG
     parent_nodes = node.parents
@@ -682,18 +683,19 @@ def update_multiple_trapezoids_right_not_boundary(
     trap_node3.left_neighbours = [trap_node1, trap_node2]
 
     # Merge carry
-    if not left_points_above_segment:  # Carry should be merged with trapezoid1
-        trapezoid1.update_left_points(carry.content.left_points)
-        for left_neighbour in carry.left_neighbours:
-            left_neighbour.right_neighbours.remove(carry)
-            left_neighbour.right_neighbours.append(trap_node1)
-            trap_node1.left_neighbours.append(left_neighbour)
-    if not left_points_below_segment:  # Carry should be merged with trapezoid2
-        trapezoid2.update_left_points(carry.content.left_points)
-        for left_neighbour in carry.left_neighbours:
-            left_neighbour.right_neighbours.remove(carry)
-            left_neighbour.right_neighbours.append(trap_node2)
-            trap_node2.left_neighbours.append(left_neighbour)
+    if carry is not None:
+        if not left_points_above_segment:  # Carry should be merged with trapezoid1
+            trapezoid1.update_left_points(carry.content.left_points)
+            for left_neighbour in carry.left_neighbours:
+                left_neighbour.right_neighbours.remove(carry)
+                left_neighbour.right_neighbours.append(trap_node1)
+                trap_node1.left_neighbours.append(left_neighbour)
+        if not left_points_below_segment:  # Carry should be merged with trapezoid2
+            trapezoid2.update_left_points(carry.content.left_points)
+            for left_neighbour in carry.left_neighbours:
+                left_neighbour.right_neighbours.remove(carry)
+                left_neighbour.right_neighbours.append(trap_node2)
+                trap_node2.left_neighbours.append(left_neighbour)
 
     # Update DAG
     parent_nodes = node.parents
@@ -774,18 +776,19 @@ def update_multiple_trapezoids_middle(
     # No internal neighbours
 
     # Merge carry
-    if not left_points_above_segment:  # Carry should be merged with trapezoid1
-        trapezoid1.update_left_points(carry.content.left_points)
-        for left_neighbour in carry.left_neighbours:
-            left_neighbour.right_neighbours.remove(carry)
-            left_neighbour.right_neighbours.append(trap_node1)
-            trap_node1.left_neighbours.append(left_neighbour)
-    if not left_points_below_segment:  # Carry should be merged with trapezoid2
-        trapezoid2.update_left_points(carry.content.left_points)
-        for left_neighbour in carry.left_neighbours:
-            left_neighbour.right_neighbours.remove(carry)
-            left_neighbour.right_neighbours.append(trap_node2)
-            trap_node2.left_neighbours.append(left_neighbour)
+    if carry is not None:
+        if not left_points_above_segment:  # Carry should be merged with trapezoid1
+            trapezoid1.update_left_points(carry.content.left_points)
+            for left_neighbour in carry.left_neighbours:
+                left_neighbour.right_neighbours.remove(carry)
+                left_neighbour.right_neighbours.append(trap_node1)
+                trap_node1.left_neighbours.append(left_neighbour)
+        if not left_points_below_segment:  # Carry should be merged with trapezoid2
+            trapezoid2.update_left_points(carry.content.left_points)
+            for left_neighbour in carry.left_neighbours:
+                left_neighbour.right_neighbours.remove(carry)
+                left_neighbour.right_neighbours.append(trap_node2)
+                trap_node2.left_neighbours.append(left_neighbour)
 
     # Update dag references to carry
     if carry is not None:
