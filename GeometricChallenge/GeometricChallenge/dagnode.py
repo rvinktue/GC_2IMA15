@@ -16,18 +16,6 @@ class DagNode:
         self.left_neighbours = []
         self.right_neighbours = []
 
-    # @TODO: method verwijderen als alles werkt (wordt gebruikt voor debugging/tekenen)
-    # Choose which child is the successor for the point location search
-    def choose_next(self, point):
-        if isinstance(self.content, trap.Trapezoid):
-            return self
-        elif isinstance(self.content, vert.Vertex):
-            return self.left_child if self.content.x_order(point) == -1 else self.right_child
-        elif isinstance(self.content, seg.Segment):
-            return self.left_child if \
-                geometry.orientation(self.content.endpoint1, self.content.endpoint2, point) == geometry.CW \
-                else self.right_child
-
     # Choose which child is the successor for the point location search
     def choose_next_segmented(self, segment, endpoint):
         if isinstance(self.content, trap.Trapezoid):

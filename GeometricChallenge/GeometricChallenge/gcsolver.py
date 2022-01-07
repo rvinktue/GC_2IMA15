@@ -2,7 +2,8 @@ from cgshop2022utils.io import read_instance  # Provided by the challenge
 import random
 import vertical_decomposition as vdclass
 import geometry
-import segment, vertex
+import segment
+import vertex
 
 
 def perform_decompositions(g, shuffle) -> [vdclass.VerticalDecomposition]:
@@ -27,13 +28,13 @@ def perform_decompositions(g, shuffle) -> [vdclass.VerticalDecomposition]:
                 new.add_segment(seg)
                 vds.append(new)
                 break
-
+    print("Solution with: " + str(len(vds)))
     return vds
 
 
 # takes file name outputs json string with solution encoded, no debug info
 # Expected format of file_name "instances/<INSTANCE_NAME>.instance.json"
-def solve(file_name: str, save_to_file = True, shuffle = True, verify = False) -> str:
+def solve(file_name: str, save_to_file=True, shuffle=True, verify=False) -> str:
     # Incrementally build vertical decompositions of planar subgraphs
     # Read instance and instantiate graph, bounding box and starting vertical decomposition
     instance = read_instance(file_name)  # read edges from input file
@@ -41,17 +42,12 @@ def solve(file_name: str, save_to_file = True, shuffle = True, verify = False) -
 
     vds = perform_decompositions(g, shuffle)
 
-    biggestvd = 0
-    biglen = 0
     colours = [-1 for _ in range(len(g.edges))]
     lengths = []
 
     for (vdnum, vd) in enumerate(vds):
         segments = [x.content for x in vd.dag.find_all(segment.Segment)]
         lengths.append(len(segments))
-        if len(segments) > biglen:
-            biglen = len(segments)
-            biggestvd = vd
 
         for seg in segments:
             colours[seg.index] = vdnum
@@ -64,7 +60,7 @@ def solve(file_name: str, save_to_file = True, shuffle = True, verify = False) -
                         continue
                     if seg1.intersects(seg2):
                         print("Verification failed...")
-                        return None
+                        return "None"
             print("Verification successful!")
     assert min(colours) >= 0, "Some edges are uncoloured..."
     num_colours = max(colours) - min(colours) + 1
