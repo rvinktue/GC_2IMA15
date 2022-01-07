@@ -28,8 +28,22 @@ def handle_test(vertices, print_dag):
         test_draw.test_draw_dag(vd.dag, ax=ax1)
         # print("Could not add: (%s, %s) -> (%s, %s)"
         #       % (seg.endpoint1.x, seg.endpoint1.y, seg.endpoint2.x, seg.endpoint2.y))
-        for neighbour in start_node.right_neighbours:
-            test_draw.test_draw_trapezoid(neighbour.content, ax=ax2)
+        for trap in vd.dag.find_all(trapclass.Trapezoid):
+            if trap.content.left_segment.endpoint1.x == 5 \
+                    and trap.content.left_segment.endpoint1.y == 1:
+                for l in trap.left_neighbours:
+                    test_draw.test_draw_trapezoid(l.content, ax=ax2)
+                for r in trap.right_neighbours:
+                    test_draw.test_draw_trapezoid(r.content, ax=ax2)
+                for lp in trap.content.left_points:
+                    ax2.scatter(lp.x, lp.y)
+                for rp in trap.content.right_points:
+                    ax2.scatter(rp.x, rp.y)
+                # test_draw.test_draw_segment(trap.content.left_segment, ax=ax2)
+                test_draw.test_draw_segment(trap.content.right_segment, ax=ax2)
+            if trap.content.left_segment.endpoint1.x == 1 \
+                    and trap.content.left_segment.endpoint1.y == 0:
+                test_draw.test_draw_segment(trap.content.right_segment, ax=ax2)
         test_draw.test_draw_dag(vd.dag, ax=ax1)
         test_draw.test_draw_trapezoid(start_node.content, ax=ax3)
         test_draw.test_draw_trapezoid(end_node.content, ax=ax4)
@@ -41,10 +55,10 @@ def handle_test(vertices, print_dag):
 
 # Run all test cases (switch the False to True to print the final DAG for each test case)
 for index, vertex_list in enumerate([
-    # test_cases.test_case_1(),
-    # test_cases.test_case_2(),
-    # test_cases.test_case_3(),
-    # test_cases.test_case_4(),
+    test_cases.test_case_1(),
+    test_cases.test_case_2(),
+    test_cases.test_case_3(),
+    test_cases.test_case_4(),
     test_cases.test_case_5()
 ]):
     print(f"Running test {index}")

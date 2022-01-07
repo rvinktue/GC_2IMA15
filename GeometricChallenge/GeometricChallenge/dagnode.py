@@ -32,6 +32,10 @@ class DagNode:
     def choose_next_segmented(self, segment, endpoint):
         if isinstance(self.content, trap.Trapezoid):
             return self
+        elif self.right_child is None:
+            return self.left_child
+        elif self.left_child is None:
+            return self.right_child
         elif isinstance(self.content, vert.Vertex):
             if endpoint.x < self.content.x:
                 return self.left_child

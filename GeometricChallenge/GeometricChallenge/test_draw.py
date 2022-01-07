@@ -8,6 +8,7 @@ import geometry
 def test_draw_dag(root, ax = None):
     if ax is None:
         _, ax = plt.subplots()
+    print('--------')
     trapezoids = get_all_content_of_type(root, trapclass.Trapezoid)
     segments = get_all_content_of_type(root, segclass.Segment)
     vertices = get_all_content_of_type(root, vertclass.Vertex)
@@ -35,6 +36,8 @@ def get_all_content_of_type(root, content_type):
         stack.append(node.left_child)
         stack.append(node.right_child)
         if isinstance(node.content, content_type):
+            # if content_type is trapclass.Trapezoid:
+            #     print(f"({node.content.left_segment.endpoint1.x}, {node.content.left_segment.endpoint1.y}) left: {len(node.left_neighbours)}, right: {len(node.right_neighbours)}")
             contents.append(node.content)
     return contents
 
