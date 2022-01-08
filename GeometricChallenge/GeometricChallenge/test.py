@@ -61,5 +61,5 @@ for index, vertex_list in enumerate([
     test_cases.test_case_4(),
     test_cases.test_case_5()
 ]):
-    print(f"Running test {index}")
+    print(f"Running test {index + 1}")
     handle_test(vertex_list, False)

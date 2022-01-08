@@ -34,7 +34,7 @@ class Segment:
                 (self.endpoint2.x == segment.endpoint2.x and self.endpoint2.y == segment.endpoint2.y)):
             return False
 
-        # Endpoint of one line situated on other line should not intersect
+        # Endpoint of one line situated on other line should intersect
         if ((orientation1 == geometry.CL and geometry.on_segment(self.endpoint1, segment.endpoint1, self.endpoint2)) or
                 (orientation2 == geometry.CL and
                  geometry.on_segment(self.endpoint1, segment.endpoint2, self.endpoint2)) or
@@ -42,7 +42,7 @@ class Segment:
                  geometry.on_segment(segment.endpoint1, self.endpoint1, segment.endpoint2)) or
                 (orientation4 == geometry.CL and
                  geometry.on_segment(segment.endpoint1, self.endpoint2, segment.endpoint2))):
-            return False
+            return True
 
         # Different orientations means lines intersect
         if (orientation1 != orientation2) and (orientation3 != orientation4):
@@ -54,13 +54,13 @@ class Segment:
     # Calculate intersection between the two segments
     # Used for neighbours calculation
     def intersects_vertical(self, segment: 'Segment') -> bool:
-        a, b = (self.endpoint1.y, self.endpoint2.y) \
+        (a, b) = (self.endpoint1.y, self.endpoint2.y) \
             if self.endpoint1.y <= self.endpoint2.y \
             else (self.endpoint2.y, self.endpoint1.y)
-        c, d = (segment.endpoint1.y, segment.endpoint2.y) \
+        (c, d) = (segment.endpoint1.y, segment.endpoint2.y) \
             if segment.endpoint1.y <= segment.endpoint2.y \
             else (segment.endpoint2.y, segment.endpoint1.y)
-        return d < a or b < c
+        return max(a, c) < min(b, d)
 
     # Calculate intersection between segment and vertical boundary (self) of trapezoid
     def is_entered_by(self, segment: 'Segment') -> bool:
@@ -79,8 +79,7 @@ class Segment:
 
         # Endpoint of segment on boundary should intersect
         if ((orientation1 == geometry.CL and geometry.on_segment(self.endpoint1, segment.endpoint1, self.endpoint2)) or
-                (orientation2 == geometry.CL and
-                 geometry.on_segment(self.endpoint1, segment.endpoint2, self.endpoint2))):
+                (orientation2 == geometry.CL and geometry.on_segment(self.endpoint1, segment.endpoint2, self.endpoint2))):
             return True
 
         # Different orientations means lines intersect
