@@ -24,7 +24,7 @@ def orientation(point1: vertex.Vertex, point2: vertex.Vertex, point3: vertex.Ver
 # where we assume the three points are collinear
 def on_segment(point1: vertex.Vertex, point2: vertex.Vertex, point3: vertex.Vertex) -> bool:
     if min(point1.x, point3.x) <= point2.x <= max(point1.x, point3.x) and \
-       min(point1.y, point3.y) <= point2.y <= max(point1.y, point3.y):
+            min(point1.y, point3.y) <= point2.y <= max(point1.y, point3.y):
         return True
     return False
 
@@ -43,6 +43,6 @@ def find_bounding_box(nodes):
     right_bottom = vertex.Vertex(max_x + 1, min_y - 1)
 
     return trapezoid.Trapezoid(segment.Segment(left_top, right_top),
-                               [left_bottom],
-                               [right_top],
+                               {left_bottom},
+                               {right_top},
                                segment.Segment(left_bottom, right_bottom))

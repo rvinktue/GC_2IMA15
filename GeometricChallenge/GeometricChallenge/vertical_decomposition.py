@@ -103,21 +103,21 @@ class VerticalDecomposition:
         # 1: left of segment
         trapezoid1 = trapclass.Trapezoid(trapezoid.top_segment,
                                          trapezoid.left_points,
-                                         [segment.endpoint1],
+                                         {segment.endpoint1},
                                          trapezoid.bottom_segment)
         # 2: above segment
         trapezoid2 = trapclass.Trapezoid(trapezoid.top_segment,
-                                         [segment.endpoint1],
-                                         [segment.endpoint2],
+                                         {segment.endpoint1},
+                                         {segment.endpoint2},
                                          segment)
         # 3: below segment
         trapezoid3 = trapclass.Trapezoid(segment,
-                                         [segment.endpoint1],
-                                         [segment.endpoint2],
+                                         {segment.endpoint1},
+                                         {segment.endpoint2},
                                          trapezoid.bottom_segment)
         # 4: right of segment
         trapezoid4 = trapclass.Trapezoid(trapezoid.top_segment,
-                                         [segment.endpoint2],
+                                         {segment.endpoint2},
                                          trapezoid.right_points,
                                          trapezoid.bottom_segment)
 
@@ -181,29 +181,27 @@ def update_single_trapezoid_left_boundary(
         trapezoid: trapclass.Trapezoid,
         segment: segclass.Segment
 ) -> None:
-    left_points_above_segment = [point for point in trapezoid.left_points if point.is_above(segment)]
-    left_points_below_segment = [point for point in trapezoid.left_points if point.is_below(segment)]
+    left_points_above_segment = {point for point in trapezoid.left_points if point.is_above(segment)}
+    left_points_below_segment = {point for point in trapezoid.left_points if point.is_below(segment)}
 
     # 1: above segment
     trapezoid1 = trapclass.Trapezoid(trapezoid.top_segment,
-                                     left_points_above_segment + ([segment.endpoint1]
-                                                                  if trapezoid.left_segment.on_segment(segment.endpoint1) and
-                                                                     segment.endpoint1 not in left_points_above_segment
-                                                                  else []),
-                                     [segment.endpoint2],
+                                     left_points_above_segment.union({segment.endpoint1})
+                                     if trapezoid.left_segment.on_segment(segment.endpoint1)
+                                     else left_points_above_segment,
+                                     {segment.endpoint2},
                                      segment)
     # 2: below segment
     trapezoid2 = trapclass.Trapezoid(segment,
-                                     left_points_below_segment + ([segment.endpoint1]
-                                                                  if trapezoid.left_segment.on_segment(segment.endpoint1) and
-                                                                     segment.endpoint1 not in left_points_below_segment
-                                                                  else []),
-                                     [segment.endpoint2],
+                                     left_points_below_segment.union({segment.endpoint1})
+                                     if trapezoid.left_segment.on_segment(segment.endpoint1)
+                                     else left_points_below_segment,
+                                     {segment.endpoint2},
                                      trapezoid.bottom_segment)
 
     # 3: right of segment
     trapezoid3 = trapclass.Trapezoid(trapezoid.top_segment,
-                                     [segment.endpoint2],
+                                     {segment.endpoint2},
                                      trapezoid.right_points,
                                      trapezoid.bottom_segment)
 
@@ -250,9 +248,8 @@ def update_single_trapezoid_left_boundary(
 
     # Add segment endpoint to neighbour trapezoids
     for left_neighbour in node.left_neighbours:
-        if left_neighbour.content.right_segment.point_contained_vertical(segment.endpoint1) and \
-                segment.endpoint1 not in left_neighbour.content.right_points:
-            left_neighbour.content.right_points.append(segment.endpoint1)
+        if left_neighbour.content.right_segment.point_contained_vertical(segment.endpoint1):
+            left_neighbour.content.right_points.add(segment.endpoint1)
 
 
 def update_single_trapezoid_right_boundary(
@@ -260,30 +257,28 @@ def update_single_trapezoid_right_boundary(
         trapezoid: trapclass.Trapezoid,
         segment: segclass.Segment
 ) -> None:
-    right_points_above_segment = [point for point in trapezoid.right_points if point.is_above(segment)]
-    right_points_below_segment = [point for point in trapezoid.right_points if point.is_below(segment)]
+    right_points_above_segment = {point for point in trapezoid.right_points if point.is_above(segment)}
+    right_points_below_segment = {point for point in trapezoid.right_points if point.is_below(segment)}
 
     # 1: left of segment
     trapezoid1 = trapclass.Trapezoid(trapezoid.top_segment,
                                      trapezoid.left_points,
-                                     [segment.endpoint1],
+                                     {segment.endpoint1},
                                      trapezoid.bottom_segment)
     # 2: above segment
     trapezoid2 = trapclass.Trapezoid(trapezoid.top_segment,
-                                     [segment.endpoint1],
-                                     right_points_above_segment + ([segment.endpoint2]
-                                                                   if trapezoid.left_segment.on_segment(segment.endpoint2) and
-                                                                      segment.endpoint2 not in right_points_above_segment
-                                                                   else []),
+                                     {segment.endpoint1},
+                                     right_points_above_segment.union({segment.endpoint2})
+                                     if trapezoid.left_segment.on_segment(segment.endpoint2)
+                                     else right_points_above_segment,
                                      segment)
 
     # 3: below segment
     trapezoid3 = trapclass.Trapezoid(segment,
-                                     [segment.endpoint1],
-                                     right_points_below_segment + ([segment.endpoint2]
-                                                                   if trapezoid.left_segment.on_segment(segment.endpoint2) and
-                                                                      segment.endpoint2 not in right_points_below_segment
-                                                                   else []),
+                                     {segment.endpoint1},
+                                     right_points_below_segment.union({segment.endpoint2})
+                                     if trapezoid.left_segment.on_segment(segment.endpoint2)
+                                     else right_points_below_segment,
                                      trapezoid.bottom_segment)
 
     trap_node1 = dag.DagNode(trapezoid1)
@@ -329,9 +324,8 @@ def update_single_trapezoid_right_boundary(
 
     # Add segment endpoint to neighbour trapezoids
     for right_neighbour in node.right_neighbours:
-        if right_neighbour.content.left_segment.point_contained_vertical(segment.endpoint2) and \
-                segment.endpoint2 not in right_neighbour.content.left_points:
-            right_neighbour.content.left_points.append(segment.endpoint2)
+        if right_neighbour.content.left_segment.point_contained_vertical(segment.endpoint2):
+            right_neighbour.content.left_points.add(segment.endpoint2)
 
 
 def update_single_trapezoid_both_boundary(
@@ -339,36 +333,28 @@ def update_single_trapezoid_both_boundary(
         trapezoid: trapclass.Trapezoid,
         segment: segclass.Segment
 ) -> None:
-    left_points_above_segment = [point for point in trapezoid.left_points
-                                 if point.is_above(segment)]
-    left_points_below_segment = [point for point in trapezoid.left_points
-                                 if point.is_below(segment)]
-    right_points_above_segment = [point for point in trapezoid.right_points
-                                  if point.is_above(segment)]
-    right_points_below_segment = [point for point in trapezoid.right_points
-                                  if point.is_below(segment)]
+    left_points_above_segment = {point for point in trapezoid.left_points if point.is_above(segment)}
+    left_points_below_segment = {point for point in trapezoid.left_points if point.is_below(segment)}
+    right_points_above_segment = {point for point in trapezoid.right_points if point.is_above(segment)}
+    right_points_below_segment = {point for point in trapezoid.right_points if point.is_below(segment)}
 
     # 1: above segment
     trapezoid1 = trapclass.Trapezoid(trapezoid.top_segment,
-                                     left_points_above_segment + ([segment.endpoint1]
-                                                                  if trapezoid.left_segment.on_segment(segment.endpoint1) and
-                                                                     segment.endpoint1 not in left_points_above_segment
-                                                                  else []),
-                                     right_points_above_segment + ([segment.endpoint2]
-                                                                   if trapezoid.left_segment.on_segment(segment.endpoint2) and
-                                                                      segment.endpoint2 not in right_points_above_segment
-                                                                   else []),
+                                     left_points_above_segment.union({segment.endpoint1})
+                                     if trapezoid.left_segment.on_segment(segment.endpoint1)
+                                     else left_points_above_segment,
+                                     right_points_above_segment.union({segment.endpoint2})
+                                     if trapezoid.left_segment.on_segment(segment.endpoint2)
+                                     else right_points_above_segment,
                                      segment)
     # 2: below segment
     trapezoid2 = trapclass.Trapezoid(segment,
-                                     left_points_below_segment + ([segment.endpoint1]
-                                                                  if trapezoid.left_segment.on_segment(segment.endpoint1) and
-                                                                     segment.endpoint1 not in left_points_below_segment
-                                                                  else []),
-                                     right_points_below_segment + ([segment.endpoint2]
-                                                                   if trapezoid.left_segment.on_segment(segment.endpoint2) and
-                                                                      segment.endpoint2 not in right_points_below_segment
-                                                                   else []),
+                                     left_points_below_segment.union({segment.endpoint1})
+                                     if trapezoid.left_segment.on_segment(segment.endpoint1)
+                                     else left_points_below_segment,
+                                     right_points_below_segment.union({segment.endpoint2})
+                                     if trapezoid.left_segment.on_segment(segment.endpoint2)
+                                     else right_points_below_segment,
                                      trapezoid.bottom_segment)
 
     trap_node1 = dag.DagNode(trapezoid1)
@@ -413,14 +399,12 @@ def update_single_trapezoid_both_boundary(
 
     # Add segment endpoints to neighbour trapezoids
     for left_neighbour in node.left_neighbours:
-        if left_neighbour.content.right_segment.point_contained_vertical(segment.endpoint1) and \
-                segment.endpoint1 not in left_neighbour.content.right_points:
-            left_neighbour.content.right_points.append(segment.endpoint1)
+        if left_neighbour.content.right_segment.point_contained_vertical(segment.endpoint1):
+            left_neighbour.content.right_points.add(segment.endpoint1)
 
     for right_neighbour in node.right_neighbours:
-        if right_neighbour.content.left_segment.point_contained_vertical(segment.endpoint2) and \
-                segment.endpoint2 not in right_neighbour.content.left_points:
-            right_neighbour.content.left_points.append(segment.endpoint2)
+        if right_neighbour.content.left_segment.point_contained_vertical(segment.endpoint2):
+            right_neighbour.content.left_points.add(segment.endpoint2)
 
 
 def update_multiple_trapezoids(
@@ -452,46 +436,40 @@ def update_multiple_trapezoids_left(
     carry, carry_complement = None, None
 
     if trapezoid.right_segment.on_segment(segment.endpoint1):
-        if segment.endpoint1 not in trapezoid.right_points:
-            trapezoid.right_points.append(segment.endpoint1)
+        trapezoid.right_points.add(segment.endpoint1)
 
         for right_neighbour in node.right_neighbours:
-            if right_neighbour.content.left_segment.point_contained_vertical(segment.endpoint1) and \
-                    segment.endpoint1 not in right_neighbour.content.left_points:
-                right_neighbour.content.left_points.append(segment.endpoint1)
+            if right_neighbour.content.left_segment.point_contained_vertical(segment.endpoint1):
+                right_neighbour.content.left_points.add(segment.endpoint1)
 
         # Handle case as middle or right, return for now
         return None, None
     elif trapezoid.left_segment.on_segment(segment.endpoint1):
-        if segment.endpoint1 not in trapezoid.left_points:
-            trapezoid.left_points.append(segment.endpoint1)
+        trapezoid.left_points.add(segment.endpoint1)
 
         for left_neighbour in node.left_neighbours:
-            if left_neighbour.content.right_segment.point_contained_vertical(segment.endpoint1) and \
-                    segment.endpoint1 not in left_neighbour.content.right_points:
-                left_neighbour.content.right_points.append(segment.endpoint1)
+            if left_neighbour.content.right_segment.point_contained_vertical(segment.endpoint1):
+                left_neighbour.content.right_points.add(segment.endpoint1)
 
         # Handle case as middle with left endpoint on left boundary
         return update_multiple_trapezoids_middle(node, trapezoid, segment, carry, carry_complement)
     else:
-        right_points_above_segment = [point for point in trapezoid.right_points
-                                      if point.is_above(segment)]
-        right_points_below_segment = [point for point in trapezoid.right_points
-                                      if point.is_below(segment)]
+        right_points_above_segment = {point for point in trapezoid.right_points if point.is_above(segment)}
+        right_points_below_segment = {point for point in trapezoid.right_points if point.is_below(segment)}
 
         # 1: left of segment
         trapezoid1 = trapclass.Trapezoid(trapezoid.top_segment,
                                          trapezoid.left_points,
-                                         [segment.endpoint1],
+                                         {segment.endpoint1},
                                          trapezoid.bottom_segment)
         # 2: above segment
         trapezoid2 = trapclass.Trapezoid(trapezoid.top_segment,
-                                         [segment.endpoint1],
+                                         {segment.endpoint1},
                                          right_points_above_segment,
                                          segment)
         # 3: below segment
         trapezoid3 = trapclass.Trapezoid(segment,
-                                         [segment.endpoint1],
+                                         {segment.endpoint1},
                                          right_points_below_segment,
                                          trapezoid.bottom_segment)
 
@@ -551,9 +529,8 @@ def update_multiple_trapezoids_right(
         carry: None | dag.DagNode,
         carry_complement: None | dag.DagNode
 ) -> None:
-    if trapezoid.left_segment.on_segment(segment.endpoint2) and \
-            segment.endpoint2 not in trapezoid.left_points:
-        trapezoid.left_points.append(segment.endpoint2)
+    if trapezoid.left_segment.on_segment(segment.endpoint2):
+        trapezoid.left_points.add(segment.endpoint2)
 
     if trapezoid.right_segment.on_segment(segment.endpoint2):
         update_multiple_trapezoids_right_boundary(node, trapezoid, segment, carry, carry_complement)
@@ -569,30 +546,28 @@ def update_multiple_trapezoids_right_boundary(
         carry: None | dag.DagNode,
         carry_complement: None | dag.DagNode
 ) -> None:
-    left_points_above_segment = [point for point in trapezoid.left_points if point.is_above(segment)]
-    left_points_below_segment = [point for point in trapezoid.left_points if point.is_below(segment)]
-    right_points_above_segment = [point for point in trapezoid.right_points if point.is_above(segment)]
-    right_points_below_segment = [point for point in trapezoid.right_points if point.is_below(segment)]
+    left_points_above_segment = {point for point in trapezoid.left_points if point.is_above(segment)}
+    left_points_below_segment = {point for point in trapezoid.left_points if point.is_below(segment)}
+    right_points_above_segment = {point for point in trapezoid.right_points if point.is_above(segment)}
+    right_points_below_segment = {point for point in trapezoid.right_points if point.is_below(segment)}
 
     # 1: above segment
     trapezoid1 = trapclass.Trapezoid(trapezoid.top_segment,
-                                     left_points_above_segment + ([segment.endpoint1]
-                                                                  if trapezoid.left_segment.on_segment(segment.endpoint1) and
-                                                                     segment.endpoint1 not in left_points_above_segment
-                                                                  else []),
-                                     right_points_above_segment + ([segment.endpoint2]
-                                                                   if segment.endpoint1 not in right_points_above_segment
-                                                                   else []),
+                                     left_points_above_segment.union({segment.endpoint1})
+                                     if trapezoid.left_segment.on_segment(segment.endpoint1)
+                                     else left_points_above_segment,
+                                     right_points_above_segment.union({segment.endpoint2})
+                                     if segment.endpoint1 not in right_points_above_segment
+                                     else right_points_above_segment,
                                      segment)
     # 2: below segment
     trapezoid2 = trapclass.Trapezoid(segment,
-                                     left_points_below_segment + ([segment.endpoint1]
-                                                                  if trapezoid.left_segment.on_segment(segment.endpoint1) and
-                                                                     segment.endpoint1 not in left_points_below_segment
-                                                                  else []),
-                                     right_points_below_segment + ([segment.endpoint2]
-                                                                   if segment.endpoint1 not in right_points_below_segment
-                                                                   else []),
+                                     left_points_below_segment.union({segment.endpoint1})
+                                     if trapezoid.left_segment.on_segment(segment.endpoint1)
+                                     else left_points_below_segment,
+                                     right_points_below_segment.union({segment.endpoint2})
+                                     if segment.endpoint1 not in right_points_below_segment
+                                     else right_points_below_segment,
                                      trapezoid.bottom_segment)
 
     trap_node1 = dag.DagNode(trapezoid1)
@@ -614,6 +589,7 @@ def update_multiple_trapezoids_right_boundary(
                 and trapezoid2.left_segment.intersects_vertical(left_neighbour.content.right_segment):
             left_neighbour.right_neighbours.add(trap_node2)
             trap_node2.left_neighbours.add(left_neighbour)
+
     for right_neighbour in node.right_neighbours:
         right_neighbour.left_neighbours.discard(node)
         if trapezoid1.right_segment.intersects_vertical(right_neighbour.content.left_segment):
@@ -642,9 +618,8 @@ def update_multiple_trapezoids_right_boundary(
 
         # Add segment endpoint to neighbour trapezoids
         for right_neighbour in node.right_neighbours:
-            if right_neighbour.content.left_segment.point_contained_vertical(segment.endpoint2) and \
-                    segment.endpoint2 not in right_neighbour.content.left_points:
-                right_neighbour.content.left_points.append(segment.endpoint2)
+            if right_neighbour.content.left_segment.point_contained_vertical(segment.endpoint2):
+                right_neighbour.content.left_points.add(segment.endpoint2)
 
     # Update DAG
     parent_nodes = node.parents
@@ -681,28 +656,26 @@ def update_multiple_trapezoids_right_not_boundary(
         carry: None | dag.DagNode,
         carry_complement: None | dag.DagNode
 ) -> None:
-    left_points_above_segment = [point for point in trapezoid.left_points if point.is_above(segment)]
-    left_points_below_segment = [point for point in trapezoid.left_points if point.is_below(segment)]
+    left_points_above_segment = {point for point in trapezoid.left_points if point.is_above(segment)}
+    left_points_below_segment = {point for point in trapezoid.left_points if point.is_below(segment)}
 
     # 1: above segment
     trapezoid1 = trapclass.Trapezoid(trapezoid.top_segment,
-                                     left_points_above_segment + ([segment.endpoint1]
-                                                                  if trapezoid.left_segment.on_segment(segment.endpoint1) and
-                                                                     segment.endpoint1 not in left_points_above_segment
-                                                                  else []),
-                                     [segment.endpoint2],
+                                     left_points_above_segment.union({segment.endpoint1})
+                                     if trapezoid.left_segment.on_segment(segment.endpoint1)
+                                     else left_points_above_segment,
+                                     {segment.endpoint2},
                                      segment)
     # 2: below segment
     trapezoid2 = trapclass.Trapezoid(segment,
-                                     left_points_below_segment + ([segment.endpoint1]
-                                                                  if trapezoid.left_segment.on_segment(segment.endpoint1) and
-                                                                     segment.endpoint1 not in left_points_below_segment
-                                                                  else []),
-                                     [segment.endpoint2],
+                                     left_points_below_segment.union({segment.endpoint1})
+                                     if trapezoid.left_segment.on_segment(segment.endpoint1)
+                                     else left_points_below_segment,
+                                     {segment.endpoint2},
                                      trapezoid.bottom_segment)
     # 3: right of segment
     trapezoid3 = trapclass.Trapezoid(trapezoid.top_segment,
-                                     [segment.endpoint2],
+                                     {segment.endpoint2},
                                      trapezoid.right_points,
                                      trapezoid.bottom_segment)
 
@@ -787,32 +760,28 @@ def update_multiple_trapezoids_middle(
         carry: None | dag.DagNode,
         carry_complement: None | dag.DagNode
 ) -> typing.Tuple[None | dag.DagNode, None | dag.DagNode]:
-    left_points_above_segment = [point for point in trapezoid.left_points if point.is_above(segment)]
-    left_points_below_segment = [point for point in trapezoid.left_points if point.is_below(segment)]
-    right_points_above_segment = [point for point in trapezoid.right_points if point.is_above(segment)]
-    right_points_below_segment = [point for point in trapezoid.right_points if point.is_below(segment)]
+    left_points_above_segment = {point for point in trapezoid.left_points if point.is_above(segment)}
+    left_points_below_segment = {point for point in trapezoid.left_points if point.is_below(segment)}
+    right_points_above_segment = {point for point in trapezoid.right_points if point.is_above(segment)}
+    right_points_below_segment = {point for point in trapezoid.right_points if point.is_below(segment)}
 
     # 1: above segment
     trapezoid1 = trapclass.Trapezoid(trapezoid.top_segment,
-                                     left_points_above_segment + ([segment.endpoint1]
-                                                                  if trapezoid.left_segment.on_segment(segment.endpoint1) and
-                                                                     segment.endpoint1 not in left_points_above_segment
-                                                                  else []),
-                                     right_points_above_segment + ([segment.endpoint2]
-                                                                   if trapezoid.right_segment.on_segment(segment.endpoint2) and
-                                                                      segment.endpoint2 not in right_points_above_segment
-                                                                   else []),
+                                     left_points_above_segment.union({segment.endpoint1})
+                                     if trapezoid.left_segment.on_segment(segment.endpoint1)
+                                     else left_points_above_segment,
+                                     right_points_above_segment.union({segment.endpoint2})
+                                     if trapezoid.right_segment.on_segment(segment.endpoint2)
+                                     else right_points_above_segment,
                                      segment)
     # 2: below segment
     trapezoid2 = trapclass.Trapezoid(segment,
-                                     left_points_below_segment + ([segment.endpoint1]
-                                                                  if trapezoid.left_segment.on_segment(segment.endpoint1) and
-                                                                     segment.endpoint1 not in left_points_below_segment
-                                                                  else []),
-                                     right_points_below_segment + ([segment.endpoint2]
-                                                                   if trapezoid.right_segment.on_segment(segment.endpoint2) and
-                                                                      segment.endpoint2 not in right_points_below_segment
-                                                                   else []),
+                                     left_points_below_segment.union({segment.endpoint1})
+                                     if trapezoid.left_segment.on_segment(segment.endpoint1)
+                                     else left_points_below_segment,
+                                     right_points_below_segment.union({segment.endpoint2})
+                                     if trapezoid.right_segment.on_segment(segment.endpoint2)
+                                     else right_points_below_segment,
                                      trapezoid.bottom_segment)
 
     trap_node1 = dag.DagNode(trapezoid1)

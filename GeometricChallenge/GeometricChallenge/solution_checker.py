@@ -70,7 +70,7 @@ if __name__ == "__main__":
         p.close()
         p.join()
 
-    print(f"{len([x for x in solution_checks if x.is_correct])}/225 correct.")
+    print(f"{len([x for x in solution_checks if x.is_correct])}/{len(instance_names)} correct.")
 
     for solcheck in solution_checks:
         if not solcheck.is_correct:

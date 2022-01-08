@@ -34,11 +34,11 @@ class Trapezoid:
         d = self.bottom_segment.endpoint1
 
         if len(self.left_points) > 0:
-            px = self.left_points[0].x
+            px = next(iter(self.left_points)).x
         else:
             px = max(a.x, d.x)
         if len(self.right_points) > 0:
-            qx = self.right_points[0].x
+            qx = next(iter(self.right_points)).x
         else:
             qx = min(b.x, c.x)
 
@@ -54,8 +54,8 @@ class Trapezoid:
     def segment_enter(self, segment: segclass.Segment) -> bool:
         return self.left_segment.is_entered_by(segment)
 
-    def update_left_points(self, new_points: typing.List[vertclass.Vertex] | []) -> None:
-        self.left_points = new_points[:]
+    def update_left_points(self, new_points: typing.Set[vertclass.Vertex]) -> None:
+        self.left_points = new_points
 
         # Precompute quad and left/right segments
         a = self.top_segment.endpoint1
@@ -64,7 +64,7 @@ class Trapezoid:
         d = self.bottom_segment.endpoint1
 
         if len(self.left_points) > 0:
-            px = self.left_points[0].x
+            px = next(iter(self.left_points)).x
         else:
             px = max(a.x, d.x)
 
