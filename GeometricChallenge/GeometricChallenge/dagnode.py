@@ -8,6 +8,8 @@ import geometry
 
 # Class that represents the DAG
 class DagNode:
+    # __slots__ = ('content', 'left_child', 'right_child', 'parents', 'left_neighbours', 'right_neighbours')
+
     def __init__(self, content) -> None:
         self.content = content
         self.left_child = None

@@ -3,6 +3,8 @@ import geometry
 
 # Class that represents a single vertex
 class Vertex:
+    __slots__ = ('x', 'y', 'type')
+
     def __init__(self, x, y):
         self.x = x
         self.y = y

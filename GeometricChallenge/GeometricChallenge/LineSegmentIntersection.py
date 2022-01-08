@@ -20,4 +20,6 @@ def solve_cg_challenge():
 
 
 if __name__ == '__main__':
-    solve_cg_challenge()
+    # solve_cg_challenge()
+    # solve_instance("reecn3382.instance.json")
+    solve_instance("reecn23484.instance.json")

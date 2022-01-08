@@ -7,6 +7,8 @@ import geometry
 
 # Class that represents a single Trapezoid in the Vertical Decomposition
 class Trapezoid:
+    # __slots__ = ('top_segment', 'left_points', 'right_points', 'bottom_segment', 'type', 'left_segment', 'right_segment')
+
     def __init__(self, top_segment, left_points, right_points, bottom_segment) -> None:
         self.top_segment = top_segment
         self.left_points = left_points
