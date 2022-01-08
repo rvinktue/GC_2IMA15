@@ -141,7 +141,7 @@ class VerticalDecomposition:
         else:
             lp_node = dag.DagNode(segment.endpoint1)
             for parent_node in parent_nodes:
-                if parent_node.left_child == node:  # If we are the left child
+                if parent_node.left_child is node:  # If we are the left child
                     parent_node.set_left_child(lp_node)  # Left endpoint becomes left child
                 else:
                     # We are the right child
@@ -212,7 +212,7 @@ def update_single_trapezoid_left_boundary(
     parent_nodes = node.parents
     lp_node = dag.DagNode(segment.endpoint1)
     for parent_node in parent_nodes:
-        if parent_node.left_child == node:  # If we are the left child
+        if parent_node.left_child is node:  # If we are the left child
             parent_node.set_left_child(lp_node)  # Left endpoint becomes left child
         else:
             # We are the right child
@@ -288,7 +288,7 @@ def update_single_trapezoid_right_boundary(
     parent_nodes = node.parents
     lp_node = dag.DagNode(segment.endpoint1)
     for parent_node in parent_nodes:
-        if parent_node.left_child == node:  # If we are the left child
+        if parent_node.left_child is node:  # If we are the left child
             parent_node.set_left_child(lp_node)  # Left endpoint becomes left child
         else:
             # We are the right child
@@ -363,7 +363,7 @@ def update_single_trapezoid_both_boundary(
     parent_nodes = node.parents
     lp_node = dag.DagNode(segment.endpoint1)
     for parent_node in parent_nodes:
-        if parent_node.left_child == node:  # If we are the left child
+        if parent_node.left_child is node:  # If we are the left child
             parent_node.set_left_child(lp_node)  # Left endpoint becomes left child
         else:
             # We are the right child
@@ -485,7 +485,7 @@ def update_multiple_trapezoids_left(
         parent_nodes = node.parents
         lp_node = dag.DagNode(segment.endpoint1)
         for parent_node in parent_nodes:
-            if parent_node.left_child == node:
+            if parent_node.left_child is node:
                 parent_node.set_left_child(lp_node)
             else:
                 parent_node.set_right_child(lp_node)
@@ -624,7 +624,7 @@ def update_multiple_trapezoids_right_boundary(
     parent_nodes = node.parents
     lp_node = dag.DagNode(segment.endpoint2)
     for parent_node in parent_nodes:
-        if parent_node.left_child == node:
+        if parent_node.left_child is node:
             parent_node.set_left_child(lp_node)
         else:
             parent_node.set_right_child(lp_node)
@@ -642,7 +642,7 @@ def update_multiple_trapezoids_right_boundary(
             carry_complement = trap_node2
 
         for parent in carry.parents:
-            if parent.left_child == carry:
+            if parent.left_child is carry:
                 parent.set_left_child(carry_complement)
             else:
                 parent.set_right_child(carry_complement)
@@ -727,7 +727,7 @@ def update_multiple_trapezoids_right_not_boundary(
     parent_nodes = node.parents
     lp_node = dag.DagNode(segment.endpoint2)
     for parent_node in parent_nodes:
-        if parent_node.left_child == node:
+        if parent_node.left_child is node:
             parent_node.set_left_child(lp_node)
         else:
             parent_node.set_right_child(lp_node)
@@ -746,7 +746,7 @@ def update_multiple_trapezoids_right_not_boundary(
             carry_complement = trap_node2
 
         for parent in carry.parents:
-            if parent.left_child == carry:
+            if parent.left_child is carry:
                 parent.set_left_child(carry_complement)
             else:
                 parent.set_right_child(carry_complement)
@@ -828,7 +828,7 @@ def update_multiple_trapezoids_middle(
             carry_complement = trap_node2
 
         for parent in carry.parents:
-            if parent.left_child == carry:
+            if parent.left_child is carry:
                 parent.set_left_child(carry_complement)
             else:
                 parent.set_right_child(carry_complement)

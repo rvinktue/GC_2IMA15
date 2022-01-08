@@ -12,6 +12,7 @@ def handle_test(vertices, print_dag):
     segments = [segclass.Segment(vertices[2 * i], vertices[2 * i + 1]) for i in range(len(vertices) // 2)]
     vd = vdclass.VerticalDecomposition(geometry.find_bounding_box([[v.x, v.y] for v in vertices]))
 
+    trapezoids = set()
     for seg in segments:
         fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2, sharex=True, sharey=True)
         start_node, end_node = vd.point_location_segment(seg)
@@ -24,7 +25,8 @@ def handle_test(vertices, print_dag):
                   % (seg.endpoint1.x, seg.endpoint1.y, seg.endpoint2.x, seg.endpoint2.y))
 
         test_draw.test_draw_dag(vd.dag, ax=ax1)
-        for trap in vd.dag.find_all(trapclass.Trapezoid):
+        trapezoids = vd.dag.find_all(trapclass.Trapezoid)
+        for trap in trapezoids:
             if trap.content.left_segment.endpoint1.x == 5 \
                     and trap.content.left_segment.endpoint1.y == 1:
                 for l in trap.left_neighbours:
@@ -45,7 +47,7 @@ def handle_test(vertices, print_dag):
         plt.show()
 
     if print_dag:
-        print(["%s, %s\n" % (node, vars(node)) for node in vd.dag.find_all(trapclass.Trapezoid)])
+        print(["%s, %s\n" % (node, vars(node)) for node in trapezoids])
 
 
 # Run all test cases (switch the False to True to print the final DAG for each test case)
