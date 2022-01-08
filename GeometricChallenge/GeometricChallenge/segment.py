@@ -95,3 +95,6 @@ class Segment:
         We assume the segment is a vertical line.
         """
         return self.endpoint1.x == point.x
+
+    def point_contained_vertical(self, point: vertex.Vertex) -> bool:
+        return min(self.endpoint1.y, self.endpoint2.y) <= point.y <= max(self.endpoint1.y, self.endpoint2.y)

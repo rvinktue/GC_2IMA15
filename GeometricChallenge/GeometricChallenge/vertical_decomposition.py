@@ -248,7 +248,7 @@ def update_single_trapezoid_left_boundary(
 
     # Add segment endpoint to neighbour trapezoids
     for left_neighbour in node.left_neighbours:
-        if left_neighbour.content.right_segment.on_segment(segment.endpoint1):
+        if left_neighbour.content.right_segment.point_contained_vertical(segment.endpoint1):
             left_neighbour.content.right_points.append(segment.endpoint1)
 
 
@@ -322,7 +322,7 @@ def update_single_trapezoid_right_boundary(
 
     # Add segment endpoint to neighbour trapezoids
     for right_neighbour in node.right_neighbours:
-        if right_neighbour.content.left_segment.on_segment(segment.endpoint2):
+        if right_neighbour.content.left_segment.point_contained_vertical(segment.endpoint2):
             right_neighbour.content.left_points.append(segment.endpoint2)
 
 
@@ -393,11 +393,11 @@ def update_single_trapezoid_both_boundary(
 
     # Add segment endpoints to neighbour trapezoids
     for left_neighbour in node.left_neighbours:
-        if left_neighbour.content.right_segment.on_segment(segment.endpoint1):
+        if left_neighbour.content.right_segment.point_contained_vertical(segment.endpoint1):
             left_neighbour.content.right_points.append(segment.endpoint1)
 
     for right_neighbour in node.right_neighbours:
-        if right_neighbour.content.left_segment.on_segment(segment.endpoint2):
+        if right_neighbour.content.left_segment.point_contained_vertical(segment.endpoint2):
             right_neighbour.content.left_points.append(segment.endpoint2)
 
 
@@ -431,11 +431,17 @@ def update_multiple_trapezoids_left(
 
     if trapezoid.right_segment.on_segment(segment.endpoint1):
         trapezoid.right_points.append(segment.endpoint1)
+        for right_neighbour in node.right_neighbours:
+            if right_neighbour.content.left_segment.point_contained_vertical(segment.endpoint1):
+                right_neighbour.content.left_points.append(segment.endpoint1)
 
         # Handle case as middle or right, return for now
         return None, None
     elif trapezoid.left_segment.on_segment(segment.endpoint1):
         trapezoid.left_points.append(segment.endpoint1)
+        for left_neighbour in node.left_neighbours:
+            if left_neighbour.content.right_segment.point_contained_vertical(segment.endpoint1):
+                left_neighbour.content.right_points.append(segment.endpoint1)
 
         # Handle case as middle with left endpoint on left boundary
         return update_multiple_trapezoids_middle(node, trapezoid, segment, carry, carry_complement)
@@ -598,7 +604,7 @@ def update_multiple_trapezoids_right_boundary(
 
         # Add segment endpoint to neighbour trapezoids
         for right_neighbour in node.right_neighbours:
-            if right_neighbour.content.left_segment.on_segment(segment.endpoint2):
+            if right_neighbour.content.left_segment.point_contained_vertical(segment.endpoint2):
                 right_neighbour.content.left_points.append(segment.endpoint2)
 
     # Update DAG
