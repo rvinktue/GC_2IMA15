@@ -13,7 +13,7 @@ def solve_cg_challenge():
     from os import listdir
     from multiprocessing import Pool
 
-    with Pool(8) as p:
+    with Pool(14) as p:
         p.map(solve_instance, listdir("instances/"))
         p.close()
         p.join()
@@ -21,7 +21,7 @@ def solve_cg_challenge():
 
 if __name__ == '__main__':
     # solve_cg_challenge()
-    file = "sqrpecn39689.instance.json"
+    file = "sqrpecn49763.instance.json"
     start = time.perf_counter()
     print(f"Starting {file}...")
     gcsolver.solve("instances/" + file, shuffle=False)

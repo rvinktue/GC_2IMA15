@@ -1,5 +1,6 @@
 import segment as segclass
 import vertex as vertclass
+import geometry
 
 
 # Class that represents a single Trapezoid in the Vertical Decomposition
@@ -89,3 +90,15 @@ class Trapezoid:
         return point.is_above(self.bottom_segment) and \
                not point.is_above(self.top_segment) \
                and self.left_segment.endpoint1.x <= point.x <= self.right_segment.endpoint1.x
+
+    def is_valid(self, vertex: vertclass.Vertex) -> bool:
+        if (self.top_segment.endpoint1.x == vertex.x and self.top_segment.endpoint1.y == vertex.y) != \
+                (self.top_segment.endpoint2.x == vertex.x and self.top_segment.endpoint2.y == vertex.y) or \
+                (self.bottom_segment.endpoint1.x == vertex.x and self.bottom_segment.endpoint1.y == vertex.y) != \
+                (self.bottom_segment.endpoint2.x == vertex.x and self.bottom_segment.endpoint2.y == vertex.y):
+            return True
+
+        orientation1 = geometry.orientation(self.top_segment.endpoint1, self.top_segment.endpoint2, vertex)
+        orientation2 = geometry.orientation(self.bottom_segment.endpoint1, self.bottom_segment.endpoint2, vertex)
+
+        return not orientation1 == geometry.CL and not orientation2 == geometry.CL

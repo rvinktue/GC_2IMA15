@@ -59,14 +59,14 @@ def check_instance(instance_name):
     return SolutionCheck(instance_name, g, data["colors"])
 
 
-if __name__ == "__main__":
+if False and __name__ == "__main__":
     from os import listdir
 
     instance_names = [file.split('.')[0] for file in listdir("instances/")]
 
     from multiprocessing import Pool
 
-    with Pool(8) as p:
+    with Pool(14) as p:
         solution_checks = p.map(check_instance, instance_names)
         p.close()
         p.join()
@@ -76,3 +76,5 @@ if __name__ == "__main__":
     # for solcheck in solution_checks:
     #     if not solcheck.is_correct:
     #         solcheck.report_errors()
+
+check_instance("sqrpecn49763").report_errors()

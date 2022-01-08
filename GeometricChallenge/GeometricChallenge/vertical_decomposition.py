@@ -3,6 +3,8 @@ from typing import Tuple
 import dagnode as dag
 import trapezoid as trapclass
 import segment as segclass
+import test_draw
+import matplotlib.pyplot as plt
 
 
 # Class that represents the vertical decomposition of a planar graph
@@ -31,6 +33,9 @@ class VerticalDecomposition:
         start_node, end_node = self.point_location_segment(segment)
         intersected_trapezoids = [start_node]
         current_node = start_node
+
+        if not start_node.content.is_valid(segment.endpoint1) or not end_node.content.is_valid(segment.endpoint2):
+            return []
 
         while current_node is not end_node:
             if len(current_node.right_neighbours) == 0 or not segment.intersects(current_node.content.right_segment):
@@ -156,21 +161,21 @@ class VerticalDecomposition:
         # Update neighbour lists
         # External neighbours
         for left_neighbour in node.left_neighbours:
-            left_neighbour.right_neighbours.remove(node)
-            left_neighbour.right_neighbours.append(trap_node1)
-            trap_node1.left_neighbours.append(left_neighbour)
+            left_neighbour.right_neighbours.discard(node)
+            left_neighbour.right_neighbours.add(trap_node1)
+            trap_node1.left_neighbours.add(left_neighbour)
         for right_neighbour in node.right_neighbours:
-            right_neighbour.left_neighbours.remove(node)
-            right_neighbour.left_neighbours.append(trap_node4)
-            trap_node4.right_neighbours.append(right_neighbour)
+            right_neighbour.left_neighbours.discard(node)
+            right_neighbour.left_neighbours.add(trap_node4)
+            trap_node4.right_neighbours.add(right_neighbour)
 
         # Internal neighbours
-        trap_node1.right_neighbours = [trap_node2, trap_node3]
-        trap_node2.left_neighbours = [trap_node1]
-        trap_node2.right_neighbours = [trap_node4]
-        trap_node3.left_neighbours = [trap_node1]
-        trap_node3.right_neighbours = [trap_node4]
-        trap_node4.left_neighbours = [trap_node2, trap_node3]
+        trap_node1.right_neighbours = {trap_node2, trap_node3}
+        trap_node2.left_neighbours = {trap_node1}
+        trap_node2.right_neighbours = {trap_node4}
+        trap_node3.left_neighbours = {trap_node1}
+        trap_node3.right_neighbours = {trap_node4}
+        trap_node4.left_neighbours = {trap_node2, trap_node3}
 
 
 def update_single_trapezoid_left_boundary(
@@ -224,22 +229,22 @@ def update_single_trapezoid_left_boundary(
     # Update neighbours
     # External neighbours
     for left_neighbour in node.left_neighbours:
-        left_neighbour.right_neighbours.remove(node)
+        left_neighbour.right_neighbours.discard(node)
         if trapezoid1.left_segment.intersects_vertical(left_neighbour.content.right_segment):
-            left_neighbour.right_neighbours.append(trap_node1)
-            trap_node1.left_neighbours.append(left_neighbour)
+            left_neighbour.right_neighbours.add(trap_node1)
+            trap_node1.left_neighbours.add(left_neighbour)
         if trapezoid2.left_segment.intersects_vertical(left_neighbour.content.right_segment):
-            left_neighbour.right_neighbours.append(trap_node2)
-            trap_node2.left_neighbours.append(left_neighbour)
+            left_neighbour.right_neighbours.add(trap_node2)
+            trap_node2.left_neighbours.add(left_neighbour)
     for right_neighbour in node.right_neighbours:
-        right_neighbour.left_neighbours.remove(node)
-        right_neighbour.left_neighbours.append(trap_node3)
-        trap_node3.right_neighbours.append(right_neighbour)
+        right_neighbour.left_neighbours.discard(node)
+        right_neighbour.left_neighbours.add(trap_node3)
+        trap_node3.right_neighbours.add(right_neighbour)
 
     # Internal neighbours
-    trap_node1.right_neighbours = [trap_node3]
-    trap_node2.right_neighbours = [trap_node3]
-    trap_node3.left_neighbours = [trap_node1, trap_node2]
+    trap_node1.right_neighbours = {trap_node3}
+    trap_node2.right_neighbours = {trap_node3}
+    trap_node3.left_neighbours = {trap_node1, trap_node2}
 
     # Add segment endpoint to neighbour trapezoids
     for left_neighbour in node.left_neighbours:
@@ -298,22 +303,22 @@ def update_single_trapezoid_right_boundary(
     # Update neighbours
     # External neighbours
     for left_neighbour in node.left_neighbours:
-        left_neighbour.right_neighbours.remove(node)
-        left_neighbour.right_neighbours.append(trap_node1)
-        trap_node1.left_neighbours.append(left_neighbour)
+        left_neighbour.right_neighbours.discard(node)
+        left_neighbour.right_neighbours.add(trap_node1)
+        trap_node1.left_neighbours.add(left_neighbour)
     for right_neighbour in node.right_neighbours:
-        right_neighbour.left_neighbours.remove(node)
+        right_neighbour.left_neighbours.discard(node)
         if trapezoid2.right_segment.intersects_vertical(right_neighbour.content.left_segment):
-            right_neighbour.left_neighbours.append(trap_node2)
-            trap_node2.right_neighbours.append(right_neighbour)
+            right_neighbour.left_neighbours.add(trap_node2)
+            trap_node2.right_neighbours.add(right_neighbour)
         if trapezoid3.right_segment.intersects_vertical(right_neighbour.content.left_segment):
-            right_neighbour.left_neighbours.append(trap_node3)
-            trap_node3.right_neighbours.append(right_neighbour)
+            right_neighbour.left_neighbours.add(trap_node3)
+            trap_node3.right_neighbours.add(right_neighbour)
 
     # Internal neighbours
-    trap_node1.right_neighbours = [trap_node2, trap_node3]
-    trap_node2.left_neighbours = [trap_node1]
-    trap_node3.left_neighbours = [trap_node1]
+    trap_node1.right_neighbours = {trap_node2, trap_node3}
+    trap_node2.left_neighbours = {trap_node1}
+    trap_node3.left_neighbours = {trap_node1}
 
     # Add segment endpoint to neighbour trapezoids
     for right_neighbour in node.right_neighbours:
@@ -368,21 +373,21 @@ def update_single_trapezoid_both_boundary(
     # Update neighbours
     # External neighbours
     for left_neighbour in node.left_neighbours:
-        left_neighbour.right_neighbours.remove(node)
+        left_neighbour.right_neighbours.discard(node)
         if trapezoid1.left_segment.intersects_vertical(left_neighbour.content.right_segment):
-            left_neighbour.right_neighbours.append(trap_node1)
-            trap_node1.left_neighbours.append(left_neighbour)
+            left_neighbour.right_neighbours.add(trap_node1)
+            trap_node1.left_neighbours.add(left_neighbour)
         if trapezoid2.left_segment.intersects_vertical(left_neighbour.content.right_segment):
-            left_neighbour.right_neighbours.append(trap_node2)
-            trap_node2.left_neighbours.append(left_neighbour)
+            left_neighbour.right_neighbours.add(trap_node2)
+            trap_node2.left_neighbours.add(left_neighbour)
     for right_neighbour in node.right_neighbours:
-        right_neighbour.left_neighbours.remove(node)
+        right_neighbour.left_neighbours.discard(node)
         if trapezoid1.right_segment.intersects_vertical(right_neighbour.content.left_segment):
-            right_neighbour.left_neighbours.append(trap_node1)
-            trap_node1.right_neighbours.append(right_neighbour)
+            right_neighbour.left_neighbours.add(trap_node1)
+            trap_node1.right_neighbours.add(right_neighbour)
         if trapezoid2.right_segment.intersects_vertical(right_neighbour.content.left_segment):
-            right_neighbour.left_neighbours.append(trap_node2)
-            trap_node2.right_neighbours.append(right_neighbour)
+            right_neighbour.left_neighbours.add(trap_node2)
+            trap_node2.right_neighbours.add(right_neighbour)
 
     # No internal neighbours
 
@@ -481,24 +486,24 @@ def update_multiple_trapezoids_left(
         # Update neighbour lists
         # External neighbours
         for left_neighbour in node.left_neighbours:
-            left_neighbour.right_neighbours.remove(node)
-            left_neighbour.right_neighbours.append(trap_node1)
-            trap_node1.left_neighbours.append(left_neighbour)
+            left_neighbour.right_neighbours.discard(node)
+            left_neighbour.right_neighbours.add(trap_node1)
+            trap_node1.left_neighbours.add(left_neighbour)
         for right_neighbour in node.right_neighbours:
-            right_neighbour.left_neighbours.remove(node)
+            right_neighbour.left_neighbours.discard(node)
             if carry is not trap_node2 \
                     and trapezoid2.right_segment.intersects_vertical(right_neighbour.content.left_segment):
-                right_neighbour.left_neighbours.append(trap_node2)
-                trap_node2.right_neighbours.append(right_neighbour)
+                right_neighbour.left_neighbours.add(trap_node2)
+                trap_node2.right_neighbours.add(right_neighbour)
             if carry is not trap_node3 \
                     and trapezoid3.right_segment.intersects_vertical(right_neighbour.content.left_segment):
-                right_neighbour.left_neighbours.append(trap_node3)
-                trap_node3.right_neighbours.append(right_neighbour)
+                right_neighbour.left_neighbours.add(trap_node3)
+                trap_node3.right_neighbours.add(right_neighbour)
 
         # Internal neighbours
-        trap_node1.right_neighbours = [trap_node2, trap_node3]
-        trap_node2.left_neighbours = [trap_node1]
-        trap_node3.left_neighbours = [trap_node1]
+        trap_node1.right_neighbours = {trap_node2, trap_node3}
+        trap_node2.left_neighbours = {trap_node1}
+        trap_node3.left_neighbours = {trap_node1}
 
     return carry, carry_complement
 
@@ -550,27 +555,27 @@ def update_multiple_trapezoids_right_boundary(
     # Update neighbour lists
     # External neighbours
     for left_neighbour in node.left_neighbours:
-        left_neighbour.right_neighbours.remove(node)
+        left_neighbour.right_neighbours.discard(node)
 
         # Carry should be merged with trapezoid1
         if left_points_above_segment \
                 and trapezoid1.left_segment.intersects_vertical(left_neighbour.content.right_segment):
-            left_neighbour.right_neighbours.append(trap_node1)
-            trap_node1.left_neighbours.append(left_neighbour)
+            left_neighbour.right_neighbours.add(trap_node1)
+            trap_node1.left_neighbours.add(left_neighbour)
 
         # Carry should be merged with trapezoid1
         if left_points_below_segment \
                 and trapezoid2.left_segment.intersects_vertical(left_neighbour.content.right_segment):
-            left_neighbour.right_neighbours.append(trap_node2)
-            trap_node2.left_neighbours.append(left_neighbour)
+            left_neighbour.right_neighbours.add(trap_node2)
+            trap_node2.left_neighbours.add(left_neighbour)
     for right_neighbour in node.right_neighbours:
-        right_neighbour.left_neighbours.remove(node)
+        right_neighbour.left_neighbours.discard(node)
         if trapezoid1.right_segment.intersects_vertical(right_neighbour.content.left_segment):
-            right_neighbour.left_neighbours.append(trap_node1)
-            trap_node1.right_neighbours.append(right_neighbour)
+            right_neighbour.left_neighbours.add(trap_node1)
+            trap_node1.right_neighbours.add(right_neighbour)
         if trapezoid2.right_segment.intersects_vertical(right_neighbour.content.left_segment):
-            right_neighbour.left_neighbours.append(trap_node2)
-            trap_node2.right_neighbours.append(right_neighbour)
+            right_neighbour.left_neighbours.add(trap_node2)
+            trap_node2.right_neighbours.add(right_neighbour)
 
     # No internal neighbours
 
@@ -579,15 +584,15 @@ def update_multiple_trapezoids_right_boundary(
         if not left_points_above_segment:  # Carry should be merged with trapezoid1
             trapezoid1.update_left_points(carry.content.left_points)
             for left_neighbour in carry.left_neighbours:
-                left_neighbour.right_neighbours.remove(carry)
-                left_neighbour.right_neighbours.append(trap_node1)
-                trap_node1.left_neighbours.append(left_neighbour)
+                left_neighbour.right_neighbours.discard(carry)
+                left_neighbour.right_neighbours.add(trap_node1)
+                trap_node1.left_neighbours.add(left_neighbour)
         if not left_points_below_segment:  # Carry should be merged with trapezoid2
             trapezoid2.update_left_points(carry.content.left_points)
             for left_neighbour in carry.left_neighbours:
-                left_neighbour.right_neighbours.remove(carry)
-                left_neighbour.right_neighbours.append(trap_node2)
-                trap_node2.left_neighbours.append(left_neighbour)
+                left_neighbour.right_neighbours.discard(carry)
+                left_neighbour.right_neighbours.add(trap_node2)
+                trap_node2.left_neighbours.add(left_neighbour)
 
         # Add segment endpoint to neighbour trapezoids
         for right_neighbour in node.right_neighbours:
@@ -659,43 +664,43 @@ def update_multiple_trapezoids_right_not_boundary(
     # Update neighbour lists
     # External neighbours
     for left_neighbour in node.left_neighbours:
-        left_neighbour.right_neighbours.remove(node)
+        left_neighbour.right_neighbours.discard(node)
 
         # Carry should be merged with trapezoid1
         if left_points_above_segment \
                 and trapezoid1.left_segment.intersects_vertical(left_neighbour.content.right_segment):
-            left_neighbour.right_neighbours.append(trap_node1)
-            trap_node1.left_neighbours.append(left_neighbour)
+            left_neighbour.right_neighbours.add(trap_node1)
+            trap_node1.left_neighbours.add(left_neighbour)
 
         # Carry should be merged with trapezoid2
         if left_points_below_segment \
                 and trapezoid2.left_segment.intersects_vertical(left_neighbour.content.right_segment):
-            left_neighbour.right_neighbours.append(trap_node2)
-            trap_node2.left_neighbours.append(left_neighbour)
+            left_neighbour.right_neighbours.add(trap_node2)
+            trap_node2.left_neighbours.add(left_neighbour)
     for right_neighbour in node.right_neighbours:
-        right_neighbour.left_neighbours.remove(node)
-        right_neighbour.left_neighbours.append(trap_node3)
-        trap_node3.right_neighbours.append(right_neighbour)
+        right_neighbour.left_neighbours.discard(node)
+        right_neighbour.left_neighbours.add(trap_node3)
+        trap_node3.right_neighbours.add(right_neighbour)
 
     # Internal neighbours
-    trap_node1.right_neighbours = [trap_node3]
-    trap_node2.right_neighbours = [trap_node3]
-    trap_node3.left_neighbours = [trap_node1, trap_node2]
+    trap_node1.right_neighbours = {trap_node3}
+    trap_node2.right_neighbours = {trap_node3}
+    trap_node3.left_neighbours = {trap_node1, trap_node2}
 
     # Merge carry
     if carry is not None:
         if not left_points_above_segment:  # Carry should be merged with trapezoid1
             trapezoid1.update_left_points(carry.content.left_points)
             for left_neighbour in carry.left_neighbours:
-                left_neighbour.right_neighbours.remove(carry)
-                left_neighbour.right_neighbours.append(trap_node1)
-                trap_node1.left_neighbours.append(left_neighbour)
+                left_neighbour.right_neighbours.discard(carry)
+                left_neighbour.right_neighbours.add(trap_node1)
+                trap_node1.left_neighbours.add(left_neighbour)
         if not left_points_below_segment:  # Carry should be merged with trapezoid2
             trapezoid2.update_left_points(carry.content.left_points)
             for left_neighbour in carry.left_neighbours:
-                left_neighbour.right_neighbours.remove(carry)
-                left_neighbour.right_neighbours.append(trap_node2)
-                trap_node2.left_neighbours.append(left_neighbour)
+                left_neighbour.right_neighbours.discard(carry)
+                left_neighbour.right_neighbours.add(trap_node2)
+                trap_node2.left_neighbours.add(left_neighbour)
 
     # Update DAG
     parent_nodes = node.parents
@@ -719,11 +724,20 @@ def update_multiple_trapezoids_right_not_boundary(
         if not left_points_below_segment:
             carry_complement = trap_node2
 
-        for parent in carry.parents:
-            if parent.left_child == carry:
-                parent.set_left_child(carry_complement)
-            else:
-                parent.set_right_child(carry_complement)
+        try:
+            for parent in carry.parents:
+                if parent.left_child == carry:
+                    parent.set_left_child(carry_complement)
+                else:
+                    parent.set_right_child(carry_complement)
+        except Exception as e:
+            dags = None
+            while len(node.parents) > 0:
+                dags = node.parents[0]
+                node = node.parents[0]
+            test_draw.test_draw_dag(dags)
+            test_draw.test_draw_segment(segment, color=(1, 0, 1))
+            plt.show()
 
 
 def update_multiple_trapezoids_middle(
@@ -759,19 +773,19 @@ def update_multiple_trapezoids_middle(
     # Update left neighbour lists
     # External neighbours
     for left_neighbour in node.left_neighbours:
-        left_neighbour.right_neighbours.remove(node)
+        left_neighbour.right_neighbours.discard(node)
 
         # Carry should be merged with trapezoid1
         if left_points_above_segment \
                 and trapezoid1.left_segment.intersects_vertical(left_neighbour.content.right_segment):
-            left_neighbour.right_neighbours.append(trap_node1)
-            trap_node1.left_neighbours.append(left_neighbour)
+            left_neighbour.right_neighbours.add(trap_node1)
+            trap_node1.left_neighbours.add(left_neighbour)
 
         # Carry should be merged with trapezoid2
         if left_points_below_segment \
                 and trapezoid2.left_segment.intersects_vertical(left_neighbour.content.right_segment):
-            left_neighbour.right_neighbours.append(trap_node2)
-            trap_node2.left_neighbours.append(left_neighbour)
+            left_neighbour.right_neighbours.add(trap_node2)
+            trap_node2.left_neighbours.add(left_neighbour)
 
     # No internal neighbours
 
@@ -780,15 +794,15 @@ def update_multiple_trapezoids_middle(
         if not left_points_above_segment:  # Carry should be merged with trapezoid1
             trapezoid1.update_left_points(carry.content.left_points)
             for left_neighbour in carry.left_neighbours:
-                left_neighbour.right_neighbours.remove(carry)
-                left_neighbour.right_neighbours.append(trap_node1)
-                trap_node1.left_neighbours.append(left_neighbour)
+                left_neighbour.right_neighbours.discard(carry)
+                left_neighbour.right_neighbours.add(trap_node1)
+                trap_node1.left_neighbours.add(left_neighbour)
         if not left_points_below_segment:  # Carry should be merged with trapezoid2
             trapezoid2.update_left_points(carry.content.left_points)
             for left_neighbour in carry.left_neighbours:
-                left_neighbour.right_neighbours.remove(carry)
-                left_neighbour.right_neighbours.append(trap_node2)
-                trap_node2.left_neighbours.append(left_neighbour)
+                left_neighbour.right_neighbours.discard(carry)
+                left_neighbour.right_neighbours.add(trap_node2)
+                trap_node2.left_neighbours.add(left_neighbour)
 
     # Update dag references to carry
     if carry is not None:
@@ -813,15 +827,15 @@ def update_multiple_trapezoids_middle(
 
     # Update right neighbour lists
     for right_neighbour in node.right_neighbours:
-        right_neighbour.left_neighbours.remove(node)
+        right_neighbour.left_neighbours.discard(node)
         if carry is not trap_node1 \
                 and trapezoid1.right_segment.intersects_vertical(right_neighbour.content.left_segment):
-            right_neighbour.left_neighbours.append(trap_node1)
-            trap_node1.right_neighbours.append(right_neighbour)
+            right_neighbour.left_neighbours.add(trap_node1)
+            trap_node1.right_neighbours.add(right_neighbour)
         if carry is not trap_node2 \
                 and trapezoid2.right_segment.intersects_vertical(right_neighbour.content.left_segment):
-            right_neighbour.left_neighbours.append(trap_node2)
-            trap_node2.right_neighbours.append(right_neighbour)
+            right_neighbour.left_neighbours.add(trap_node2)
+            trap_node2.right_neighbours.add(right_neighbour)
 
     # Update DAG
     parent_nodes = node.parents

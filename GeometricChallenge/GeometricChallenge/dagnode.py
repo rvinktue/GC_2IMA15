@@ -13,8 +13,8 @@ class DagNode:
         self.parents = parents
         if parents is None:
             self.parents = []
-        self.left_neighbours = []
-        self.right_neighbours = []
+        self.left_neighbours = set()
+        self.right_neighbours = set()
 
     # Choose which child is the successor for the point location search
     def choose_next_segmented(self, segment, endpoint):
