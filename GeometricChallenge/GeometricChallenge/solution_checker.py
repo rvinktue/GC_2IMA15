@@ -45,7 +45,6 @@ class SolutionCheck:
             for i in range(len(subset)):
                 for j in range(i + 1, len(subset)):
                     if subset[i].intersects(subset[j]):
-                        # print(f"We have a problem between edge {subset[i].index} and {subset[j].index} in subset {subsetnr}")
                         error.append((subset[i], subset[j]))
             self.errors.append(error)
 
@@ -59,7 +58,7 @@ def check_instance(instance_name):
     return SolutionCheck(instance_name, g, data["colors"])
 
 
-if False and __name__ == "__main__":
+if __name__ == "__main__":
     from os import listdir
 
     instance_names = [file.split('.')[0] for file in listdir("instances/")]
@@ -73,8 +72,6 @@ if False and __name__ == "__main__":
 
     print(f"{len([x for x in solution_checks if x.is_correct])}/225 correct.")
 
-    # for solcheck in solution_checks:
-    #     if not solcheck.is_correct:
-    #         solcheck.report_errors()
-
-check_instance("sqrpecn49763").report_errors()
+    for solcheck in solution_checks:
+        if not solcheck.is_correct:
+            solcheck.report_errors()

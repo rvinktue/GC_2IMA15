@@ -7,8 +7,8 @@ import geometry
 class Trapezoid:
     def __init__(self, top_segment, left_points, right_points, bottom_segment):
         self.top_segment = top_segment
-        self.left_points = list(set(left_points))
-        self.right_points = list(set(right_points))
+        self.left_points = left_points
+        self.right_points = right_points
         self.bottom_segment = bottom_segment
         # Update bottom segment reference
         bottom_segment.face_above = self

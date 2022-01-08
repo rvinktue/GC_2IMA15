@@ -5,7 +5,7 @@ import gcsolver
 def solve_instance(file):
     start = time.perf_counter()
     print(f"Starting {file}...")
-    gcsolver.solve("instances/" + file, shuffle=True)
+    gcsolver.solve("instances/" + file, shuffle=False)
     print(f"Solved {file} in {time.perf_counter() - start} seconds...")
 
 
@@ -20,9 +20,4 @@ def solve_cg_challenge():
 
 
 if __name__ == '__main__':
-    # solve_cg_challenge()
-    file = "sqrpecn49763.instance.json"
-    start = time.perf_counter()
-    print(f"Starting {file}...")
-    gcsolver.solve("instances/" + file, shuffle=False)
-    print(f"Solved {file} in {time.perf_counter() - start} seconds...")
+    solve_cg_challenge()

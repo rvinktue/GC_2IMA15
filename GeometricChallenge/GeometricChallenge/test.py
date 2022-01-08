@@ -13,21 +13,17 @@ def handle_test(vertices, print_dag):
     vd = vdclass.VerticalDecomposition(geometry.find_bounding_box([[v.x, v.y] for v in vertices]))
 
     for seg in segments:
+        fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2, sharex=True, sharey=True)
         start_node, end_node = vd.point_location_segment(seg)
         is_added = vd.add_segment(seg)
-        # if is_added:
-        #     print("Added: (%s, %s) -> (%s, %s)" % (seg.endpoint1.x, seg.endpoint1.y, seg.endpoint2.x, seg.endpoint2.y))
-        #     # test_draw.test_draw_dag(vd.dag)
-        #     # for trap in vd.dag.find_all(trapclass.Trapezoid):
-        #     #     test_draw.test_draw_trapezoid(trap.content, (190/255, 190/255, 190/255))
-        #     #     plt.show()
-        #     #     test_draw.test_draw_dag(vd.dag)
-        #     # plt.show()
-        # else:
-        fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2, sharex=True, sharey=True)
+
+        if is_added:
+            print("Added: (%s, %s) -> (%s, %s)" % (seg.endpoint1.x, seg.endpoint1.y, seg.endpoint2.x, seg.endpoint2.y))
+        else:
+            print("Could not add: (%s, %s) -> (%s, %s)"
+                  % (seg.endpoint1.x, seg.endpoint1.y, seg.endpoint2.x, seg.endpoint2.y))
+
         test_draw.test_draw_dag(vd.dag, ax=ax1)
-        # print("Could not add: (%s, %s) -> (%s, %s)"
-        #       % (seg.endpoint1.x, seg.endpoint1.y, seg.endpoint2.x, seg.endpoint2.y))
         for trap in vd.dag.find_all(trapclass.Trapezoid):
             if trap.content.left_segment.endpoint1.x == 5 \
                     and trap.content.left_segment.endpoint1.y == 1:
@@ -39,7 +35,6 @@ def handle_test(vertices, print_dag):
                     ax2.scatter(lp.x, lp.y)
                 for rp in trap.content.right_points:
                     ax2.scatter(rp.x, rp.y)
-                # test_draw.test_draw_segment(trap.content.left_segment, ax=ax2)
                 test_draw.test_draw_segment(trap.content.right_segment, ax=ax2)
             if trap.content.left_segment.endpoint1.x == 1 \
                     and trap.content.left_segment.endpoint1.y == 0:
