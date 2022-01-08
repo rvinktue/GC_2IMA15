@@ -732,25 +732,11 @@ def update_multiple_trapezoids_right_not_boundary(
         if not left_points_below_segment:
             carry_complement = trap_node2
 
-        try:
-            for parent in carry.parents:
-                if parent.left_child == carry:
-                    parent.set_left_child(carry_complement)
-                else:
-                    parent.set_right_child(carry_complement)
-        except Exception as e:
-            dags = None
-            while len(node.parents) > 0:
-                dags = node.parents[0]
-                node = node.parents[0]
-            fig, ax = plt.subplots(1, 1)
-            test_draw.test_draw_dag(dags, ax=ax)
-            test_draw.test_draw_segment(segment, color=(1, 0, 1), ax=ax)
-            test_draw.test_draw_trapezoid(carry.content, color=(1, 1, 0), ax=ax, linestyle='-')
-            test_draw.test_draw_trapezoid(trapezoid1, color=(0, 0, 1), ax=ax, linestyle='-')
-            test_draw.test_draw_trapezoid(trapezoid2, color=(0, 1, 0), ax=ax, linestyle='-')
-            test_draw.test_draw_trapezoid(trapezoid3, color=(0, 1, 1), ax=ax, linestyle='-')
-            plt.show()
+        for parent in carry.parents:
+            if parent.left_child == carry:
+                parent.set_left_child(carry_complement)
+            else:
+                parent.set_right_child(carry_complement)
 
 def update_multiple_trapezoids_middle(
         node: dag.DagNode,
