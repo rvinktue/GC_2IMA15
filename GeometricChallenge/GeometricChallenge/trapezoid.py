@@ -1,3 +1,5 @@
+from __future__ import annotations
+import typing
 import segment as segclass
 import vertex as vertclass
 import geometry
@@ -5,7 +7,7 @@ import geometry
 
 # Class that represents a single Trapezoid in the Vertical Decomposition
 class Trapezoid:
-    def __init__(self, top_segment, left_points, right_points, bottom_segment):
+    def __init__(self, top_segment, left_points, right_points, bottom_segment) -> None:
         self.top_segment = top_segment
         self.left_points = left_points
         self.right_points = right_points
@@ -49,10 +51,10 @@ class Trapezoid:
         self.left_segment = segclass.Segment(p_bot, p_top)
         self.right_segment = segclass.Segment(q_bot, q_top)
 
-    def segment_enter(self, segment):
+    def segment_enter(self, segment: segclass.Segment) -> bool:
         return self.left_segment.is_entered_by(segment)
 
-    def update_left_points(self, new_points):
+    def update_left_points(self, new_points: typing.List[vertclass.Vertex] | []) -> None:
         self.left_points = new_points[:]
 
         # Precompute quad and left/right segments
@@ -73,14 +75,14 @@ class Trapezoid:
 
     # Returns True if the segment crosses top or bottom boundary of this trapezoid
     #         False otherwise
-    def is_violated_by_segment(self, segment):
+    def is_violated_by_segment(self, segment: segclass.Segment) -> bool:
         for boundary in [self.bottom_segment, self.top_segment]:
             if boundary.intersects(segment):
                 return True
 
         return False
 
-    def contains(self, point):
+    def contains(self, point: vertclass.Vertex) -> bool:
         return point.is_above(self.bottom_segment) and \
                not point.is_above(self.top_segment) \
                and self.left_segment.endpoint1.x <= point.x <= self.right_segment.endpoint1.x

@@ -1,3 +1,5 @@
+from __future__ import annotations
+import typing
 import trapezoid as trap
 import vertex as vert
 import segment as seg
@@ -6,7 +8,7 @@ import geometry
 
 # Class that represents the DAG
 class DagNode:
-    def __init__(self, content, left_child=None, right_child=None, parents=None):
+    def __init__(self, content, left_child=None, right_child=None, parents=None) -> None:
         self.content = content
         self.left_child = left_child
         self.right_child = right_child
@@ -17,7 +19,7 @@ class DagNode:
         self.right_neighbours = set()
 
     # Choose which child is the successor for the point location search
-    def choose_next_segmented(self, segment, endpoint):
+    def choose_next_segmented(self, segment: seg.Segment, endpoint: vert.Vertex) -> 'DagNode':
         if isinstance(self.content, trap.Trapezoid):
             return self
         elif self.right_child is None:
@@ -46,8 +48,9 @@ class DagNode:
                 else:
                     return self.right_child
 
+    # @TODO: this is a debug method: delete upon release
     # Find all objects of class
-    def find_all(self, object_class):
+    def find_all(self, object_class) -> typing.Set[object]:
         output = set()
         if isinstance(self.content, object_class):
             output.add(self)
@@ -57,23 +60,12 @@ class DagNode:
             output.update(self.right_child.find_all(object_class))
         return output
 
-    # Find all references to node
-    def find_all_node(self, node):
-        output = []
-        if self.content == node.content:
-            output.append(self)
-        if self.left_child is not None:
-            output += self.left_child.find_all_node(node)
-        if self.right_child is not None:
-            output += self.right_child.find_all_node(node)
-        return output
-
     # Set left child
-    def set_left_child(self, other):
+    def set_left_child(self, other: 'DagNode') -> None:
         self.left_child = other
         other.parents.append(self)
 
     # Set right child
-    def set_right_child(self, other):
+    def set_right_child(self, other: 'DagNode') -> None:
         self.right_child = other
         other.parents.append(self)

@@ -10,7 +10,7 @@ class Vertex:
     # Returns 0 if they share their x-coordinate
     #         1 if this vertex lies to the left of point
     #        -1 if this vertex lies to the right of point
-    def x_order(self, point):
+    def x_order(self, point: 'Vertex') -> int:
         if self.x == point.x:
             return 0
         else:
@@ -18,9 +18,9 @@ class Vertex:
 
     # Returns True if vertex lies above the segment
     #         False if vertex lies underneath the segment
-    def is_above(self, segment):
+    def is_above(self, segment) -> bool:
         return geometry.orientation(segment.endpoint1, segment.endpoint2, self) != geometry.CLOCKWISE
 
-    def is_below(self, segment):
+    def is_below(self, segment) -> bool:
         return geometry.orientation(segment.endpoint1, segment.endpoint2, self) != geometry.CCW
 

@@ -10,7 +10,7 @@ COUNTERCLOCKWISE = CCW = -1
 # Returns 0 if the three points are collinear,
 #         1 if traversing the points in order of arguments given makes a right turn (clockwise)
 #        -1 if traversing the points in order of arguments given makes a left turn (counterclockwise)
-def orientation(point1, point2, point3):
+def orientation(point1: vertex.Vertex, point2: vertex.Vertex, point3: vertex.Vertex) -> int:
     val = (point2.y - point1.y) * (point3.x - point2.x) - (point2.x - point1.x) * (point3.y - point2.y)
     if val > 0:
         return CW  # Clockwise
@@ -22,7 +22,7 @@ def orientation(point1, point2, point3):
 
 # Checks if point2 is contained on the line segment with endpoints point1 and point3
 # where we assume the three points are collinear
-def on_segment(point1, point2, point3):
+def on_segment(point1: vertex.Vertex, point2: vertex.Vertex, point3: vertex.Vertex) -> bool:
     if min(point1.x, point3.x) <= point2.x <= max(point1.x, point3.x) and \
        min(point1.y, point3.y) <= point2.y <= max(point1.y, point3.y):
         return True

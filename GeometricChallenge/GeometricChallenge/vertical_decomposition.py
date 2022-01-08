@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import Tuple
+import typing
 import dagnode as dag
 import trapezoid as trapclass
 import segment as segclass
@@ -7,10 +7,10 @@ import segment as segclass
 
 # Class that represents the vertical decomposition of a planar graph
 class VerticalDecomposition:
-    def __init__(self, bounding_box):
+    def __init__(self, bounding_box: trapclass.Trapezoid) -> None:
         self.dag = dag.DagNode(bounding_box)
 
-    def point_location_segment(self, segment: segclass.Segment) -> [dag.DagNode]:
+    def point_location_segment(self, segment: segclass.Segment) -> typing.Tuple[dag.DagNode | None, dag.DagNode | None]:
         current_node_1 = self.dag
 
         while not isinstance(current_node_1.content, trapclass.Trapezoid):
@@ -27,7 +27,7 @@ class VerticalDecomposition:
         return trap_point_1, trap_point_2
 
     # Finds all trapezoids intersected by segment (assuming segment does not intersect any existing edges in the VD)
-    def find_intersecting_trapezoids(self, segment: segclass.Segment) -> [dag.DagNode]:
+    def find_intersecting_trapezoids(self, segment: segclass.Segment) -> typing.Tuple[dag.DagNode] | []:
         start_node, end_node = self.point_location_segment(segment)
         intersected_trapezoids = [start_node]
         current_node = start_node
@@ -448,7 +448,7 @@ def update_multiple_trapezoids_left(
         node: dag.DagNode,
         trapezoid: trapclass.Trapezoid,
         segment: segclass.Segment
-) -> Tuple[None | dag.DagNode, None | dag.DagNode]:
+) -> typing.Tuple[None | dag.DagNode, None | dag.DagNode]:
     carry, carry_complement = None, None
 
     if trapezoid.right_segment.on_segment(segment.endpoint1):
@@ -786,7 +786,7 @@ def update_multiple_trapezoids_middle(
         segment: segclass.Segment,
         carry: None | dag.DagNode,
         carry_complement: None | dag.DagNode
-) -> Tuple[None | dag.DagNode, None | dag.DagNode]:
+) -> typing.Tuple[None | dag.DagNode, None | dag.DagNode]:
     left_points_above_segment = [point for point in trapezoid.left_points if point.is_above(segment)]
     left_points_below_segment = [point for point in trapezoid.left_points if point.is_below(segment)]
     right_points_above_segment = [point for point in trapezoid.right_points if point.is_above(segment)]
