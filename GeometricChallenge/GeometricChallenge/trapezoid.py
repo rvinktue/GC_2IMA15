@@ -15,8 +15,6 @@ class Trapezoid:
         self.right_points = right_points
         self.bottom_segment = bottom_segment
         self.type = geometry.TRAPEZOID
-        # Update bottom segment reference
-        bottom_segment.face_above = self
 
         if self.top_segment.endpoint1.x == self.top_segment.endpoint2.x:
             bottom_vertex = self.top_segment.endpoint1 \
