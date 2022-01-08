@@ -6,6 +6,7 @@ class Vertex:
     def __init__(self, x, y):
         self.x = x
         self.y = y
+        self.type = geometry.VERTEX
 
     # Returns 0 if they share their x-coordinate
     #         1 if this vertex lies to the left of point

@@ -1,6 +1,7 @@
 from __future__ import annotations
 import typing
 import dagnode as dag
+import geometry
 import trapezoid as trapclass
 import segment as segclass
 
@@ -13,18 +14,16 @@ class VerticalDecomposition:
     def point_location_segment(self, segment: segclass.Segment) -> typing.Tuple[dag.DagNode | None, dag.DagNode | None]:
         current_node_1 = self.dag
 
-        while not isinstance(current_node_1.content, trapclass.Trapezoid):
+        while not current_node_1.content.type == geometry.TRAPEZOID:
             current_node_1 = current_node_1.choose_next_segmented(segment, segment.endpoint1)
 
-        trap_point_1 = current_node_1
         current_node_2 = self.dag
 
-        while not isinstance(current_node_2.content, trapclass.Trapezoid):
+        while not current_node_2.content.type == geometry.TRAPEZOID:
             current_node_2 = current_node_2.choose_next_segmented(segment, segment.endpoint2)
-        trap_point_2 = current_node_2
 
         # returns point location of left endpoint, point location of right endpoint
-        return trap_point_1, trap_point_2
+        return current_node_1, current_node_2
 
     # Finds all trapezoids intersected by segment (assuming segment does not intersect any existing edges in the VD)
     def find_intersecting_trapezoids(self, segment: segclass.Segment) -> typing.Tuple[dag.DagNode] | []:

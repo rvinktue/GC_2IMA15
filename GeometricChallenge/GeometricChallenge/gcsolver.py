@@ -1,3 +1,5 @@
+import copy
+
 from cgshop2022utils.io import read_instance  # Provided by the challenge
 import random
 import vertical_decomposition as vdclass
@@ -12,7 +14,8 @@ def perform_decompositions(g, shuffle) -> [vdclass.VerticalDecomposition]:
     if shuffle:
         random.shuffle(indices)  # Find random reordering of edges to decrease expected running time complexity
 
-    vds = [vdclass.VerticalDecomposition(geometry.find_bounding_box(g.nodes))]
+    bounding_box = geometry.find_bounding_box(g.nodes)
+    vds = [vdclass.VerticalDecomposition(copy.copy(bounding_box))]
 
     # Process all edges
     for edgenum in indices:
@@ -24,7 +27,7 @@ def perform_decompositions(g, shuffle) -> [vdclass.VerticalDecomposition]:
                 break
             if key == len(vds) - 1:
                 # If segment could not be added in any of the existing VDs, create a new VD
-                new = vdclass.VerticalDecomposition(geometry.find_bounding_box(g.nodes))
+                new = vdclass.VerticalDecomposition(copy.copy(bounding_box))
                 new.add_segment(seg)
                 vds.append(new)
                 break

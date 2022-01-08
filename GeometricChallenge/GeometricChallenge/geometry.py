@@ -6,6 +6,10 @@ COLLINEAR = CL = 0
 CLOCKWISE = CW = 1
 COUNTERCLOCKWISE = CCW = -1
 
+VERTEX = 1
+SEGMENT = 2
+TRAPEZOID = 3
+
 
 # Returns 0 if the three points are collinear,
 #         1 if traversing the points in order of arguments given makes a right turn (clockwise)

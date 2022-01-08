@@ -12,6 +12,7 @@ class Trapezoid:
         self.left_points = left_points
         self.right_points = right_points
         self.bottom_segment = bottom_segment
+        self.type = geometry.TRAPEZOID
         # Update bottom segment reference
         bottom_segment.face_above = self
 

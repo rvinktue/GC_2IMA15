@@ -8,25 +8,23 @@ import geometry
 
 # Class that represents the DAG
 class DagNode:
-    def __init__(self, content, left_child=None, right_child=None, parents=None) -> None:
+    def __init__(self, content) -> None:
         self.content = content
-        self.left_child = left_child
-        self.right_child = right_child
-        self.parents = parents
-        if parents is None:
-            self.parents = []
+        self.left_child = None
+        self.right_child = None
+        self.parents = []
         self.left_neighbours = set()
         self.right_neighbours = set()
 
     # Choose which child is the successor for the point location search
     def choose_next_segmented(self, segment: seg.Segment, endpoint: vert.Vertex) -> 'DagNode':
-        if isinstance(self.content, trap.Trapezoid):
+        if self.content.type == geometry.TRAPEZOID:
             return self
         elif self.right_child is None:
             return self.left_child
         elif self.left_child is None:
             return self.right_child
-        elif isinstance(self.content, vert.Vertex):
+        elif self.content.type == geometry.VERTEX:
             if endpoint.x < self.content.x:
                 return self.left_child
             elif endpoint.x > self.content.x:
@@ -34,7 +32,7 @@ class DagNode:
             else:
                 # endpoint.x == self.content.x
                 return self.left_child if segment.endpoint2 is endpoint else self.right_child
-        elif isinstance(self.content, seg.Segment):
+        elif self.content.type == geometry.SEGMENT:
             ori = geometry.orientation(self.content.endpoint1, self.content.endpoint2, endpoint)
             if ori is geometry.CW:
                 return self.left_child

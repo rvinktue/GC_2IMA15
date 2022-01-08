@@ -9,6 +9,7 @@ class Segment:
         self.endpoint2 = endpoint2 if endpoint1.x <= endpoint2.x else endpoint1
         self.face_above = face_above
         self.index = index
+        self.type = geometry.SEGMENT
 
     # Calculate intersection between the two segments
     def intersects(self, segment: 'Segment') -> bool:
@@ -70,6 +71,10 @@ class Segment:
         orientation3 = geometry.orientation(segment.endpoint1, segment.endpoint2, self.endpoint1)
         orientation4 = geometry.orientation(segment.endpoint1, segment.endpoint2, self.endpoint2)
 
+        # Different orientations means lines intersect
+        if (orientation1 != orientation2) and (orientation3 != orientation4):
+            return True
+
         # Shared endpoint should intersect
         if ((self.endpoint1.x == segment.endpoint1.x and self.endpoint1.y == segment.endpoint1.y) or
                 (self.endpoint2.x == segment.endpoint1.x and self.endpoint2.y == segment.endpoint1.y) or
@@ -82,9 +87,7 @@ class Segment:
                 (orientation2 == geometry.CL and geometry.on_segment(self.endpoint1, segment.endpoint2, self.endpoint2))):
             return True
 
-        # Different orientations means lines intersect
-        if (orientation1 != orientation2) and (orientation3 != orientation4):
-            return True
+
 
         # All other cases do not intersect
         return False
