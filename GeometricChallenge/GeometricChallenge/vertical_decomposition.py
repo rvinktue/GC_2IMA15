@@ -545,7 +545,8 @@ def update_multiple_trapezoids_right_boundary(
     # 1: above segment
     trapezoid1 = trapclass.Trapezoid(trapezoid.top_segment,
                                      left_points_above_segment + ([segment.endpoint1]
-                                                                  if trapezoid.left_segment.on_segment(segment.endpoint1)
+                                                                  if trapezoid.left_segment.on_segment(segment.endpoint1) and
+                                                                     segment.endpoint1 not in left_points_above_segment
                                                                   else []),
                                      right_points_above_segment + [segment.endpoint2],
                                      segment)
@@ -737,6 +738,7 @@ def update_multiple_trapezoids_right_not_boundary(
                 parent.set_left_child(carry_complement)
             else:
                 parent.set_right_child(carry_complement)
+
 
 def update_multiple_trapezoids_middle(
         node: dag.DagNode,
