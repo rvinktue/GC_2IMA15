@@ -20,4 +20,9 @@ def solve_cg_challenge():
 
 
 if __name__ == '__main__':
-    solve_cg_challenge()
+    # solve_cg_challenge()
+    file = "sqrpecn39689.instance.json"
+    start = time.perf_counter()
+    print(f"Starting {file}...")
+    gcsolver.solve("instances/" + file, shuffle=False)
+    print(f"Solved {file} in {time.perf_counter() - start} seconds...")

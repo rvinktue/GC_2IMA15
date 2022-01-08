@@ -11,7 +11,7 @@ COUNTERCLOCKWISE = CCW = -1
 #         1 if traversing the points in order of arguments given makes a right turn (clockwise)
 #        -1 if traversing the points in order of arguments given makes a left turn (counterclockwise)
 def orientation(point1, point2, point3):
-    val = (float(point2.y - point1.y) * (point3.x - point2.x)) - (float(point2.x - point1.x) * (point3.y - point2.y))
+    val = (point2.y - point1.y) * (point3.x - point2.x) - (point2.x - point1.x) * (point3.y - point2.y)
     if val > 0:
         return CW  # Clockwise
     elif val < 0:
