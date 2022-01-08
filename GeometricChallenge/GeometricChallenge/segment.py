@@ -34,7 +34,7 @@ class Segment:
                 (self.endpoint2.x == segment.endpoint2.x and self.endpoint2.y == segment.endpoint2.y)):
             return False
 
-        # Endpoint of one line situated on other line should not intersect
+        # Endpoint of one line situated on other line should intersect
         if ((orientation1 == geometry.CL and geometry.on_segment(self.endpoint1, segment.endpoint1, self.endpoint2)) or
                 (orientation2 == geometry.CL and
                  geometry.on_segment(self.endpoint1, segment.endpoint2, self.endpoint2)) or
@@ -42,7 +42,7 @@ class Segment:
                  geometry.on_segment(segment.endpoint1, self.endpoint1, segment.endpoint2)) or
                 (orientation4 == geometry.CL and
                  geometry.on_segment(segment.endpoint1, self.endpoint2, segment.endpoint2))):
-            return False
+            return True
 
         # Different orientations means lines intersect
         if (orientation1 != orientation2) and (orientation3 != orientation4):
