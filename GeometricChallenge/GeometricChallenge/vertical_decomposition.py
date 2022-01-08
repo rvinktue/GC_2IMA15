@@ -30,6 +30,8 @@ class VerticalDecomposition:
     def find_intersecting_trapezoids(self, segment: segclass.Segment) -> [dag.DagNode]:
         start_node, end_node = self.point_location_segment(segment)
         intersected_trapezoids = [start_node]
+        if segment.intersects(start_node.content.bottom_segment):
+            return []
         current_node = start_node
 
         while current_node is not end_node:
