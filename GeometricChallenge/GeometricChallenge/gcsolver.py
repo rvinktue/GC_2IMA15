@@ -37,7 +37,7 @@ def perform_decompositions(g, shuffle) -> [vdclass.VerticalDecomposition]:
 
 # takes file name outputs json string with solution encoded, no debug info
 # Expected format of file_name "instances/<INSTANCE_NAME>.instance.json"
-def solve(file_name: str, save_to_file=True, shuffle=True, verify=False) -> str:
+def solve(file_name: str, save_to_file=True, shuffle=False, verify=False) -> str:
     # Incrementally build vertical decompositions of planar subgraphs
     # Read instance and instantiate graph, bounding box and starting vertical decomposition
     instance = read_instance(file_name)  # read edges from input file
