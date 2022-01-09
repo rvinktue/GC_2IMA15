@@ -1,7 +1,3 @@
-import vertex
-import segment
-import trapezoid
-
 COLLINEAR = CL = 0
 CLOCKWISE = CW = 1
 COUNTERCLOCKWISE = CCW = -1
@@ -14,7 +10,7 @@ TRAPEZOID = 3
 # Returns 0 if the three points are collinear,
 #         1 if traversing the points in order of arguments given makes a right turn (clockwise)
 #        -1 if traversing the points in order of arguments given makes a left turn (counterclockwise)
-def orientation(point1: vertex.Vertex, point2: vertex.Vertex, point3: vertex.Vertex) -> int:
+def orientation(point1, point2, point3) -> int:
     val = (point2.y - point1.y) * (point3.x - point2.x) - (point2.x - point1.x) * (point3.y - point2.y)
     if val > 0:
         return CW  # Clockwise
@@ -26,7 +22,7 @@ def orientation(point1: vertex.Vertex, point2: vertex.Vertex, point3: vertex.Ver
 
 # Checks if point2 is contained on the line segment with endpoints point1 and point3
 # where we assume the three points are collinear
-def on_segment(point1: vertex.Vertex, point2: vertex.Vertex, point3: vertex.Vertex) -> bool:
+def on_segment(point1, point2, point3) -> bool:
     if min(point1.x, point3.x) <= point2.x <= max(point1.x, point3.x) and \
             min(point1.y, point3.y) <= point2.y <= max(point1.y, point3.y):
         return True
@@ -35,6 +31,10 @@ def on_segment(point1: vertex.Vertex, point2: vertex.Vertex, point3: vertex.Vert
 
 # Returns a bounding box for the set of nodes as a trapezoid
 def find_bounding_box(nodes):
+    import segment
+    import vertex
+    import trapezoid
+
     min_x = min_y = 1e10
     max_x = max_y = -1e10
     for node in nodes:
