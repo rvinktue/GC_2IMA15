@@ -85,7 +85,7 @@ class Trapezoid:
 
     def contains(self, point: vertclass.Vertex) -> bool:
         return point.is_above(self.bottom_segment) and \
-               not point.is_above(self.top_segment) \
+               point.is_below(self.top_segment) \
                and self.left_segment.endpoint1.x <= point.x <= self.right_segment.endpoint1.x
 
     def is_valid(self, vertex: vertclass.Vertex) -> bool:
