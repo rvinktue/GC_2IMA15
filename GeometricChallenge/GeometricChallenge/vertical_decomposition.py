@@ -67,13 +67,13 @@ class VerticalDecomposition:
         return True
 
     # Updates the DAG with the new trapezoids induced by adding segment
-    def update(self, nodes: [dag.DagNode], segment: segclass.Segment) -> None:
+    def update(self, nodes: typing.List[dag.DagNode], segment: segclass.Segment) -> None:
         if len(nodes) == 1:
             self.update_single_trapezoid(nodes, segment)
         else:
             update_multiple_trapezoids(nodes, segment)
 
-    def update_single_trapezoid(self, nodes: [dag.DagNode], segment: segclass.Segment) -> None:
+    def update_single_trapezoid(self, nodes: typing.List[dag.DagNode], segment: segclass.Segment) -> None:
         # Segment is completely contained in a single trapezoid
         node = nodes[0]
         trapezoid = node.content
@@ -408,7 +408,7 @@ def update_single_trapezoid_both_boundary(
 
 
 def update_multiple_trapezoids(
-        nodes: [dag.DagNode],
+        nodes: typing.List[dag.DagNode],
         segment: segclass.Segment
 ) -> None:
     carry = None
