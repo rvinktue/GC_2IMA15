@@ -70,7 +70,7 @@ def _naive_graph_generation(G):
 
 
 t0 = time.time_ns()
-instance_name = "sqrpecn3020"  # "reecn3382"
+instance_name = "sqrpecn73925"  # "reecn3382"
 instance = read_instance("./instances/" + instance_name + ".instance.json")
 print("Reading took: %s ms" % {(time.time_ns() - t0) / (10 ** 6)})
 

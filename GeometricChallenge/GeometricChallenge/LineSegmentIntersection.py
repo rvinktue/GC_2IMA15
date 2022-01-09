@@ -20,4 +20,7 @@ def solve_cg_challenge():
 
 
 if __name__ == '__main__':
-    solve_cg_challenge()
+    # solve_cg_challenge()
+    while True:
+        solve_instance("rsqrp4637.instance.json", shuffle=True)
+

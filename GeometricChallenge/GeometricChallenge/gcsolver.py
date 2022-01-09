@@ -1,5 +1,5 @@
 import copy
-
+import json
 from cgshop2022utils.io import read_instance  # Provided by the challenge
 import random
 import vertical_decomposition as vdclass
@@ -31,7 +31,6 @@ def perform_decompositions(g, shuffle) -> [vdclass.VerticalDecomposition]:
                 new.add_segment(seg)
                 vds.append(new)
                 break
-    print("Solution with: " + str(len(vds)))
     return vds
 
 
@@ -45,7 +44,7 @@ def solve(file_name: str, save_to_file=True, shuffle=False, verify=False) -> str
 
     vds = perform_decompositions(g, shuffle)
 
-    colours = [-1 for _ in range(len(g.edges))]
+    colours = [-1] * len(g.edges)
     lengths = []
 
     for (vdnum, vd) in enumerate(vds):
@@ -68,13 +67,7 @@ def solve(file_name: str, save_to_file=True, shuffle=False, verify=False) -> str
     assert min(colours) >= 0, "Some edges are uncoloured..."
     num_colours = max(colours) - min(colours) + 1
     instance_name = file_name.split('.')[0][10:]
-    '''
-    import numpy as np
-    import matplotlib.pyplot as plt
-    hist, bins = np.histogram(lengths, range = (0, 100*((max(lengths)//100)+1)), bins=25)
-    plt.hist(lengths, bins)
-    plt.show()
-    '''
+
     output_string = "{\n" \
                     "  \"type\": \"Solution_CGSHOP2022\",\n" \
                     "  \"instance\": \"" + instance_name + "\", \n" \
@@ -83,8 +76,22 @@ def solve(file_name: str, save_to_file=True, shuffle=False, verify=False) -> str
                     "}"
 
     if save_to_file:
-        f = open("solutions/" + instance_name + ".solution.json", 'w')
-        f.write(output_string)
-        f.close()
+        # check if solution is better than existing solution
+        score = 1e99
+        try:
+            json_file = open(f"solutions/{instance_name}.solution.json", 'r')
+            data = json.load(json_file)
+            score = data["num_colors"]
+        except Exception as e:
+            # file does not exist
+            pass
+        finally:
+            if num_colours < score:
+                f = open("solutions/" + instance_name + ".solution.json", 'w')
+                f.write(output_string)
+                f.close()
+                print(f"{instance_name}: existing solution found with score {score}, worse than new score {num_colours}. Saved!")
+            else:
+                print(f"{instance_name}: existing solution found with score {score}, better than new score {num_colours}. Not saved.")
 
     return output_string
