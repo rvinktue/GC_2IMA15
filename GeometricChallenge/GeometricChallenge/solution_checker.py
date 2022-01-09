@@ -61,7 +61,7 @@ def check_instance(instance_name):
 if __name__ == "__main__":
     from os import listdir
 
-    instance_names = [file.split('.')[0] for file in listdir("instances/")]
+    instance_names = [file.split('.')[0] for file in listdir("solutions/")]
 
     from multiprocessing import Pool
 
