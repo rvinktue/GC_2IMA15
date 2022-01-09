@@ -2,7 +2,6 @@ from __future__ import annotations
 from copy import deepcopy
 import typing
 import dagnode as dag
-import geometry
 import trapezoid as trapclass
 import segment as segclass
 
@@ -15,21 +14,23 @@ class VerticalDecomposition:
     def point_location_segment(self, segment: segclass.Segment) -> typing.Tuple[dag.DagNode | None, dag.DagNode | None]:
         current_node_1 = self.dag
 
-        while not current_node_1.content.type == geometry.TRAPEZOID:
+        # geometry.TRAPEZOID = 3
+        while not current_node_1.content.type == 3:
             current_node_1 = current_node_1.choose_next_segmented(segment, segment.endpoint1)
 
         current_node_2 = self.dag
 
-        while not current_node_2.content.type == geometry.TRAPEZOID:
+        while not current_node_2.content.type == 3:
             current_node_2 = current_node_2.choose_next_segmented(segment, segment.endpoint2)
 
         # returns point location of left endpoint, point location of right endpoint
         return current_node_1, current_node_2
 
     # Finds all trapezoids intersected by segment (assuming segment does not intersect any existing edges in the VD)
-    def find_intersecting_trapezoids(self, segment: segclass.Segment) -> typing.Tuple[dag.DagNode] | []:
+    def find_intersecting_trapezoids(self, segment: segclass.Segment) -> typing.List[dag.DagNode] | []:
         start_node, end_node = self.point_location_segment(segment)
         intersected_trapezoids = [start_node]
+        push_trapezoid = intersected_trapezoids.append
         current_node = start_node
 
         if not start_node.content.is_valid(segment.endpoint1) or not end_node.content.is_valid(segment.endpoint2):
@@ -43,7 +44,7 @@ class VerticalDecomposition:
                 trap = node.content
                 if trap.segment_enter(segment):
                     # Found the successor
-                    intersected_trapezoids.append(node)
+                    push_trapezoid(node)
                     current_node = node
                     break
             else:
@@ -77,21 +78,23 @@ class VerticalDecomposition:
         # Segment is completely contained in a single trapezoid
         node = nodes[0]
         trapezoid = node.content
+        on_trap_left_segment = trapezoid.left_segment.on_segment
+        on_trap_right_segment = trapezoid.right_segment.on_segment
 
-        if not trapezoid.left_segment.on_segment(segment.endpoint1) \
-                and not trapezoid.right_segment.on_segment(segment.endpoint2):
+        if not on_trap_left_segment(segment.endpoint1) \
+                and not on_trap_right_segment(segment.endpoint2):
             self.update_single_trapezoid_contained(node, trapezoid, segment)
 
-        if trapezoid.left_segment.on_segment(segment.endpoint1) \
-                and not trapezoid.right_segment.on_segment(segment.endpoint2):
+        if on_trap_left_segment(segment.endpoint1) \
+                and not on_trap_right_segment(segment.endpoint2):
             update_single_trapezoid_left_boundary(node, trapezoid, segment)
 
-        if not trapezoid.left_segment.on_segment(segment.endpoint1) \
-                and trapezoid.right_segment.on_segment(segment.endpoint2):
+        if not on_trap_left_segment(segment.endpoint1) \
+                and on_trap_right_segment(segment.endpoint2):
             update_single_trapezoid_right_boundary(node, trapezoid, segment)
 
-        if trapezoid.left_segment.on_segment(segment.endpoint1) \
-                and trapezoid.right_segment.on_segment(segment.endpoint2):
+        if on_trap_left_segment(segment.endpoint1) \
+                and on_trap_right_segment(segment.endpoint2):
             update_single_trapezoid_both_boundary(node, trapezoid, segment)
 
     def update_single_trapezoid_contained(
@@ -132,13 +135,14 @@ class VerticalDecomposition:
         if len(parent_nodes) == 0:
             # Replace the initial bounding box
             # new root becomes left endpoint of segment
-            self.dag = dag.DagNode(segment.endpoint1)
-            self.dag.set_left_child(trap_node1)
-            self.dag.set_right_child(dag.DagNode(segment.endpoint2))
-            self.dag.right_child.set_right_child(trap_node4)
-            self.dag.right_child.set_left_child(dag.DagNode(segment))
-            self.dag.right_child.left_child.set_left_child(trap_node3)
-            self.dag.right_child.left_child.set_right_child(trap_node2)
+            root = dag.DagNode(segment.endpoint1)
+            root.set_left_child(trap_node1)
+            root.set_right_child(dag.DagNode(segment.endpoint2))
+            root.right_child.set_right_child(trap_node4)
+            root.right_child.set_left_child(dag.DagNode(segment))
+            root.right_child.left_child.set_left_child(trap_node3)
+            root.right_child.left_child.set_right_child(trap_node2)
+            self.dag = root
         else:
             lp_node = dag.DagNode(segment.endpoint1)
             for parent_node in parent_nodes:
