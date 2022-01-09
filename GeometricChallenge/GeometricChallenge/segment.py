@@ -17,6 +17,9 @@ class Segment:
         self.index = index
         self.type = geometry.SEGMENT
 
+    def __str__(self):
+        return f"(index: {self.index}, {self.endpoint1} -- {self.endpoint2})"
+
     # Calculate intersection between the two segments
     def intersects(self, segment: 'Segment') -> bool:
         # avoid dot

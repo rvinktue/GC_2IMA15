@@ -52,6 +52,9 @@ class Trapezoid:
         self.left_segment = segclass.Segment(p_bot, p_top)
         self.right_segment = segclass.Segment(q_bot, q_top)
 
+    def __str__(self):
+        return f"Left: {self.left_segment} \nRight: {self.right_segment} \nTop: {self.top_segment} \nBot: {self.bottom_segment}"
+
     def segment_enter(self, segment: segclass.Segment) -> bool:
         return self.left_segment.is_entered_by(segment)
 

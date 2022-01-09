@@ -10,6 +10,12 @@ class Vertex:
         self.y = y
         self.type = geometry.VERTEX
 
+    def __str__(self):
+        return f"({self.x}, {self.y})"
+
+    def __repr__(self):
+        return self.__str__()
+
     # Returns 0 if they share their x-coordinate
     #         1 if this vertex lies to the left of point
     #        -1 if this vertex lies to the right of point
