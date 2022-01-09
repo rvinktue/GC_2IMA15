@@ -52,12 +52,13 @@ def handle_test(vertices, print_dag):
 
 # Run all test cases (switch the False to True to print the final DAG for each test case)
 for index, vertex_list in enumerate([
-    test_cases.test_case_1(),
-    test_cases.test_case_2(),
-    test_cases.test_case_3(),
-    test_cases.test_case_4(),
-    test_cases.test_case_5(),
-    test_cases.test_case_6()
+    # test_cases.test_case_1(),
+    # test_cases.test_case_2(),
+    # test_cases.test_case_3(),
+    # test_cases.test_case_4(),
+    # test_cases.test_case_5(),
+    # test_cases.test_case_6(),
+    test_cases.test_case_7()
 ]):
     print(f"Running test {index + 1}")
     handle_test(vertex_list, False)

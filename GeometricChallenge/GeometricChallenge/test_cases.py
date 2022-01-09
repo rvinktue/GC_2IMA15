@@ -47,3 +47,11 @@ def test_case_6():
     return [vertclass.Vertex(0, 0), vertclass.Vertex(2, 2),
             vertclass.Vertex(1, 1), vertclass.Vertex(2, 1)
             ]
+
+
+# Endpoint of one line on other line
+def test_case_7():
+    return [vertclass.Vertex(5, 0), vertclass.Vertex(10, 5),
+            vertclass.Vertex(0, 5), vertclass.Vertex(5, 10),
+            vertclass.Vertex(2, 2), vertclass.Vertex(8, 8)
+            ]

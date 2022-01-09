@@ -273,7 +273,7 @@ def update_single_trapezoid_right_boundary(
     trapezoid2 = trapclass.Trapezoid(trapezoid.top_segment,
                                      {segment.endpoint1},
                                      right_points_above_segment.union({segment.endpoint2})
-                                     if trapezoid.left_segment.on_segment(segment.endpoint2)
+                                     if trapezoid.right_segment.on_segment(segment.endpoint2)
                                      else right_points_above_segment,
                                      segment)
 
@@ -281,7 +281,7 @@ def update_single_trapezoid_right_boundary(
     trapezoid3 = trapclass.Trapezoid(segment,
                                      {segment.endpoint1},
                                      right_points_below_segment.union({segment.endpoint2})
-                                     if trapezoid.left_segment.on_segment(segment.endpoint2)
+                                     if trapezoid.right_segment.on_segment(segment.endpoint2)
                                      else right_points_below_segment,
                                      trapezoid.bottom_segment)
 
@@ -348,7 +348,7 @@ def update_single_trapezoid_both_boundary(
                                      if trapezoid.left_segment.on_segment(segment.endpoint1)
                                      else left_points_above_segment,
                                      right_points_above_segment.union({segment.endpoint2})
-                                     if trapezoid.left_segment.on_segment(segment.endpoint2)
+                                     if trapezoid.right_segment.on_segment(segment.endpoint2)
                                      else right_points_above_segment,
                                      segment)
     # 2: below segment
@@ -357,7 +357,7 @@ def update_single_trapezoid_both_boundary(
                                      if trapezoid.left_segment.on_segment(segment.endpoint1)
                                      else left_points_below_segment,
                                      right_points_below_segment.union({segment.endpoint2})
-                                     if trapezoid.left_segment.on_segment(segment.endpoint2)
+                                     if trapezoid.right_segment.on_segment(segment.endpoint2)
                                      else right_points_below_segment,
                                      trapezoid.bottom_segment)
 
@@ -561,7 +561,7 @@ def update_multiple_trapezoids_right_boundary(
                                      if trapezoid.left_segment.on_segment(segment.endpoint1)
                                      else left_points_above_segment,
                                      right_points_above_segment.union({segment.endpoint2})
-                                     if segment.endpoint1 not in right_points_above_segment
+                                     if trapezoid.right_segment.on_segment(segment.endpoint2)
                                      else right_points_above_segment,
                                      segment)
     # 2: below segment
@@ -570,7 +570,7 @@ def update_multiple_trapezoids_right_boundary(
                                      if trapezoid.left_segment.on_segment(segment.endpoint1)
                                      else left_points_below_segment,
                                      right_points_below_segment.union({segment.endpoint2})
-                                     if segment.endpoint1 not in right_points_below_segment
+                                     if trapezoid.right_segment.on_segment(segment.endpoint2)
                                      else right_points_below_segment,
                                      trapezoid.bottom_segment)
 
