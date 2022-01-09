@@ -1,4 +1,5 @@
 from __future__ import annotations
+from copy import deepcopy
 import typing
 import dagnode as dag
 import geometry
@@ -180,8 +181,8 @@ def update_single_trapezoid_left_boundary(
         trapezoid: trapclass.Trapezoid,
         segment: segclass.Segment
 ) -> None:
-    left_points_above_segment = {point for point in trapezoid.left_points if point.is_above(segment)}
-    left_points_below_segment = {point for point in trapezoid.left_points if point.is_below(segment)}
+    left_points_above_segment = deepcopy({point for point in trapezoid.left_points if point.is_above(segment)})
+    left_points_below_segment = deepcopy({point for point in trapezoid.left_points if point.is_below(segment)})
 
     # 1: above segment
     trapezoid1 = trapclass.Trapezoid(trapezoid.top_segment,
@@ -256,8 +257,8 @@ def update_single_trapezoid_right_boundary(
         trapezoid: trapclass.Trapezoid,
         segment: segclass.Segment
 ) -> None:
-    right_points_above_segment = {point for point in trapezoid.right_points if point.is_above(segment)}
-    right_points_below_segment = {point for point in trapezoid.right_points if point.is_below(segment)}
+    right_points_above_segment = deepcopy({point for point in trapezoid.right_points if point.is_above(segment)})
+    right_points_below_segment = deepcopy({point for point in trapezoid.right_points if point.is_below(segment)})
 
     # 1: left of segment
     trapezoid1 = trapclass.Trapezoid(trapezoid.top_segment,
@@ -332,10 +333,10 @@ def update_single_trapezoid_both_boundary(
         trapezoid: trapclass.Trapezoid,
         segment: segclass.Segment
 ) -> None:
-    left_points_above_segment = {point for point in trapezoid.left_points if point.is_above(segment)}
-    left_points_below_segment = {point for point in trapezoid.left_points if point.is_below(segment)}
-    right_points_above_segment = {point for point in trapezoid.right_points if point.is_above(segment)}
-    right_points_below_segment = {point for point in trapezoid.right_points if point.is_below(segment)}
+    left_points_above_segment = deepcopy({point for point in trapezoid.left_points if point.is_above(segment)})
+    left_points_below_segment = deepcopy({point for point in trapezoid.left_points if point.is_below(segment)})
+    right_points_above_segment = deepcopy({point for point in trapezoid.right_points if point.is_above(segment)})
+    right_points_below_segment = deepcopy({point for point in trapezoid.right_points if point.is_below(segment)})
 
     # 1: above segment
     trapezoid1 = trapclass.Trapezoid(trapezoid.top_segment,
@@ -453,8 +454,8 @@ def update_multiple_trapezoids_left(
         # Handle case as middle with left endpoint on left boundary
         return update_multiple_trapezoids_middle(node, trapezoid, segment, carry, carry_complement)
     else:
-        right_points_above_segment = {point for point in trapezoid.right_points if point.is_above(segment)}
-        right_points_below_segment = {point for point in trapezoid.right_points if point.is_below(segment)}
+        right_points_above_segment = deepcopy({point for point in trapezoid.right_points if point.is_above(segment)})
+        right_points_below_segment = deepcopy({point for point in trapezoid.right_points if point.is_below(segment)})
 
         # 1: left of segment
         trapezoid1 = trapclass.Trapezoid(trapezoid.top_segment,
@@ -545,10 +546,10 @@ def update_multiple_trapezoids_right_boundary(
         carry: None | dag.DagNode,
         carry_complement: None | dag.DagNode
 ) -> None:
-    left_points_above_segment = {point for point in trapezoid.left_points if point.is_above(segment)}
-    left_points_below_segment = {point for point in trapezoid.left_points if point.is_below(segment)}
-    right_points_above_segment = {point for point in trapezoid.right_points if point.is_above(segment)}
-    right_points_below_segment = {point for point in trapezoid.right_points if point.is_below(segment)}
+    left_points_above_segment = deepcopy({point for point in trapezoid.left_points if point.is_above(segment)})
+    left_points_below_segment = deepcopy({point for point in trapezoid.left_points if point.is_below(segment)})
+    right_points_above_segment = deepcopy({point for point in trapezoid.right_points if point.is_above(segment)})
+    right_points_below_segment = deepcopy({point for point in trapezoid.right_points if point.is_below(segment)})
 
     # 1: above segment
     trapezoid1 = trapclass.Trapezoid(trapezoid.top_segment,
@@ -655,8 +656,8 @@ def update_multiple_trapezoids_right_not_boundary(
         carry: None | dag.DagNode,
         carry_complement: None | dag.DagNode
 ) -> None:
-    left_points_above_segment = {point for point in trapezoid.left_points if point.is_above(segment)}
-    left_points_below_segment = {point for point in trapezoid.left_points if point.is_below(segment)}
+    left_points_above_segment = deepcopy({point for point in trapezoid.left_points if point.is_above(segment)})
+    left_points_below_segment = deepcopy({point for point in trapezoid.left_points if point.is_below(segment)})
 
     # 1: above segment
     trapezoid1 = trapclass.Trapezoid(trapezoid.top_segment,
@@ -759,10 +760,10 @@ def update_multiple_trapezoids_middle(
         carry: None | dag.DagNode,
         carry_complement: None | dag.DagNode
 ) -> typing.Tuple[None | dag.DagNode, None | dag.DagNode]:
-    left_points_above_segment = {point for point in trapezoid.left_points if point.is_above(segment)}
-    left_points_below_segment = {point for point in trapezoid.left_points if point.is_below(segment)}
-    right_points_above_segment = {point for point in trapezoid.right_points if point.is_above(segment)}
-    right_points_below_segment = {point for point in trapezoid.right_points if point.is_below(segment)}
+    left_points_above_segment = deepcopy({point for point in trapezoid.left_points if point.is_above(segment)})
+    left_points_below_segment = deepcopy({point for point in trapezoid.left_points if point.is_below(segment)})
+    right_points_above_segment = deepcopy({point for point in trapezoid.right_points if point.is_above(segment)})
+    right_points_below_segment = deepcopy({point for point in trapezoid.right_points if point.is_below(segment)})
 
     # 1: above segment
     trapezoid1 = trapclass.Trapezoid(trapezoid.top_segment,
