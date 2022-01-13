@@ -15,7 +15,7 @@ def solve_cg_challenge():
 
     with Pool(8) as p:
         instance_names = listdir("instances/")
-        p.map(solve_instance, ["reecn3382.instance.json", "reecn3988.instance.json", "reecn6910.instance.json", "rsqrp4637.instance.json", "rsqrpecn8051.instance.json", "rvisp3499.instance.json"])
+        p.map(solve_instance, instance_names)
         p.close()
         p.join()
 
