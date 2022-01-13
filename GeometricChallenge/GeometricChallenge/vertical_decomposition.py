@@ -37,7 +37,7 @@ class VerticalDecomposition:
             return []
 
         while current_node is not end_node:
-            if len(current_node.right_neighbours) == 0 or not segment.intersects(current_node.content.right_segment):
+            if not segment.intersects_side(current_node.content.right_segment):
                 return []
 
             for node in current_node.right_neighbours:

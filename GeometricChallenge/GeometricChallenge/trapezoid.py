@@ -4,7 +4,7 @@ import segment as segclass
 import vertex as vertclass
 import geometry
 
-
+orientation = geometry.orientation
 # Class that represents a single Trapezoid in the Vertical Decomposition
 class Trapezoid:
     # __slots__ = ('top_segment', 'left_points', 'right_points', 'bottom_segment', 'type', 'left_segment', 'right_segment')
@@ -98,7 +98,7 @@ class Trapezoid:
                 (self.bottom_segment.endpoint2.x == vertex.x and self.bottom_segment.endpoint2.y == vertex.y):
             return True
 
-        orientation1 = geometry.orientation(self.top_segment.endpoint1, self.top_segment.endpoint2, vertex)
-        orientation2 = geometry.orientation(self.bottom_segment.endpoint1, self.bottom_segment.endpoint2, vertex)
+        orientation1 = orientation(self.top_segment.endpoint1, self.top_segment.endpoint2, vertex)
+        orientation2 = orientation(self.bottom_segment.endpoint1, self.bottom_segment.endpoint2, vertex)
 
         return not orientation1 == geometry.CL and not orientation2 == geometry.CL

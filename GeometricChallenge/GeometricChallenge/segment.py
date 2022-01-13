@@ -67,6 +67,30 @@ class Segment:
         # All other cases do not intersect
         return False
 
+        # Calculate intersection between the two segments
+
+    # used for checking if segment goes through other segment that is vertical
+    def intersects_side(self, segment: 'Segment') -> bool:
+        # avoid dot
+        _selfendpoint1 = self.endpoint1
+        _selfendpoint2 = self.endpoint2
+        _otherendpoint1 = segment.endpoint1
+        _otherendpoint2 = segment.endpoint2
+
+        if _selfendpoint1.x == _selfendpoint2.x:
+            return self.intersects_vertical(segment)
+
+        # If we don't reach it, we don't intersect with it
+        if not _selfendpoint1.x <= _otherendpoint1.x <= _selfendpoint2.x:
+            return False
+
+        # segment intersects x=_otherendpoint1.x at:
+        y = (_selfendpoint2.y-_selfendpoint1.y)*(_otherendpoint1.x-_selfendpoint1.x)
+        b = _selfendpoint1.y
+        dx = _selfendpoint2.x-_selfendpoint1.x
+        _min, _max = (_otherendpoint1.y, _otherendpoint2.y) if _otherendpoint1.y <= _otherendpoint2.y else (_otherendpoint2.y, _otherendpoint1.y)
+        return (_min-b)*dx < y < (_max-b)*dx
+
     # Calculate intersection between the two segments
     # Used for neighbours calculation
     def intersects_vertical(self, segment: 'Segment') -> bool:
@@ -80,32 +104,7 @@ class Segment:
 
     # Calculate intersection between segment and vertical boundary (self) of trapezoid
     def is_entered_by(self, segment: 'Segment') -> bool:
-        # Find orientations
-        orientation1 = orientation(self.endpoint1, self.endpoint2, segment.endpoint1)
-        orientation2 = orientation(self.endpoint1, self.endpoint2, segment.endpoint2)
-        orientation3 = orientation(segment.endpoint1, segment.endpoint2, self.endpoint1)
-        orientation4 = orientation(segment.endpoint1, segment.endpoint2, self.endpoint2)
-
-        # Different orientations means lines intersect
-        if (orientation1 != orientation2) and (orientation3 != orientation4):
-            return True
-
-        # Shared endpoint should intersect
-        if ((self.endpoint1.x == segment.endpoint1.x and self.endpoint1.y == segment.endpoint1.y) or
-                (self.endpoint2.x == segment.endpoint1.x and self.endpoint2.y == segment.endpoint1.y) or
-                (self.endpoint1.x == segment.endpoint2.x and self.endpoint1.y == segment.endpoint2.y) or
-                (self.endpoint2.x == segment.endpoint2.x and self.endpoint2.y == segment.endpoint2.y)):
-            return True
-
-        # Endpoint of segment on boundary should intersect
-        if ((orientation1 == geometry.CL and geometry.on_segment(self.endpoint1, segment.endpoint1, self.endpoint2)) or
-                (orientation2 == geometry.CL and geometry.on_segment(self.endpoint1, segment.endpoint2, self.endpoint2))):
-            return True
-
-
-
-        # All other cases do not intersect
-        return False
+        return segment.intersects_side(self)
 
     def on_segment(self, point: vertex.Vertex) -> bool:
         """

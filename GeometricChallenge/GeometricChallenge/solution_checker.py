@@ -1,8 +1,12 @@
 from cgshop2022utils.io import read_instance  # Provided by the challenge
 
+import geometry
 import segment
+import test_draw
 import vertex
 import json
+
+import vertical_decomposition
 
 
 class SolutionCheck:
@@ -57,12 +61,10 @@ def check_instance(instance_name):
     solution_file.close()
     return SolutionCheck(instance_name, g, data["colors"])
 
-
 if __name__ == "__main__":
     from os import listdir
 
     instance_names = [file.split('.')[0] for file in listdir("solutions/")]
-
     from multiprocessing import Pool
 
     with Pool(14) as p:
